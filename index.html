@@ -1384,7 +1384,7 @@ async function migrateLocalQuizzesToSupabase() {
     }
 
     const { error } = await supabaseClient
-        .from("quiz")
+        .from("quizzes")
         .insert(rows);
 
     if (error) {
@@ -1798,7 +1798,7 @@ async function saveQuiz() {
     if (editingQuizId) {
 
         const result = await supabaseClient
-            .from("quiz")
+            .from("quizzes")
             .update({
                 title: name,
                 description: description,
@@ -1813,7 +1813,7 @@ async function saveQuiz() {
     } else {
 
         const result = await supabaseClient
-            .from("quiz")
+            .from("quizzes")
             .insert({
                 creator_id: currentProfile.id,
                 title: name,
@@ -1996,7 +1996,7 @@ async function deleteQuiz(id) {
     }
 
     const { error } = await supabaseClient
-        .from("quiz")
+        .from("quizzes")
         .delete()
         .eq("id", quiz.id)
         .eq("creator_id", currentProfile.id);
