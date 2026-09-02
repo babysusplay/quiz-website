@@ -1906,7 +1906,8 @@ function renderQuizList() {
 
                 <button
                     class="edit-btn"
-                    onclick='editQuiz(${JSON.stringify(quiz.id)})'>
+                    type="button"
+                    data-quiz-id="${escapeHTML(String(quiz.id))}">
                     Edit
                 </button>
 
@@ -1920,6 +1921,13 @@ function renderQuizList() {
         `;
 
         list.appendChild(item);
+
+        const editButton = item.querySelector(".edit-btn");
+        if (editButton) {
+            editButton.addEventListener("click", function () {
+                editQuiz(this.dataset.quizId);
+            });
+        }
     });
 }
 
@@ -1928,7 +1936,7 @@ function renderQuizList() {
    EDIT QUIZ
 ========================= */
 
-function editQuiz(id) {
+async function editQuiz(id) {
 
     if (!currentProfile) {
         alert("Please login first.");
@@ -1936,10 +1944,23 @@ function editQuiz(id) {
         return;
     }
 
-    const quiz = quizzes.find(q => String(q.id) === String(id));
+    let quiz = quizzes.find(q => String(q.id) === String(id));
 
     if (!quiz) {
-        return;
+        const { data, error } = await supabaseClient
+            .from("quizzes")
+            .select("*")
+            .eq("id", id)
+            .eq("creator_id", currentProfile.id)
+            .maybeSingle();
+
+        if (error || !data) {
+            console.error("Edit quiz load error:", error);
+            alert("Unable to open quiz for editing.");
+            return;
+        }
+
+        quiz = quizFromDatabase(data);
     }
 
     if (quiz.creator_id && quiz.creator_id !== currentProfile.id) {
