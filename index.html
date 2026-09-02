@@ -1342,7 +1342,7 @@ async function loadQuizzesFromSupabase() {
     if (!currentProfile) return;
 
     const { data, error } = await supabaseClient
-        .from("quiz")
+        .from("quizzes")
         .select("*")
         .eq("creator_id", currentProfile.id)
         .order("created_at", { ascending: false });
