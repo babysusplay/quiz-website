@@ -1866,6 +1866,16 @@ function renderQuizList() {
 
     list.innerHTML = "";
 
+    // Use one delegated handler so Edit keeps working after every re-render.
+    list.onclick = function (event) {
+        const editButton = event.target.closest(".edit-btn");
+        if (!editButton || !list.contains(editButton)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const quizId = editButton.dataset.quizId;
+        if (quizId) editQuiz(quizId);
+    };
+
     if (quizzes.length === 0) {
         list.innerHTML = `
             <div class="empty">
@@ -1922,12 +1932,6 @@ function renderQuizList() {
 
         list.appendChild(item);
 
-        const editButton = item.querySelector(".edit-btn");
-        if (editButton) {
-            editButton.addEventListener("click", function () {
-                editQuiz(this.dataset.quizId);
-            });
-        }
     });
 }
 
