@@ -224,6 +224,10 @@ button {
     color: #ff8a8a;
 }
 
+.profile-menu .admin-menu-btn {
+    color: #d6b3ff;
+}
+
 .profile-info {
     display: flex;
     align-items: center;
@@ -264,7 +268,6 @@ button {
 .discord-logo {
     fill: currentColor;
 }
-
 
 .primary-btn {
     background: white;
@@ -627,6 +630,292 @@ textarea {
     background: #e9e9e9;
 }
 
+/* =========================
+   PARTICIPANTS & LEADERBOARD
+========================= */
+
+.participant-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.participant-controls select {
+    flex: 1;
+}
+
+.results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 430px;
+    overflow-y: auto;
+}
+
+.result-item {
+    background: #171a22;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    padding: 13px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.result-main {
+    min-width: 0;
+}
+
+.result-name {
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.result-meta {
+    color: #9da3b0;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.result-score {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.rank-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #242833;
+    font-weight: 700;
+    flex: 0 0 30px;
+}
+
+.result-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+/* =========================
+   ADMIN PANEL
+========================= */
+
+.admin-card {
+    border-color: rgba(190,130,255,.22);
+}
+
+.admin-card .card-icon {
+    background: rgba(170,100,255,.12);
+}
+
+.admin-user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.admin-user-item {
+    background: #10131a;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 13px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.admin-user-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.admin-user-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #242833;
+    flex: 0 0 46px;
+}
+
+.admin-user-text {
+    min-width: 0;
+}
+
+.admin-user-name {
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-user-id {
+    color: #9da3b0;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.admin-user-provider {
+    color: #777d8a;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.admin-view-btn {
+    background: rgba(255,255,255,.08);
+    color: white;
+    padding: 9px 13px;
+    font-size: 12px;
+    flex: 0 0 auto;
+}
+
+.admin-view-btn:hover {
+    background: rgba(255,255,255,.13);
+}
+
+.admin-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.admin-profile-head {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.admin-profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #242833;
+}
+
+.admin-profile-head-text {
+    min-width: 0;
+}
+
+.admin-profile-head-text h3 {
+    margin-bottom: 5px;
+}
+
+.admin-profile-head-text p {
+    color: #8f95a2;
+    font-size: 13px;
+}
+
+.admin-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.admin-info-box {
+    background: #10131a;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 11px;
+    padding: 12px;
+}
+
+.admin-info-label {
+    color: #777d8a;
+    font-size: 11px;
+    margin-bottom: 5px;
+}
+
+.admin-info-value {
+    color: #fff;
+    font-size: 13px;
+    word-break: break-word;
+}
+
+.admin-section-title {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.admin-mini-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.admin-mini-item {
+    background: #10131a;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 10px;
+    padding: 11px 13px;
+}
+
+.admin-mini-item strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.admin-mini-item small {
+    color: #8f95a2;
+    font-size: 11px;
+}
+
+.admin-back-btn {
+    background: rgba(255,255,255,.08);
+    color: white;
+    margin-bottom: 15px;
+}
+
+.admin-stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.admin-stat {
+    background: #10131a;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 11px;
+    padding: 15px;
+    text-align: center;
+}
+
+.admin-stat strong {
+    display: block;
+    font-size: 22px;
+}
+
+.admin-stat span {
+    display: block;
+    color: #777d8a;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.admin-badge {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(170,100,255,.12);
+    color: #d3a8ff;
+    font-size: 10px;
+}
 
 /* =========================
    MOBILE
@@ -698,71 +987,18 @@ textarea {
     .modal-content {
         padding: 20px;
     }
-}
 
-/* =========================
-   PARTICIPANTS & LEADERBOARD
-========================= */
-.participant-controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 18px;
-}
-.participant-controls select {
-    flex: 1;
-}
-.results-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-height: 430px;
-    overflow-y: auto;
-}
-.result-item {
-    background: #171a22;
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 12px;
-    padding: 13px 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-.result-main {
-    min-width: 0;
-}
-.result-name {
-    font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.result-meta {
-    color: #9da3b0;
-    font-size: 12px;
-    margin-top: 4px;
-}
-.result-score {
-    font-weight: 700;
-    white-space: nowrap;
-}
-.rank-badge {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #242833;
-    font-weight: 700;
-    flex: 0 0 30px;
-}
-.result-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
+    .admin-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-stat-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .admin-user-item {
+        align-items: flex-start;
+    }
 }
 </style>
 </head>
@@ -796,26 +1032,87 @@ textarea {
     </nav>
 
     <div class="account-area">
-        <button class="login-btn" id="loginButton" onclick="showLogin()">Login</button>
 
-        <button class="profile-btn" id="profileButton" onclick="toggleProfileMenu()" style="display:none;">
-            <img id="profileAvatar" class="profile-avatar" src="" alt="Profile">
-            <span id="profileName">User</span>
-            <span class="profile-arrow">▾</span>
+        <button
+            class="login-btn"
+            id="loginButton"
+            onclick="showLogin()">
+            Login
         </button>
 
-        <div class="profile-menu" id="profileMenu" style="display:none;">
+        <button
+            class="profile-btn"
+            id="profileButton"
+            onclick="toggleProfileMenu()"
+            style="display:none;">
+
+            <img
+                id="profileAvatar"
+                class="profile-avatar"
+                src=""
+                alt="Profile">
+
+            <span id="profileName">
+                User
+            </span>
+
+            <span class="profile-arrow">
+                ▾
+            </span>
+
+        </button>
+
+        <div
+            class="profile-menu"
+            id="profileMenu"
+            style="display:none;">
+
             <div class="profile-menu-user">
-                <img id="menuAvatar" class="profile-menu-avatar" src="" alt="Profile">
+
+                <img
+                    id="menuAvatar"
+                    class="profile-menu-avatar"
+                    src=""
+                    alt="Profile">
+
                 <div>
-                    <strong id="menuName">User</strong>
-                    <small id="menuUserId">USER-000001</small>
+
+                    <strong id="menuName">
+                        User
+                    </strong>
+
+                    <small id="menuUserId">
+                        USER-000001
+                    </small>
+
                 </div>
+
             </div>
-            <button onclick="openProfile()">View Profile</button>
-            <button onclick="openEditProfile()">Edit Profile</button>
-            <button class="logout-menu-btn" onclick="logoutUser()">Logout</button>
+
+            <button onclick="openProfile()">
+                View Profile
+            </button>
+
+            <button onclick="openEditProfile()">
+                Edit Profile
+            </button>
+
+            <button
+                id="adminMenuButton"
+                class="admin-menu-btn"
+                onclick="openAdminPanel()"
+                style="display:none;">
+                Admin Panel
+            </button>
+
+            <button
+                class="logout-menu-btn"
+                onclick="logoutUser()">
+                Logout
+            </button>
+
         </div>
+
     </div>
 
 </header>
@@ -882,77 +1179,147 @@ textarea {
 
     <div class="cards">
 
-    <div class="card" onclick="openCreateQuiz()">
-        <div class="card-icon">+</div>
+        <div
+            class="card"
+            onclick="openCreateQuiz()">
 
-        <h3>Create Quiz</h3>
+            <div class="card-icon">
+                +
+            </div>
 
-        <p>
-            Create a quiz and add as many questions
-            as you need.
-        </p>
+            <h3>
+                Create Quiz
+            </h3>
+
+            <p>
+                Create a quiz and add as many questions
+                as you need.
+            </p>
+
+        </div>
+
+
+        <div
+            class="card"
+            onclick="openCreateQuiz()">
+
+            <div class="card-icon">
+                ?
+            </div>
+
+            <h3>
+                Add Questions
+            </h3>
+
+            <p>
+                Add four answer options and select
+                the correct answer.
+            </p>
+
+        </div>
+
+
+        <div
+            class="card"
+            onclick="openQuizLibrary()">
+
+            <div class="card-icon">
+                ✎
+            </div>
+
+            <h3>
+                Edit Quiz
+            </h3>
+
+            <p>
+                Edit your quiz and remove questions
+                whenever needed.
+            </p>
+
+        </div>
+
+
+        <div
+            class="card"
+            onclick="openQuizLibrary()">
+
+            <div class="card-icon">
+                ▶
+            </div>
+
+            <h3>
+                Play Quiz
+            </h3>
+
+            <p>
+                Start your quiz when your community
+                event begins.
+            </p>
+
+        </div>
+
+
+        <div
+            class="card"
+            onclick="openParticipants()">
+
+            <div class="card-icon">
+                👥
+            </div>
+
+            <h3>
+                Participants
+            </h3>
+
+            <p>
+                Keep track of players participating
+                in your event.
+            </p>
+
+        </div>
+
+
+        <div
+            class="card"
+            onclick="openLeaderboard()">
+
+            <div class="card-icon">
+                🏆
+            </div>
+
+            <h3>
+                Leaderboard
+            </h3>
+
+            <p>
+                Display player scores and final rankings.
+            </p>
+
+        </div>
+
+
+        <div
+            class="card admin-card"
+            id="adminHomeCard"
+            onclick="openAdminPanel()"
+            style="display:none;">
+
+            <div class="card-icon">
+                ⚙
+            </div>
+
+            <h3>
+                Admin Panel
+            </h3>
+
+            <p>
+                Manage users, quizzes, attempts and
+                account information.
+            </p>
+
+        </div>
+
     </div>
-
-
-    <div class="card" onclick="openCreateQuiz()">
-        <div class="card-icon">?</div>
-
-        <h3>Add Questions</h3>
-
-        <p>
-            Add four answer options and select
-            the correct answer.
-        </p>
-    </div>
-
-
-    <div class="card" onclick="openQuizLibrary()">
-        <div class="card-icon">✎</div>
-
-        <h3>Edit Quiz</h3>
-
-        <p>
-            Edit your quiz and remove questions
-            whenever needed.
-        </p>
-    </div>
-
-
-    <div class="card" onclick="openQuizLibrary()">
-        <div class="card-icon">▶</div>
-
-        <h3>Play Quiz</h3>
-
-        <p>
-            Start your quiz when your community
-            event begins.
-        </p>
-    </div>
-
-
-    <div class="card" onclick="openParticipants()">
-        <div class="card-icon">👥</div>
-
-        <h3>Participants</h3>
-
-        <p>
-            Keep track of players participating
-            in your event.
-        </p>
-    </div>
-
-
-    <div class="card" onclick="openLeaderboard()">
-        <div class="card-icon">🏆</div>
-
-        <h3>Leaderboard</h3>
-
-        <p>
-            Display player scores and final rankings.
-        </p>
-    </div>
-
-</div>
 
 
     <section
@@ -1018,128 +1385,336 @@ textarea {
 
 
 <!-- LOGIN MODAL -->
-<div class="modal" id="loginModal">
-    <div class="modal-content" style="max-width:420px;">
+
+<div
+    class="modal"
+    id="loginModal">
+
+    <div
+        class="modal-content"
+        style="max-width:420px;">
+
         <div class="modal-header">
-            <h2>Login</h2>
+
+            <h2>
+                Login
+            </h2>
+
             <button
                 class="close"
                 onclick="closeModal('loginModal')">
+
                 ×
+
             </button>
+
         </div>
 
-        <p id="loginMessage" style="margin:0 0 16px; color:#9da3b0; font-size:14px; text-align:center;">Please login first to continue.</p>
+        <p
+            id="loginMessage"
+            style="
+                margin:0 0 16px;
+                color:#9da3b0;
+                font-size:14px;
+                text-align:center;
+            ">
+
+            Please login first to continue.
+
+        </p>
 
         <button
             class="primary-btn login-provider-btn"
             style="width:100%; margin-bottom:12px;"
             onclick="loginWithGoogle()">
-            <svg class="provider-logo google-logo" viewBox="0 0 24 24" aria-hidden="true">
+
+            <svg
+                class="provider-logo google-logo"
+                viewBox="0 0 24 24"
+                aria-hidden="true">
+
                 <path d="M21.35 12.27c0-.68-.06-1.34-.17-1.97H12v3.73h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.15Z"/>
+
                 <path d="M12 21.5c2.63 0 4.84-.87 6.45-2.35l-3.14-2.45c-.87.58-1.98.93-3.31.93-2.54 0-4.69-1.72-5.46-4.03H3.29v2.53A9.74 9.74 0 0 0 12 21.5Z"/>
+
                 <path d="M6.54 13.6A5.85 5.85 0 0 1 6.23 12c0-.56.1-1.1.31-1.6V7.87H3.29A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.05 1.04 4.13l3.25-2.53Z"/>
+
                 <path d="M12 6.37c1.43 0 2.71.49 3.72 1.46l2.79-2.79C16.84 3.38 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.71 5.37l3.25 2.53C7.31 8.09 9.46 6.37 12 6.37Z"/>
+
             </svg>
-            <span>Continue with Google</span>
+
+            <span>
+                Continue with Google
+            </span>
+
         </button>
+
 
         <button
             class="secondary-btn login-provider-btn"
             style="width:100%;"
             onclick="loginWithDiscord()">
-            <svg class="provider-logo discord-logo" viewBox="0 0 24 24" aria-hidden="true">
+
+            <svg
+                class="provider-logo discord-logo"
+                viewBox="0 0 24 24"
+                aria-hidden="true">
+
                 <path d="M19.54 5.35A16.7 16.7 0 0 0 15.4 4l-.5 1.02a15.2 15.2 0 0 0-5.8 0L8.6 4a16.7 16.7 0 0 0-4.14 1.35C1.84 9.1 1.13 12.8 1.5 16.45a16.8 16.8 0 0 0 5.1 2.58l1.23-1.67c-.68-.25-1.32-.56-1.92-.92l.47-.36c3.7 1.73 7.75 1.73 11.4 0l.48.36c-.6.36-1.24.67-1.93.92l1.23 1.67a16.8 16.8 0 0 0 5.1-2.58c.44-4.24-.75-7.9-3.12-11.1ZM8.2 14.35c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2c1.12 0 2.01.99 2 2.2 0 1.21-.88 2.2-2 2.2Zm7.6 0c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2c1.12 0 2.01.99 2 2.2 0 1.21-.88 2.2-2 2.2Z"/>
+
             </svg>
-            <span>Continue with Discord</span>
+
+            <span>
+                Continue with Discord
+            </span>
+
         </button>
+
     </div>
+
 </div>
 
 
 <!-- PROFILE MODAL -->
-<div class="modal" id="profileModal">
-    <div class="modal-content" style="max-width:520px;">
+
+<div
+    class="modal"
+    id="profileModal">
+
+    <div
+        class="modal-content"
+        style="max-width:520px;">
+
         <div class="modal-header">
-            <h2>Profile</h2>
-            <button class="close" onclick="closeModal('profileModal')">×</button>
+
+            <h2>
+                Profile
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeModal('profileModal')">
+
+                ×
+
+            </button>
+
         </div>
+
 
         <div class="profile-info">
-            <img id="profileModalAvatar" class="profile-info-avatar" src="" alt="Profile">
+
+            <img
+                id="profileModalAvatar"
+                class="profile-info-avatar"
+                src=""
+                alt="Profile">
+
             <div class="profile-details">
-                <h3 id="profileModalName">User</h3>
-                <p id="profileModalUserId">User ID: USER-000001</p>
-                <p id="profileModalProvider">Login: Google</p>
+
+                <h3 id="profileModalName">
+                    User
+                </h3>
+
+                <p id="profileModalUserId">
+                    User ID: USER-000001
+                </p>
+
+                <p id="profileModalProvider">
+                    Login: Google
+                </p>
+
             </div>
+
         </div>
 
-        <div class="section-title" style="margin-top:10px; margin-bottom:10px;">
-            <h3>My Quizzes</h3>
-            <p>Your quizzes will appear here.</p>
+
+        <div
+            class="section-title"
+            style="margin-top:10px; margin-bottom:10px;">
+
+            <h3>
+                My Quizzes
+            </h3>
+
+            <p>
+                Your quizzes will appear here.
+            </p>
+
         </div>
 
-        <div class="empty" id="profileQuizList">
+
+        <div
+            class="empty"
+            id="profileQuizList">
+
             No quizzes created yet.
+
         </div>
+
     </div>
+
 </div>
+
 
 <!-- EDIT PROFILE MODAL -->
-<div class="modal" id="editProfileModal">
-    <div class="modal-content" style="max-width:520px;">
+
+<div
+    class="modal"
+    id="editProfileModal">
+
+    <div
+        class="modal-content"
+        style="max-width:520px;">
+
         <div class="modal-header">
-            <h2>Edit Profile</h2>
-            <button class="close" onclick="closeModal('editProfileModal')">×</button>
+
+            <h2>
+                Edit Profile
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeModal('editProfileModal')">
+
+                ×
+
+            </button>
+
         </div>
+
 
         <div class="form-group">
-            <label>Username</label>
-            <input type="text" id="editDisplayName" placeholder="Enter your username" maxlength="40">
+
+            <label>
+                Username
+            </label>
+
+            <input
+                type="text"
+                id="editDisplayName"
+                placeholder="Enter your username"
+                maxlength="40">
+
         </div>
+
 
         <div class="form-group">
-            <label>Avatar URL</label>
-            <input type="url" id="editAvatarUrl" placeholder="https://...">
+
+            <label>
+                Avatar URL
+            </label>
+
+            <input
+                type="url"
+                id="editAvatarUrl"
+                placeholder="https://...">
+
         </div>
 
-        <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+
+        <button
+            class="save-btn"
+            onclick="saveProfile()">
+
+            Save Changes
+
+        </button>
+
     </div>
-</div>
 
+</div>
 
 
 <!-- PARTICIPANTS MODAL -->
-<div class="modal" id="participantsModal">
+
+<div
+    class="modal"
+    id="participantsModal">
+
     <div class="modal-content">
+
         <div class="modal-header">
-            <h2>Participants</h2>
-            <button class="close" onclick="closeModal('participantsModal')">×</button>
+
+            <h2>
+                Participants
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeModal('participantsModal')">
+
+                ×
+
+            </button>
+
         </div>
+
 
         <div class="participant-controls">
-            <select id="participantsQuizSelect" onchange="renderParticipants()"></select>
+
+            <select
+                id="participantsQuizSelect"
+                onchange="renderParticipants()">
+            </select>
+
         </div>
 
-        <div id="participantsList" class="results-list"></div>
+
+        <div
+            id="participantsList"
+            class="results-list">
+        </div>
+
     </div>
+
 </div>
+
 
 <!-- LEADERBOARD MODAL -->
-<div class="modal" id="leaderboardModal">
+
+<div
+    class="modal"
+    id="leaderboardModal">
+
     <div class="modal-content">
+
         <div class="modal-header">
-            <h2>Leaderboard</h2>
-            <button class="close" onclick="closeModal('leaderboardModal')">×</button>
+
+            <h2>
+                Leaderboard
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeModal('leaderboardModal')">
+
+                ×
+
+            </button>
+
         </div>
+
 
         <div class="participant-controls">
-            <select id="leaderboardQuizSelect" onchange="renderLeaderboard()"></select>
+
+            <select
+                id="leaderboardQuizSelect"
+                onchange="renderLeaderboard()">
+            </select>
+
         </div>
 
-        <div id="leaderboardList" class="results-list"></div>
+
+        <div
+            id="leaderboardList"
+            class="results-list">
+        </div>
+
     </div>
+
 </div>
+
 
 <!-- CREATE QUIZ MODAL -->
 
@@ -1188,7 +1763,8 @@ textarea {
 
             <textarea
                 id="quizDescription"
-                placeholder="Enter quiz description"></textarea>
+                placeholder="Enter quiz description">
+            </textarea>
 
         </div>
 
@@ -1246,7 +1822,6 @@ textarea {
         <div
             class="quiz-list"
             id="quizList">
-
         </div>
 
     </div>
@@ -1284,7 +1859,116 @@ textarea {
 </div>
 
 
+<!-- ADMIN PANEL -->
+
+<div
+    class="modal"
+    id="adminModal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>
+                Admin Panel
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeModal('adminModal')">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <div id="adminMainView">
+
+            <div class="admin-stat-row">
+
+                <div class="admin-stat">
+                    <strong id="adminUserCount">0</strong>
+                    <span>Users</span>
+                </div>
+
+                <div class="admin-stat">
+                    <strong id="adminQuizCount">0</strong>
+                    <span>Quizzes</span>
+                </div>
+
+                <div class="admin-stat">
+                    <strong id="adminAttemptCount">0</strong>
+                    <span>Attempts</span>
+                </div>
+
+            </div>
+
+
+            <div
+                style="
+                    margin-top:20px;
+                    margin-bottom:12px;
+                ">
+
+                <h3 class="admin-section-title">
+                    Users
+                </h3>
+
+                <p
+                    style="
+                        color:#777d8a;
+                        font-size:12px;
+                    ">
+
+                    Select a user to view their account details.
+
+                </p>
+
+            </div>
+
+
+            <div
+                id="adminUserList"
+                class="admin-user-list">
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="adminDetailView"
+            style="display:none;">
+
+            <button
+                class="admin-back-btn"
+                onclick="showAdminUsers()">
+
+                ← Back to Users
+
+            </button>
+
+
+            <div
+                id="adminUserDetail"
+                class="admin-detail">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script>
+
+/* =========================
+   GLOBAL STATE
+========================= */
 
 let quizzes = JSON.parse(
     localStorage.getItem("quizzes") || "[]"
@@ -1300,7 +1984,13 @@ let currentQuestionIndex = 0;
 
 let currentScore = 0;
 
-let participants = JSON.parse(localStorage.getItem("quizParticipants") || "[]");
+let participants = JSON.parse(
+    localStorage.getItem("quizParticipants") || "[]"
+);
+
+let currentProfile = null;
+
+let isCurrentUserAdmin = false;
 
 
 /* =========================
@@ -1309,14 +1999,22 @@ let participants = JSON.parse(localStorage.getItem("quizParticipants") || "[]");
 
 function openModal(id) {
 
-    document.getElementById(id).style.display = "block";
+    const modal = document.getElementById(id);
+
+    if (modal) {
+        modal.style.display = "block";
+    }
 
 }
 
 
 function closeModal(id) {
 
-    document.getElementById(id).style.display = "none";
+    const modal = document.getElementById(id);
+
+    if (modal) {
+        modal.style.display = "none";
+    }
 
 }
 
@@ -1326,85 +2024,215 @@ function closeModal(id) {
 ========================= */
 
 function quizFromDatabase(row) {
+
     return {
+
         id: row.id,
+
         quiz_id: row.quiz_id,
+
         name: row.title,
+
         description: row.description || "",
-        questions: Array.isArray(row.questions) ? row.questions : [],
+
+        questions:
+            Array.isArray(row.questions)
+                ? row.questions
+                : [],
+
         creator_id: row.creator_id,
+
         created_at: row.created_at,
+
         updated_at: row.updated_at
+
     };
+
 }
+
 
 async function loadQuizzesFromSupabase() {
+
     if (!currentProfile) return;
 
-    const { data, error } = await supabaseClient
-        .from("quizzes")
-        .select("*")
-        .eq("creator_id", currentProfile.id)
-        .order("created_at", { ascending: false });
+    const { data, error } =
+        await supabaseClient
+
+            .from("quizzes")
+
+            .select("*")
+
+            .eq(
+                "creator_id",
+                currentProfile.id
+            )
+
+            .order(
+                "created_at",
+                { ascending: false }
+            );
+
 
     if (error) {
-        console.error("Quiz load error:", error);
+
+        console.error(
+            "Quiz load error:",
+            error
+        );
+
         return;
+
     }
 
-    quizzes = (data || []).map(quizFromDatabase);
-    localStorage.setItem("quizzes", JSON.stringify(quizzes));
+
+    quizzes =
+        (data || [])
+            .map(quizFromDatabase);
+
+
+    localStorage.setItem(
+        "quizzes",
+        JSON.stringify(quizzes)
+    );
+
 }
+
 
 async function migrateLocalQuizzesToSupabase() {
+
     if (!currentProfile) return;
 
-    const migrationKey = "supabaseQuizMigrationDone_" + currentProfile.id;
-    if (localStorage.getItem(migrationKey) === "true") return;
+    const migrationKey =
+        "supabaseQuizMigrationDone_" +
+        currentProfile.id;
 
-    const localQuizzes = JSON.parse(localStorage.getItem("quizzes") || "[]");
 
-    if (localQuizzes.length === 0) {
-        localStorage.setItem(migrationKey, "true");
+    if (
+        localStorage.getItem(
+            migrationKey
+        ) === "true"
+    ) {
+
         return;
+
     }
 
-    const rows = localQuizzes
-        .filter(quiz => Array.isArray(quiz.questions) && quiz.questions.length > 0)
-        .map(quiz => ({
-            creator_id: currentProfile.id,
-            title: quiz.name || "Untitled Quiz",
-            description: quiz.description || "",
-            questions: quiz.questions
-        }));
 
-    if (rows.length === 0) {
-        localStorage.setItem(migrationKey, "true");
+    const localQuizzes =
+        JSON.parse(
+            localStorage.getItem(
+                "quizzes"
+            ) || "[]"
+        );
+
+
+    if (
+        localQuizzes.length === 0
+    ) {
+
+        localStorage.setItem(
+            migrationKey,
+            "true"
+        );
+
         return;
+
     }
 
-    const { error } = await supabaseClient
-        .from("quizzes")
-        .insert(rows);
+
+    const rows =
+        localQuizzes
+
+            .filter(
+                quiz =>
+                    Array.isArray(
+                        quiz.questions
+                    ) &&
+                    quiz.questions.length > 0
+            )
+
+            .map(
+                quiz => ({
+
+                    creator_id:
+                        currentProfile.id,
+
+                    title:
+                        quiz.name ||
+                        "Untitled Quiz",
+
+                    description:
+                        quiz.description ||
+                        "",
+
+                    questions:
+                        quiz.questions
+
+                })
+            );
+
+
+    if (
+        rows.length === 0
+    ) {
+
+        localStorage.setItem(
+            migrationKey,
+            "true"
+        );
+
+        return;
+
+    }
+
+
+    const { error } =
+        await supabaseClient
+
+            .from("quizzes")
+
+            .insert(rows);
+
 
     if (error) {
-        console.error("Quiz migration error:", error);
+
+        console.error(
+            "Quiz migration error:",
+            error
+        );
+
         return;
+
     }
 
-    localStorage.setItem(migrationKey, "true");
+
+    localStorage.setItem(
+        migrationKey,
+        "true"
+    );
+
+
     await loadQuizzesFromSupabase();
+
 }
+
 
 /* =========================
    CREATE QUIZ
 ========================= */
 
 function requireLogin() {
-    if (currentProfile) return true;
+
+    if (currentProfile) {
+        return true;
+    }
+
     showLogin();
+
     return false;
+
 }
+
 
 function openCreateQuiz() {
 
@@ -1412,23 +2240,35 @@ function openCreateQuiz() {
 
     editingQuizId = null;
 
-    document.getElementById("createTitle")
-        .textContent = "Create Quiz";
+    document.getElementById(
+        "createTitle"
+    ).textContent =
+        "Create Quiz";
 
-    document.getElementById("quizName")
-        .value = "";
 
-    document.getElementById("quizDescription")
-        .value = "";
+    document.getElementById(
+        "quizName"
+    ).value = "";
 
-    document.getElementById("questionsContainer")
-        .innerHTML = "";
+
+    document.getElementById(
+        "quizDescription"
+    ).value = "";
+
+
+    document.getElementById(
+        "questionsContainer"
+    ).innerHTML = "";
+
 
     questionCounter = 0;
 
     addQuestion();
 
-    openModal("createModal");
+    openModal(
+        "createModal"
+    );
+
 }
 
 
@@ -1440,17 +2280,25 @@ function addQuestion(data = null) {
 
     questionCounter++;
 
+
     const id =
-        Date.now() + Math.random();
+        Date.now() +
+        Math.random();
+
 
     const box =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     box.className =
         "question-box";
 
+
     box.dataset.id =
         id;
+
 
     box.innerHTML = `
 
@@ -1582,29 +2430,44 @@ function addQuestion(data = null) {
 
 
     document
-        .getElementById("questionsContainer")
+        .getElementById(
+            "questionsContainer"
+        )
         .appendChild(box);
 
 
     if (data) {
 
-        box.querySelector(".question-text")
-            .value =
+        box.querySelector(
+            ".question-text"
+        ).value =
             data.question || "";
 
 
         const optionInputs =
-            box.querySelectorAll(".option");
+            box.querySelectorAll(
+                ".option"
+            );
 
 
-        if (Array.isArray(data.options)) {
+        if (
+            Array.isArray(
+                data.options
+            )
+        ) {
 
             data.options.forEach(
-                (option, index) => {
+                (
+                    option,
+                    index
+                ) => {
 
-                    if (optionInputs[index]) {
+                    if (
+                        optionInputs[index]
+                    ) {
 
-                        optionInputs[index].value =
+                        optionInputs[index]
+                            .value =
                             option || "";
 
                     }
@@ -1615,9 +2478,12 @@ function addQuestion(data = null) {
         }
 
 
-        box.querySelector(".correct-answer")
-            .value =
-            String(data.correct);
+        box.querySelector(
+            ".correct-answer"
+        ).value =
+            String(
+                data.correct
+            );
 
     }
 
@@ -1634,10 +2500,14 @@ function addQuestion(data = null) {
 function deleteQuestion(button) {
 
     const questions =
-        document.querySelectorAll(".question-box");
+        document.querySelectorAll(
+            ".question-box"
+        );
 
 
-    if (questions.length <= 1) {
+    if (
+        questions.length <= 1
+    ) {
 
         alert(
             "A quiz must contain at least one question."
@@ -1649,7 +2519,9 @@ function deleteQuestion(button) {
 
 
     button
-        .closest(".question-box")
+        .closest(
+            ".question-box"
+        )
         .remove();
 
 
@@ -1665,14 +2537,20 @@ function deleteQuestion(button) {
 function updateQuestionNumbers() {
 
     const questions =
-        document.querySelectorAll(".question-box");
+        document.querySelectorAll(
+            ".question-box"
+        );
 
 
     questions.forEach(
-        (box, index) => {
+        (
+            box,
+            index
+        ) => {
 
-            box.querySelector(".question-number")
-                .textContent =
+            box.querySelector(
+                ".question-number"
+            ).textContent =
                 `Question ${index + 1}`;
 
         }
@@ -1682,20 +2560,24 @@ function updateQuestionNumbers() {
 
 
 /* =========================
-   CHECK IF QUESTION IS BLANK
+   CHECK BLANK QUESTION
 ========================= */
 
 function isQuestionCompletelyBlank(box) {
 
     const question =
-        box.querySelector(".question-text")
-            .value
-            .trim();
+        box.querySelector(
+            ".question-text"
+        )
+        .value
+        .trim();
 
 
     const options =
         [
-            ...box.querySelectorAll(".option")
+            ...box.querySelectorAll(
+                ".option"
+            )
         ]
         .map(
             input =>
@@ -1704,16 +2586,22 @@ function isQuestionCompletelyBlank(box) {
 
 
     const correct =
-        box.querySelector(".correct-answer")
-            .value;
+        box.querySelector(
+            ".correct-answer"
+        ).value;
 
 
     return (
+
         !question &&
+
         options.every(
-            option => !option
+            option =>
+                !option
         ) &&
+
         correct === ""
+
     );
 
 }
@@ -1726,123 +2614,280 @@ function isQuestionCompletelyBlank(box) {
 async function saveQuiz() {
 
     if (!currentProfile) {
-        alert("Please login first to save a quiz.");
+
+        alert(
+            "Please login first to save a quiz."
+        );
+
         showLogin();
+
         return;
+
     }
+
 
     const name =
-        document.getElementById("quizName").value.trim();
+        document.getElementById(
+            "quizName"
+        )
+        .value
+        .trim();
+
 
     const description =
-        document.getElementById("quizDescription").value.trim();
+        document.getElementById(
+            "quizDescription"
+        )
+        .value
+        .trim();
+
 
     const questionBoxes =
-        document.querySelectorAll(".question-box");
+        document.querySelectorAll(
+            ".question-box"
+        );
+
 
     if (!name) {
-        alert("Please enter a quiz name.");
+
+        alert(
+            "Please enter a quiz name."
+        );
+
         return;
+
     }
 
-    if (questionBoxes.length === 0) {
-        alert("Please add at least one question.");
+
+    if (
+        questionBoxes.length === 0
+    ) {
+
+        alert(
+            "Please add at least one question."
+        );
+
         return;
+
     }
+
 
     const questions = [];
 
-    for (let i = 0; i < questionBoxes.length; i++) {
 
-        const box = questionBoxes[i];
+    for (
+        let i = 0;
+        i < questionBoxes.length;
+        i++
+    ) {
 
-        if (isQuestionCompletelyBlank(box)) {
-            continue;
-        }
+        const box =
+            questionBoxes[i];
 
-        const question =
-            box.querySelector(".question-text").value.trim();
-
-        const options =
-            [...box.querySelectorAll(".option")]
-                .map(input => input.value.trim());
-
-        const correct =
-            box.querySelector(".correct-answer").value;
 
         if (
-            !question ||
-            options.some(option => !option) ||
-            correct === ""
+            isQuestionCompletelyBlank(
+                box
+            )
         ) {
+
+            continue;
+
+        }
+
+
+        const question =
+            box.querySelector(
+                ".question-text"
+            )
+            .value
+            .trim();
+
+
+        const options =
+            [
+                ...box.querySelectorAll(
+                    ".option"
+                )
+            ]
+            .map(
+                input =>
+                    input.value.trim()
+            );
+
+
+        const correct =
+            box.querySelector(
+                ".correct-answer"
+            ).value;
+
+
+        if (
+
+            !question ||
+
+            options.some(
+                option =>
+                    !option
+            ) ||
+
+            correct === ""
+
+        ) {
+
             alert(
                 `Please complete Question ${i + 1} and all four options.`
             );
+
             return;
+
         }
 
+
         questions.push({
-            question: question,
-            options: options,
-            correct: Number(correct)
+
+            question:
+                question,
+
+            options:
+                options,
+
+            correct:
+                Number(correct)
+
         });
+
     }
 
-    if (questions.length === 0) {
-        alert("Please add at least one completed question.");
+
+    if (
+        questions.length === 0
+    ) {
+
+        alert(
+            "Please add at least one completed question."
+        );
+
         return;
+
     }
+
 
     let error = null;
 
-    if (editingQuizId) {
 
-        const result = await supabaseClient
-            .from("quizzes")
-            .update({
-                title: name,
-                description: description,
-                questions: questions,
-                updated_at: new Date().toISOString()
-            })
-            .eq("id", editingQuizId)
-            .eq("creator_id", currentProfile.id);
+    if (
+        editingQuizId
+    ) {
 
-        error = result.error;
+        const result =
+            await supabaseClient
+
+                .from("quizzes")
+
+                .update({
+
+                    title:
+                        name,
+
+                    description:
+                        description,
+
+                    questions:
+                        questions,
+
+                    updated_at:
+                        new Date()
+                            .toISOString()
+
+                })
+
+                .eq(
+                    "id",
+                    editingQuizId
+                )
+
+                .eq(
+                    "creator_id",
+                    currentProfile.id
+                );
+
+
+        error =
+            result.error;
 
     } else {
 
-        const result = await supabaseClient
-            .from("quizzes")
-            .insert({
-                creator_id: currentProfile.id,
-                title: name,
-                description: description,
-                questions: questions
-            })
-            .select("*")
-            .single();
+        const result =
+            await supabaseClient
 
-        error = result.error;
+                .from("quizzes")
+
+                .insert({
+
+                    creator_id:
+                        currentProfile.id,
+
+                    title:
+                        name,
+
+                    description:
+                        description,
+
+                    questions:
+                        questions
+
+                })
+
+                .select("*")
+
+                .single();
+
+
+        error =
+            result.error;
+
     }
+
 
     if (error) {
-        console.error("Quiz save error:", error);
-        alert("Unable to save quiz: " + error.message);
+
+        console.error(
+            "Quiz save error:",
+            error
+        );
+
+        alert(
+            "Unable to save quiz: " +
+            error.message
+        );
+
         return;
+
     }
+
 
     await loadQuizzesFromSupabase();
 
-    closeModal("createModal");
 
-    alert(
-        editingQuizId
-            ? "Quiz updated successfully!"
-            : "Quiz created successfully!"
+    closeModal(
+        "createModal"
     );
 
+
+    alert(
+
+        editingQuizId
+
+            ? "Quiz updated successfully!"
+
+            : "Quiz created successfully!"
+
+    );
+
+
     editingQuizId = null;
+
 }
 
 
@@ -1855,84 +2900,186 @@ async function openQuizLibrary() {
     if (!requireLogin()) return;
 
     await loadQuizzesFromSupabase();
+
     renderQuizList();
-    openModal("libraryModal");
+
+    openModal(
+        "libraryModal"
+    );
+
 }
 
 
 function renderQuizList() {
 
-    const list = document.getElementById("quizList");
+    const list =
+        document.getElementById(
+            "quizList"
+        );
+
 
     list.innerHTML = "";
 
-    // Use one delegated handler so Edit keeps working after every re-render.
-    list.onclick = function (event) {
-        const editButton = event.target.closest(".edit-btn");
-        if (!editButton || !list.contains(editButton)) return;
-        event.preventDefault();
-        event.stopPropagation();
-        const quizId = editButton.dataset.quizId;
-        if (quizId) editQuiz(quizId);
-    };
 
-    if (quizzes.length === 0) {
+    list.onclick =
+        function(event) {
+
+            const editButton =
+                event.target.closest(
+                    ".edit-btn"
+                );
+
+
+            if (
+                !editButton ||
+                !list.contains(
+                    editButton
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+
+            const quizId =
+                editButton.dataset.quizId;
+
+
+            if (quizId) {
+
+                editQuiz(
+                    quizId
+                );
+
+            }
+
+        };
+
+
+    if (
+        quizzes.length === 0
+    ) {
+
         list.innerHTML = `
+
             <div class="empty">
+
                 No quizzes created yet.
+
             </div>
+
         `;
+
         return;
+
     }
 
-    quizzes.forEach(quiz => {
 
-        const item = document.createElement("div");
+    quizzes.forEach(
+        quiz => {
 
-        item.className = "quiz-item";
+            const item =
+                document.createElement(
+                    "div"
+                );
 
-        item.innerHTML = `
-            <h3>${escapeHTML(quiz.name)}</h3>
 
-            <p>
-                ${escapeHTML(quiz.description || "No description")}
-            </p>
+            item.className =
+                "quiz-item";
 
-            <p style="margin-top:7px;">
-                ${quiz.questions.length} question(s)
-            </p>
 
-            <p style="margin-top:7px; color:#9da3b0; font-size:12px;">
-                ${escapeHTML(quiz.quiz_id || "")}
-            </p>
+            item.innerHTML = `
 
-            <div class="quiz-actions">
+                <h3>
+                    ${escapeHTML(
+                        quiz.name
+                    )}
+                </h3>
 
-                <button
-                    class="play-btn"
-                    onclick='playQuiz(${JSON.stringify(quiz.id)})'>
-                    Play
-                </button>
 
-                <button
-                    class="edit-btn"
-                    type="button"
-                    data-quiz-id="${escapeHTML(String(quiz.id))}">
-                    Edit
-                </button>
+                <p>
+                    ${escapeHTML(
+                        quiz.description ||
+                        "No description"
+                    )}
+                </p>
 
-                <button
-                    class="remove-btn"
-                    onclick='deleteQuiz(${JSON.stringify(quiz.id)})'>
-                    Delete
-                </button>
 
-            </div>
-        `;
+                <p
+                    style="
+                        margin-top:7px;
+                    ">
 
-        list.appendChild(item);
+                    ${quiz.questions.length}
+                    question(s)
 
-    });
+                </p>
+
+
+                <p
+                    style="
+                        margin-top:7px;
+                        color:#9da3b0;
+                        font-size:12px;
+                    ">
+
+                    ${escapeHTML(
+                        quiz.quiz_id ||
+                        ""
+                    )}
+
+                </p>
+
+
+                <div class="quiz-actions">
+
+                    <button
+                        class="play-btn"
+                        onclick='playQuiz(${JSON.stringify(quiz.id)})'>
+
+                        Play
+
+                    </button>
+
+
+                    <button
+                        class="edit-btn"
+                        type="button"
+                        data-quiz-id="${escapeHTML(
+                            String(quiz.id)
+                        )}">
+
+                        Edit
+
+                    </button>
+
+
+                    <button
+                        class="remove-btn"
+                        onclick='deleteQuiz(${JSON.stringify(quiz.id)})'>
+
+                        Delete
+
+                    </button>
+
+                </div>
+
+            `;
+
+
+            list.appendChild(
+                item
+            );
+
+        }
+    );
+
 }
 
 
@@ -1943,56 +3090,164 @@ function renderQuizList() {
 async function editQuiz(id) {
 
     if (!currentProfile) {
-        alert("Please login first.");
+
+        alert(
+            "Please login first."
+        );
+
         showLogin();
+
         return;
+
     }
 
-    let quiz = quizzes.find(q => String(q.id) === String(id));
+
+    let quiz =
+        quizzes.find(
+            q =>
+                String(q.id) ===
+                String(id)
+        );
+
 
     if (!quiz) {
-        const { data, error } = await supabaseClient
-            .from("quizzes")
-            .select("*")
-            .eq("id", id)
-            .eq("creator_id", currentProfile.id)
-            .maybeSingle();
 
-        if (error || !data) {
-            console.error("Edit quiz load error:", error);
-            alert("Unable to open quiz for editing.");
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+
+                .from("quizzes")
+
+                .select("*")
+
+                .eq(
+                    "id",
+                    id
+                )
+
+                .eq(
+                    "creator_id",
+                    currentProfile.id
+                )
+
+                .maybeSingle();
+
+
+        if (
+            error ||
+            !data
+        ) {
+
+            console.error(
+                "Edit quiz load error:",
+                error
+            );
+
+            alert(
+                "Unable to open quiz for editing."
+            );
+
             return;
+
         }
 
-        quiz = quizFromDatabase(data);
+
+        quiz =
+            quizFromDatabase(
+                data
+            );
+
     }
 
-    if (quiz.creator_id && quiz.creator_id !== currentProfile.id) {
-        alert("You can only edit your own quizzes.");
+
+    if (
+        quiz.creator_id &&
+        quiz.creator_id !==
+        currentProfile.id
+    ) {
+
+        alert(
+            "You can only edit your own quizzes."
+        );
+
         return;
+
     }
 
-    editingQuizId = quiz.id;
 
-    document.getElementById("createTitle").textContent = "Edit Quiz";
-    document.getElementById("quizName").value = quiz.name || "";
-    document.getElementById("quizDescription").value = quiz.description || "";
+    editingQuizId =
+        quiz.id;
 
-    const container = document.getElementById("questionsContainer");
 
-    container.innerHTML = "";
-    questionCounter = 0;
+    document.getElementById(
+        "createTitle"
+    ).textContent =
+        "Edit Quiz";
 
-    if (Array.isArray(quiz.questions)) {
-        quiz.questions.forEach(question => addQuestion(question));
+
+    document.getElementById(
+        "quizName"
+    ).value =
+        quiz.name || "";
+
+
+    document.getElementById(
+        "quizDescription"
+    ).value =
+        quiz.description || "";
+
+
+    const container =
+        document.getElementById(
+            "questionsContainer"
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    questionCounter =
+        0;
+
+
+    if (
+        Array.isArray(
+            quiz.questions
+        )
+    ) {
+
+        quiz.questions.forEach(
+            question =>
+                addQuestion(
+                    question
+                )
+        );
+
     }
 
-    if (!quiz.questions || quiz.questions.length === 0) {
+
+    if (
+        !quiz.questions ||
+        quiz.questions.length === 0
+    ) {
+
         addQuestion();
+
     }
 
-    closeModal("libraryModal");
-    openModal("createModal");
+
+    closeModal(
+        "libraryModal"
+    );
+
+
+    openModal(
+        "createModal"
+    );
+
 }
 
 
@@ -2003,38 +3258,96 @@ async function editQuiz(id) {
 async function deleteQuiz(id) {
 
     if (!currentProfile) {
-        alert("Please login first.");
+
+        alert(
+            "Please login first."
+        );
+
         showLogin();
+
         return;
+
     }
 
-    const quiz = quizzes.find(q => String(q.id) === String(id));
+
+    const quiz =
+        quizzes.find(
+            q =>
+                String(q.id) ===
+                String(id)
+        );
+
 
     if (!quiz) {
+
         return;
+
     }
 
-    const confirmDelete = confirm(`Delete "${quiz.name}"?`);
+
+    const confirmDelete =
+        confirm(
+            `Delete "${quiz.name}"?`
+        );
+
 
     if (!confirmDelete) {
+
         return;
+
     }
 
-    const { error } = await supabaseClient
-        .from("quizzes")
-        .delete()
-        .eq("id", quiz.id)
-        .eq("creator_id", currentProfile.id);
+
+    const {
+        error
+    } =
+        await supabaseClient
+
+            .from("quizzes")
+
+            .delete()
+
+            .eq(
+                "id",
+                quiz.id
+            )
+
+            .eq(
+                "creator_id",
+                currentProfile.id
+            );
+
 
     if (error) {
-        alert("Unable to delete quiz: " + error.message);
+
+        alert(
+            "Unable to delete quiz: " +
+            error.message
+        );
+
         return;
+
     }
 
-    quizzes = quizzes.filter(q => String(q.id) !== String(id));
-    localStorage.setItem("quizzes", JSON.stringify(quizzes));
+
+    quizzes =
+        quizzes.filter(
+            q =>
+                String(q.id) !==
+                String(id)
+        );
+
+
+    localStorage.setItem(
+        "quizzes",
+        JSON.stringify(
+            quizzes
+        )
+    );
+
 
     renderQuizList();
+
 }
 
 
@@ -2045,6 +3358,7 @@ async function deleteQuiz(id) {
 function playQuiz(id) {
 
     if (!requireLogin()) return;
+
 
     const quiz =
         quizzes.find(
@@ -2061,8 +3375,11 @@ function playQuiz(id) {
 
 
     if (
+
         !quiz.questions ||
+
         quiz.questions.length === 0
+
     ) {
 
         alert(
@@ -2091,11 +3408,9 @@ function playQuiz(id) {
         0;
 
 
-    document
-        .getElementById(
-            "playTitle"
-        )
-        .textContent =
+    document.getElementById(
+        "playTitle"
+    ).textContent =
         quiz.name;
 
 
@@ -2149,7 +3464,11 @@ function showCurrentQuestion() {
 
 
     progress.textContent =
-        `Question ${currentQuestionIndex + 1} of ${currentQuiz.questions.length}`;
+        `Question ${
+            currentQuestionIndex + 1
+        } of ${
+            currentQuiz.questions.length
+        }`;
 
 
     content.appendChild(
@@ -2169,9 +3488,13 @@ function showCurrentQuestion() {
 
     box.innerHTML = `
 
-        <h3 style="margin-bottom:15px;">
+        <h3
+            style="margin-bottom:15px;">
 
-            ${currentQuestionIndex + 1}.
+            ${
+                currentQuestionIndex + 1
+            }.
+
             ${escapeHTML(
                 question.question
             )}
@@ -2185,7 +3508,8 @@ function showCurrentQuestion() {
                 optionIndex
             ) => `
 
-            <label class="answer-option">
+            <label
+                class="answer-option">
 
                 <input
                     type="radio"
@@ -2224,8 +3548,10 @@ function showCurrentQuestion() {
 
 
     if (
+
         currentQuestionIndex ===
         currentQuiz.questions.length - 1
+
     ) {
 
         submit.textContent =
@@ -2251,7 +3577,7 @@ function showCurrentQuestion() {
 
 
 /* =========================
-   SUBMIT CURRENT ANSWER
+   SUBMIT ANSWER
 ========================= */
 
 function submitCurrentAnswer() {
@@ -2280,8 +3606,10 @@ function submitCurrentAnswer() {
 
 
     if (
+
         Number(selected.value) ===
         question.correct
+
     ) {
 
         currentScore++;
@@ -2293,8 +3621,10 @@ function submitCurrentAnswer() {
 
 
     if (
+
         currentQuestionIndex >=
         currentQuiz.questions.length
+
     ) {
 
         const finalScore =
@@ -2305,7 +3635,11 @@ function submitCurrentAnswer() {
             currentQuiz.questions.length;
 
 
-        saveParticipantResult(currentQuiz, finalScore);
+        saveParticipantResult(
+            currentQuiz,
+            finalScore
+        );
+
 
         alert(
             `Quiz completed!\n\nScore: ${finalScore}/${totalQuestions}`
@@ -2340,122 +3674,548 @@ function submitCurrentAnswer() {
 
 
 /* =========================
+   PARTICIPANT RESULT
+========================= */
+
+async function saveParticipantResult(
+    quiz,
+    score
+) {
+
+    if (!currentProfile) return;
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+
+            .from("quiz_attempts")
+
+            .insert({
+
+                quiz_id:
+                    quiz.id,
+
+                quiz_code:
+                    quiz.quiz_id ||
+                    "",
+
+                user_id:
+                    currentProfile.id,
+
+                participant_user_id:
+                    currentProfile.user_id ||
+                    "",
+
+                participant_name:
+                    currentProfile.display_name ||
+                    "User",
+
+                score:
+                    score,
+
+                total_questions:
+                    quiz.questions.length
+
+            });
+
+
+    if (error) {
+
+        console.error(
+            "Participant save error:",
+            error
+        );
+
+        alert(
+            "Unable to save quiz result: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    console.log(
+        "Quiz result saved to Supabase."
+    );
+
+}
+
+
+/* =========================
+   RESULT QUIZ SELECT
+========================= */
+
+function populateResultQuizSelect(
+    selectId
+) {
+
+    const select =
+        document.getElementById(
+            selectId
+        );
+
+
+    if (!select) return;
+
+
+    select.innerHTML =
+        "";
+
+
+    if (
+        quizzes.length === 0
+    ) {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            "";
+
+
+        option.textContent =
+            "No quizzes available";
+
+
+        select.appendChild(
+            option
+        );
+
+
+        return;
+
+    }
+
+
+    quizzes.forEach(
+        quiz => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                String(
+                    quiz.id
+                );
+
+
+            option.textContent =
+                quiz.name;
+
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================
    PARTICIPANTS
 ========================= */
 
-function saveParticipantResult(quiz, score) {
-    const name = currentProfile?.display_name || "Guest";
-    const userId = currentProfile?.user_id || "GUEST";
+async function openParticipants() {
 
-    participants.push({
-        id: Date.now() + Math.random(),
-        quizId: quiz.id,
-        quizName: quiz.name,
-        name: name,
-        userId: userId,
-        score: score,
-        total: quiz.questions.length,
-        completedAt: new Date().toISOString()
-    });
-
-    localStorage.setItem("quizParticipants", JSON.stringify(participants));
-}
-
-function populateResultQuizSelect(selectId) {
-    const select = document.getElementById(selectId);
-    if (!select) return;
-
-    select.innerHTML = "";
-
-    if (quizzes.length === 0) {
-        const option = document.createElement("option");
-        option.value = "";
-        option.textContent = "No quizzes available";
-        select.appendChild(option);
-        return;
-    }
-
-    quizzes.forEach(quiz => {
-        const option = document.createElement("option");
-        option.value = String(quiz.id);
-        option.textContent = quiz.name;
-        select.appendChild(option);
-    });
-}
-
-function openParticipants() {
     if (!requireLogin()) return;
-    populateResultQuizSelect("participantsQuizSelect");
-    renderParticipants();
-    openModal("participantsModal");
+
+
+    await loadQuizzesFromSupabase();
+
+
+    populateResultQuizSelect(
+        "participantsQuizSelect"
+    );
+
+
+    await renderParticipants();
+
+
+    openModal(
+        "participantsModal"
+    );
+
 }
 
-function renderParticipants() {
-    const select = document.getElementById("participantsQuizSelect");
-    const list = document.getElementById("participantsList");
+
+async function renderParticipants() {
+
+    const select =
+        document.getElementById(
+            "participantsQuizSelect"
+        );
+
+
+    const list =
+        document.getElementById(
+            "participantsList"
+        );
+
+
     if (!select || !list) return;
 
-    const quizId = select.value;
-    const entries = participants
-        .filter(entry => String(entry.quizId) === String(quizId))
-        .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
 
-    if (entries.length === 0) {
-        list.innerHTML = '<div class="empty">No participants yet. Complete a quiz to appear here.</div>';
+    const quizId =
+        select.value;
+
+
+    if (!quizId) {
+
+        list.innerHTML =
+            '<div class="empty">No quizzes available.</div>';
+
         return;
+
     }
 
-    list.innerHTML = entries.map(entry => `
-        <div class="result-item">
-            <div class="result-main">
-                <div class="result-name">${escapeHTML(entry.name)}</div>
-                <div class="result-meta">${escapeHTML(entry.userId)} • ${new Date(entry.completedAt).toLocaleString()}</div>
-            </div>
-            <div class="result-score">${entry.score}/${entry.total}</div>
-        </div>
-    `).join("");
-}
 
-function openLeaderboard() {
-    if (!requireLogin()) return;
-    populateResultQuizSelect("leaderboardQuizSelect");
-    renderLeaderboard();
-    openModal("leaderboardModal");
-}
+    list.innerHTML =
+        '<div class="empty">Loading participants...</div>';
 
-function renderLeaderboard() {
-    const select = document.getElementById("leaderboardQuizSelect");
-    const list = document.getElementById("leaderboardList");
-    if (!select || !list) return;
 
-    const quizId = select.value;
-    const entries = participants
-        .filter(entry => String(entry.quizId) === String(quizId))
-        .sort((a, b) => {
-            const scoreA = a.total ? a.score / a.total : 0;
-            const scoreB = b.total ? b.score / b.total : 0;
-            if (scoreB !== scoreA) return scoreB - scoreA;
-            return b.score - a.score;
-        });
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
 
-    if (entries.length === 0) {
-        list.innerHTML = '<div class="empty">No leaderboard entries yet. Complete a quiz to appear here.</div>';
+            .from("quiz_attempts")
+
+            .select("*")
+
+            .eq(
+                "quiz_id",
+                quizId
+            )
+
+            .order(
+                "completed_at",
+                {
+                    ascending:
+                        false
+                }
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Participants load error:",
+            error
+        );
+
+
+        list.innerHTML =
+            '<div class="empty">Unable to load participants.</div>';
+
+
         return;
+
     }
 
-    list.innerHTML = entries.map((entry, index) => `
-        <div class="result-item">
-            <div class="result-row">
-                <div class="rank-badge">${index + 1}</div>
+
+    const entries =
+        data || [];
+
+
+    if (
+        entries.length === 0
+    ) {
+
+        list.innerHTML =
+            '<div class="empty">No participants yet. Complete a quiz to appear here.</div>';
+
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        entries.map(
+            entry => `
+
+            <div class="result-item">
+
                 <div class="result-main">
-                    <div class="result-name">${escapeHTML(entry.name)}</div>
-                    <div class="result-meta">${escapeHTML(entry.userId)}</div>
+
+                    <div class="result-name">
+
+                        ${escapeHTML(
+                            entry.participant_name ||
+                            "User"
+                        )}
+
+                    </div>
+
+                    <div class="result-meta">
+
+                        ${escapeHTML(
+                            entry.participant_user_id ||
+                            "USER"
+                        )}
+
+                        •
+
+                        ${new Date(
+                            entry.completed_at
+                        ).toLocaleString()}
+
+                    </div>
+
                 </div>
+
+                <div class="result-score">
+
+                    ${
+                        entry.score
+                    }/${
+                        entry.total_questions
+                    }
+
+                </div>
+
             </div>
-            <div class="result-score">${entry.score}/${entry.total}</div>
-        </div>
-    `).join("");
+
+        `
+        ).join("");
+
 }
+
+
+/* =========================
+   LEADERBOARD
+========================= */
+
+async function openLeaderboard() {
+
+    if (!requireLogin()) return;
+
+
+    await loadQuizzesFromSupabase();
+
+
+    populateResultQuizSelect(
+        "leaderboardQuizSelect"
+    );
+
+
+    await renderLeaderboard();
+
+
+    openModal(
+        "leaderboardModal"
+    );
+
+}
+
+
+async function renderLeaderboard() {
+
+    const select =
+        document.getElementById(
+            "leaderboardQuizSelect"
+        );
+
+
+    const list =
+        document.getElementById(
+            "leaderboardList"
+        );
+
+
+    if (!select || !list) return;
+
+
+    const quizId =
+        select.value;
+
+
+    if (!quizId) {
+
+        list.innerHTML =
+            '<div class="empty">No quizzes available.</div>';
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        '<div class="empty">Loading leaderboard...</div>';
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+
+            .from("quiz_attempts")
+
+            .select("*")
+
+            .eq(
+                "quiz_id",
+                quizId
+            )
+
+            .order(
+                "score",
+                {
+                    ascending:
+                        false
+                }
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Leaderboard load error:",
+            error
+        );
+
+
+        list.innerHTML =
+            '<div class="empty">Unable to load leaderboard.</div>';
+
+
+        return;
+
+    }
+
+
+    const entries =
+        data || [];
+
+
+    entries.sort(
+        (
+            a,
+            b
+        ) => {
+
+            const percentageA =
+                a.total_questions
+                    ? a.score /
+                      a.total_questions
+                    : 0;
+
+
+            const percentageB =
+                b.total_questions
+                    ? b.score /
+                      b.total_questions
+                    : 0;
+
+
+            if (
+                percentageB !==
+                percentageA
+            ) {
+
+                return (
+                    percentageB -
+                    percentageA
+                );
+
+            }
+
+
+            return (
+                b.score -
+                a.score
+            );
+
+        }
+    );
+
+
+    if (
+        entries.length === 0
+    ) {
+
+        list.innerHTML =
+            '<div class="empty">No leaderboard entries yet. Complete a quiz to appear here.</div>';
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        entries.map(
+            (
+                entry,
+                index
+            ) => `
+
+            <div class="result-item">
+
+                <div class="result-row">
+
+                    <div class="rank-badge">
+
+                        ${
+                            index + 1
+                        }
+
+                    </div>
+
+                    <div class="result-main">
+
+                        <div class="result-name">
+
+                            ${escapeHTML(
+                                entry.participant_name ||
+                                "User"
+                            )}
+
+                        </div>
+
+                        <div class="result-meta">
+
+                            ${escapeHTML(
+                                entry.participant_user_id ||
+                                "USER"
+                            )}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="result-score">
+
+                    ${
+                        entry.score
+                    }/${
+                        entry.total_questions
+                    }
+
+                </div>
+
+            </div>
+
+        `
+        ).join("");
+
+}
+
 
 /* =========================
    HOME
@@ -2515,7 +4275,10 @@ function goAbout() {
     if (about) {
 
         about.scrollIntoView({
-            behavior: "smooth"
+
+            behavior:
+                "smooth"
+
         });
 
     }
@@ -2560,7 +4323,2162 @@ function escapeHTML(value) {
 
 
 /* =========================
-   CLOSE MODAL OUTSIDE
+   LOGIN
+========================= */
+
+function showLogin() {
+
+    openModal(
+        "loginModal"
+    );
+
+}
+
+
+async function loginWithGoogle() {
+
+    const {
+        error
+    } =
+        await supabaseClient.auth
+            .signInWithOAuth({
+
+                provider:
+                    "google",
+
+                options: {
+
+                    redirectTo:
+                        window.location.origin +
+                        window.location.pathname
+
+                }
+
+            });
+
+
+    if (error) {
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
+
+async function loginWithDiscord() {
+
+    const {
+        error
+    } =
+        await supabaseClient.auth
+            .signInWithOAuth({
+
+                provider:
+                    "discord",
+
+                options: {
+
+                    redirectTo:
+                        window.location.origin +
+                        window.location.pathname
+
+                }
+
+            });
+
+
+    if (error) {
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================
+   DEFAULT AVATAR
+========================= */
+
+function getDefaultAvatar() {
+
+    return (
+        "data:image/svg+xml;charset=UTF-8," +
+        encodeURIComponent(`
+
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="100"
+            height="100"
+            viewBox="0 0 100 100">
+
+            <rect
+                width="100"
+                height="100"
+                rx="50"
+                fill="#242833"/>
+
+            <circle
+                cx="50"
+                cy="38"
+                r="18"
+                fill="#9da3b0"/>
+
+            <path
+                d="M20 88c3-20 16-30 30-30s27 10 30 30"
+                fill="#9da3b0"/>
+
+        </svg>
+
+    `)
+    );
+
+}
+
+
+function setProfileImage(
+    elementId,
+    url
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (!element) return;
+
+
+    element.src =
+        url ||
+        getDefaultAvatar();
+
+
+    element.onerror =
+        function() {
+
+            this.onerror =
+                null;
+
+            this.src =
+                getDefaultAvatar();
+
+        };
+
+}
+
+
+/* =========================
+   PROFILE UI
+========================= */
+
+function updateLoginUI(
+    profile
+) {
+
+    const loginButton =
+        document.getElementById(
+            "loginButton"
+        );
+
+
+    const profileButton =
+        document.getElementById(
+            "profileButton"
+        );
+
+
+    const profileName =
+        document.getElementById(
+            "profileName"
+        );
+
+
+    const profileAvatar =
+        document.getElementById(
+            "profileAvatar"
+        );
+
+
+    const menuName =
+        document.getElementById(
+            "menuName"
+        );
+
+
+    const menuUserId =
+        document.getElementById(
+            "menuUserId"
+        );
+
+
+    const adminMenuButton =
+        document.getElementById(
+            "adminMenuButton"
+        );
+
+
+    const adminHomeCard =
+        document.getElementById(
+            "adminHomeCard"
+        );
+
+
+    if (!profile) {
+
+        if (loginButton) {
+
+            loginButton.style.display =
+                "block";
+
+        }
+
+
+        if (profileButton) {
+
+            profileButton.style.display =
+                "none";
+
+        }
+
+
+        if (adminMenuButton) {
+
+            adminMenuButton.style.display =
+                "none";
+
+        }
+
+
+        if (adminHomeCard) {
+
+            adminHomeCard.style.display =
+                "none";
+
+        }
+
+
+        closeProfileMenu();
+
+        return;
+
+    }
+
+
+    const name =
+        profile.display_name ||
+        "User";
+
+
+    const userId =
+        profile.user_id ||
+        "USER-000001";
+
+
+    const avatar =
+        profile.avatar_url ||
+        getDefaultAvatar();
+
+
+    if (loginButton) {
+
+        loginButton.style.display =
+            "none";
+
+    }
+
+
+    if (profileButton) {
+
+        profileButton.style.display =
+            "flex";
+
+    }
+
+
+    if (profileName) {
+
+        profileName.textContent =
+            name;
+
+    }
+
+
+    if (menuName) {
+
+        menuName.textContent =
+            name;
+
+    }
+
+
+    if (menuUserId) {
+
+        menuUserId.textContent =
+            userId;
+
+    }
+
+
+    setProfileImage(
+        "profileAvatar",
+        avatar
+    );
+
+
+    setProfileImage(
+        "menuAvatar",
+        avatar
+    );
+
+
+    if (adminMenuButton) {
+
+        adminMenuButton.style.display =
+            isCurrentUserAdmin
+                ? "block"
+                : "none";
+
+    }
+
+
+    if (adminHomeCard) {
+
+        adminHomeCard.style.display =
+            isCurrentUserAdmin
+                ? "block"
+                : "none";
+
+    }
+
+}
+
+
+function closeProfileMenu() {
+
+    const menu =
+        document.getElementById(
+            "profileMenu"
+        );
+
+
+    if (menu) {
+
+        menu.style.display =
+            "none";
+
+    }
+
+}
+
+
+function toggleProfileMenu() {
+
+    const menu =
+        document.getElementById(
+            "profileMenu"
+        );
+
+
+    if (!menu) return;
+
+
+    menu.style.display =
+        menu.style.display ===
+        "none"
+            ? "block"
+            : "none";
+
+}
+
+
+/* =========================
+   PROFILE DATABASE
+========================= */
+
+async function handleUserProfile() {
+
+    const {
+        data: {
+            user
+        }
+    } =
+        await supabaseClient.auth
+            .getUser();
+
+
+    if (!user) {
+
+        currentProfile =
+            null;
+
+        isCurrentUserAdmin =
+            false;
+
+        updateLoginUI(
+            null
+        );
+
+        return;
+
+    }
+
+
+    /*
+       IMPORTANT:
+       The real table name is profiles,
+       not profile.
+    */
+
+    const {
+        data: profile,
+        error
+    } =
+        await supabaseClient
+
+            .from("profiles")
+
+            .select("*")
+
+            .eq(
+                "id",
+                user.id
+            )
+
+            .maybeSingle();
+
+
+    if (
+        error ||
+        !profile
+    ) {
+
+        console.error(
+            "Profile error:",
+            error
+        );
+
+
+        const metadata =
+            user.user_metadata ||
+            {};
+
+
+        const provider =
+            user.app_metadata?.provider ||
+            "unknown";
+
+
+        const fallbackProfile = {
+
+            id:
+                user.id,
+
+            user_id:
+                "USER-" +
+                user.id
+                    .replace(
+                        /-/g,
+                        ""
+                    )
+                    .slice(
+                        0,
+                        6
+                    )
+                    .toUpperCase(),
+
+            display_name:
+                metadata.full_name ||
+                metadata.name ||
+                metadata.user_name ||
+                (
+                    user.email
+                        ? user.email.split("@")[0]
+                        : "User"
+                ),
+
+            email:
+                user.email ||
+                "",
+
+            provider:
+                provider,
+
+            avatar_url:
+                metadata.avatar_url ||
+                metadata.picture ||
+                ""
+
+        };
+
+
+        currentProfile =
+            fallbackProfile;
+
+
+        updateLoginUI(
+            fallbackProfile
+        );
+
+
+        await checkAdminStatus();
+
+
+        await migrateLocalQuizzesToSupabase();
+
+        await loadQuizzesFromSupabase();
+
+        return;
+
+    }
+
+
+    currentProfile =
+        profile;
+
+
+    await checkAdminStatus();
+
+
+    updateLoginUI(
+        profile
+    );
+
+
+    await migrateLocalQuizzesToSupabase();
+
+
+    const profileModalName =
+        document.getElementById(
+            "profileModalName"
+        );
+
+
+    const profileModalUserId =
+        document.getElementById(
+            "profileModalUserId"
+        );
+
+
+    const profileModalProvider =
+        document.getElementById(
+            "profileModalProvider"
+        );
+
+
+    if (profileModalName) {
+
+        profileModalName.textContent =
+            profile.display_name ||
+            "User";
+
+    }
+
+
+    if (profileModalUserId) {
+
+        profileModalUserId.textContent =
+            "User ID: " +
+            (
+                profile.user_id ||
+                ""
+            );
+
+    }
+
+
+    if (profileModalProvider) {
+
+        const provider =
+            profile.provider ||
+            "unknown";
+
+
+        profileModalProvider.textContent =
+            "Login: " +
+            provider
+                .charAt(0)
+                .toUpperCase() +
+            provider.slice(1);
+
+    }
+
+
+    setProfileImage(
+        "profileModalAvatar",
+        profile.avatar_url
+    );
+
+
+    await loadQuizzesFromSupabase();
+
+
+    renderProfileQuizList();
+
+
+    console.log(
+        "Logged in User ID:",
+        profile.user_id
+    );
+
+
+    console.log(
+        "Profile:",
+        profile
+    );
+
+}
+
+
+function renderProfileQuizList() {
+
+    const profileQuizList =
+        document.getElementById(
+            "profileQuizList"
+        );
+
+
+    if (!profileQuizList) return;
+
+
+    if (
+        quizzes.length === 0
+    ) {
+
+        profileQuizList.className =
+            "empty";
+
+
+        profileQuizList.textContent =
+            "No quizzes created yet.";
+
+
+        return;
+
+    }
+
+
+    profileQuizList.className =
+        "quiz-list";
+
+
+    profileQuizList.innerHTML =
+        quizzes.map(
+            quiz => `
+
+            <div class="quiz-item">
+
+                <h3>
+                    ${escapeHTML(
+                        quiz.name
+                    )}
+                </h3>
+
+                <p>
+                    ${escapeHTML(
+                        quiz.description ||
+                        "No description"
+                    )}
+                </p>
+
+                <p
+                    style="
+                        margin-top:7px;
+                        color:#9da3b0;
+                        font-size:12px;
+                    ">
+
+                    ${escapeHTML(
+                        quiz.quiz_id ||
+                        ""
+                    )}
+
+                    •
+
+                    ${
+                        quiz.questions.length
+                    }
+                    question(s)
+
+                </p>
+
+            </div>
+
+        `
+        ).join("");
+
+}
+
+
+function openProfile() {
+
+    closeProfileMenu();
+
+
+    if (!currentProfile) return;
+
+
+    handleUserProfile();
+
+
+    openModal(
+        "profileModal"
+    );
+
+}
+
+
+function openEditProfile() {
+
+    closeProfileMenu();
+
+
+    if (!currentProfile) return;
+
+
+    document.getElementById(
+        "editDisplayName"
+    ).value =
+        currentProfile.display_name ||
+        "";
+
+
+    document.getElementById(
+        "editAvatarUrl"
+    ).value =
+        currentProfile.avatar_url ||
+        "";
+
+
+    openModal(
+        "editProfileModal"
+    );
+
+}
+
+
+/* =========================
+   SAVE PROFILE
+========================= */
+
+async function saveProfile() {
+
+    if (!currentProfile) return;
+
+
+    const displayName =
+        document.getElementById(
+            "editDisplayName"
+        )
+        .value
+        .trim();
+
+
+    const avatarUrl =
+        document.getElementById(
+            "editAvatarUrl"
+        )
+        .value
+        .trim();
+
+
+    if (!displayName) {
+
+        alert(
+            "Please enter a username."
+        );
+
+        return;
+
+    }
+
+
+    const {
+        data: updatedProfile,
+        error
+    } =
+        await supabaseClient
+
+            .from("profiles")
+
+            .update({
+
+                display_name:
+                    displayName,
+
+                avatar_url:
+                    avatarUrl ||
+                    null
+
+            })
+
+            .eq(
+                "id",
+                currentProfile.id
+            )
+
+            .select("*")
+
+            .single();
+
+
+    if (error) {
+
+        alert(
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    currentProfile =
+        updatedProfile;
+
+
+    updateLoginUI(
+        updatedProfile
+    );
+
+
+    closeModal(
+        "editProfileModal"
+    );
+
+
+    await handleUserProfile();
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logoutUser() {
+
+    closeProfileMenu();
+
+
+    const {
+        error
+    } =
+        await supabaseClient.auth
+            .signOut();
+
+
+    if (error) {
+
+        alert(
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    currentProfile =
+        null;
+
+
+    isCurrentUserAdmin =
+        false;
+
+
+    updateLoginUI(
+        null
+    );
+
+}
+
+
+/* =========================
+   ADMIN STATUS
+========================= */
+
+async function checkAdminStatus() {
+
+    if (!currentProfile) {
+
+        isCurrentUserAdmin =
+            false;
+
+        return false;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+
+            .from("admin_users")
+
+            .select("user_id")
+
+            .eq(
+                "user_id",
+                currentProfile.id
+            )
+            
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Admin status error:",
+            error
+        );
+
+
+        isCurrentUserAdmin =
+            false;
+
+
+        updateLoginUI(
+            currentProfile
+        );
+
+
+        return false;
+
+    }
+
+
+    isCurrentUserAdmin =
+        !!data;
+
+
+    updateLoginUI(
+        currentProfile
+    );
+
+
+    return isCurrentUserAdmin;
+
+}
+
+
+/* =========================
+   ADMIN PANEL
+========================= */
+
+async function openAdminPanel() {
+
+    closeProfileMenu();
+
+
+    if (!currentProfile) {
+
+        showLogin();
+
+        return;
+
+    }
+
+
+    const admin =
+        await checkAdminStatus();
+
+
+    if (!admin) {
+
+        alert(
+            "You do not have permission to access the Admin Panel."
+        );
+
+        return;
+
+    }
+
+
+    showAdminUsers();
+
+
+    openModal(
+        "adminModal"
+    );
+
+}
+
+
+async function showAdminUsers() {
+
+    const mainView =
+        document.getElementById(
+            "adminMainView"
+        );
+
+
+    const detailView =
+        document.getElementById(
+            "adminDetailView"
+        );
+
+
+    if (mainView) {
+
+        mainView.style.display =
+            "block";
+
+    }
+
+
+    if (detailView) {
+
+        detailView.style.display =
+            "none";
+
+    }
+
+
+    await loadAdminUsers();
+
+}
+
+
+async function loadAdminUsers() {
+
+    const list =
+        document.getElementById(
+            "adminUserList"
+        );
+
+
+    if (!list) return;
+
+
+    list.innerHTML =
+        '<div class="empty">Loading users...</div>';
+
+
+    const {
+
+        data: profiles,
+
+        error
+
+    } =
+        await supabaseClient
+
+            .from("profiles")
+
+            .select("*")
+
+            .order(
+                "created_at",
+                {
+                    ascending:
+                        false
+                }
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Admin profiles error:",
+            error
+        );
+
+
+        list.innerHTML =
+            '<div class="empty">Unable to load users.</div>';
+
+
+        return;
+
+    }
+
+
+    const users =
+        profiles || [];
+
+
+    const userCount =
+        document.getElementById(
+            "adminUserCount"
+        );
+
+
+    if (userCount) {
+
+        userCount.textContent =
+            users.length;
+
+    }
+
+
+    const {
+        count: quizCount
+    } =
+        await supabaseClient
+
+            .from("quizzes")
+
+            .select(
+                "id",
+                {
+                    count:
+                        "exact",
+                    head:
+                        true
+                }
+            );
+
+
+    const {
+        count: attemptCount
+    } =
+        await supabaseClient
+
+            .from("quiz_attempts")
+
+            .select(
+                "id",
+                {
+                    count:
+                        "exact",
+                    head:
+                        true
+                }
+            );
+
+
+    const adminQuizCount =
+        document.getElementById(
+            "adminQuizCount"
+        );
+
+
+    const adminAttemptCount =
+        document.getElementById(
+            "adminAttemptCount"
+        );
+
+
+    if (adminQuizCount) {
+
+        adminQuizCount.textContent =
+            quizCount || 0;
+
+    }
+
+
+    if (adminAttemptCount) {
+
+        adminAttemptCount.textContent =
+            attemptCount || 0;
+
+    }
+
+
+    if (
+        users.length === 0
+    ) {
+
+        list.innerHTML =
+            '<div class="empty">No users found.</div>';
+
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        users.map(
+            user => {
+
+                const avatar =
+                    user.avatar_url ||
+                    getDefaultAvatar();
+
+
+                return `
+
+                <div
+                    class="admin-user-item">
+
+                    <div
+                        class="admin-user-main">
+
+                        <img
+                            class="admin-user-avatar"
+                            src="${escapeHTML(
+                                avatar
+                            )}"
+                            onerror="
+                                this.onerror=null;
+                                this.src='${escapeHTML(
+                                    getDefaultAvatar()
+                                )}'
+                            "
+                            alt="Avatar">
+
+                        <div
+                            class="admin-user-text">
+
+                            <div
+                                class="admin-user-name">
+
+                                ${escapeHTML(
+                                    user.display_name ||
+                                    "User"
+                                )}
+
+                            </div>
+
+                            <div
+                                class="admin-user-id">
+
+                                ${escapeHTML(
+                                    user.user_id ||
+                                    "No User ID"
+                                )}
+
+                            </div>
+
+                            <div
+                                class="admin-user-provider">
+
+                                ${escapeHTML(
+                                    (
+                                        user.provider ||
+                                        "unknown"
+                                    )
+                                    .charAt(0)
+                                    .toUpperCase() +
+                                    (
+                                        user.provider ||
+                                        "unknown"
+                                    ).slice(1)
+                                )}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        class="admin-view-btn"
+                        onclick='openAdminUser(${JSON.stringify(
+                            user.id
+                        )})'>
+
+                        View
+
+                    </button>
+
+                </div>
+
+            `;
+
+            }
+        ).join("");
+
+}
+
+
+async function openAdminUser(
+    userId
+) {
+
+    const mainView =
+        document.getElementById(
+            "adminMainView"
+        );
+
+
+    const detailView =
+        document.getElementById(
+            "adminDetailView"
+        );
+
+
+    const detail =
+        document.getElementById(
+            "adminUserDetail"
+        );
+
+
+    if (!detail) return;
+
+
+    if (mainView) {
+
+        mainView.style.display =
+            "none";
+
+    }
+
+
+    if (detailView) {
+
+        detailView.style.display =
+            "block";
+
+    }
+
+
+    detail.innerHTML =
+        '<div class="empty">Loading user information...</div>';
+
+
+    const {
+        data: user,
+        error: profileError
+    } =
+        await supabaseClient
+
+            .from("profiles")
+
+            .select("*")
+
+            .eq(
+                "id",
+                userId
+            )
+
+            .maybeSingle();
+
+
+    if (
+        profileError ||
+        !user
+    ) {
+
+        detail.innerHTML =
+            '<div class="empty">Unable to load this user.</div>';
+
+
+        return;
+
+    }
+
+
+    const {
+        data: userQuizzes,
+        error: quizError
+    } =
+        await supabaseClient
+
+            .from("quizzes")
+
+            .select("*")
+
+            .eq(
+                "creator_id",
+                user.id
+            )
+
+            .order(
+                "created_at",
+                {
+                    ascending:
+                        false
+                }
+            );
+
+
+    const {
+        data: attempts,
+        error: attemptError
+    } =
+        await supabaseClient
+
+            .from("quiz_attempts")
+
+            .select("*")
+
+            .eq(
+                "user_id",
+                user.id
+            )
+
+            .order(
+                "completed_at",
+                {
+                    ascending:
+                        false
+                }
+            );
+
+
+    /*
+       Avatar history is optional here.
+       If the table/columns are available,
+       we display the saved history.
+    */
+
+    let avatarHistory =
+        [];
+
+
+    try {
+
+        const {
+            data
+        } =
+            await supabaseClient
+
+                .from("avatar_history")
+
+                .select("*")
+
+                .eq(
+                    "user_id",
+                    user.id
+                )
+                
+                .order(
+                    "created_at",
+                    {
+                        ascending:
+                            false
+                    }
+                );
+
+
+        avatarHistory =
+            data || [];
+
+    } catch (error) {
+
+        console.log(
+            "Avatar history unavailable:",
+            error
+        );
+
+    }
+
+
+    const provider =
+        user.provider ||
+        "unknown";
+
+
+    const accountCreated =
+        user.created_at
+            ? new Date(
+                user.created_at
+            ).toLocaleString()
+            : "Not available";
+
+
+    const avatar =
+        user.avatar_url ||
+        getDefaultAvatar();
+
+
+    const quizzesCreated =
+        userQuizzes ||
+        [];
+
+
+    const userAttempts =
+        attempts ||
+        [];
+
+
+    const isAdmin =
+        await isUserAdmin(
+            user.id
+        );
+
+
+    detail.innerHTML = `
+
+        <div
+            class="admin-profile-head">
+
+            <img
+                class="admin-profile-avatar"
+                src="${escapeHTML(
+                    avatar
+                )}"
+                onerror="
+                    this.onerror=null;
+                    this.src='${escapeHTML(
+                        getDefaultAvatar()
+                    )}'
+                "
+                alt="Avatar">
+
+            <div
+                class="admin-profile-head-text">
+
+                <h3>
+                    ${escapeHTML(
+                        user.display_name ||
+                        "User"
+                    )}
+                </h3>
+
+                <p>
+                    ${escapeHTML(
+                        user.user_id ||
+                        "No User ID"
+                    )}
+                </p>
+
+                ${
+                    isAdmin
+                        ? `
+                        <span class="admin-badge">
+                            ADMIN
+                        </span>
+                        `
+                        : ""
+                }
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="admin-info-grid">
+
+            <div class="admin-info-box">
+
+                <div class="admin-info-label">
+                    User ID
+                </div>
+
+                <div class="admin-info-value">
+                    ${escapeHTML(
+                        user.user_id ||
+                        "Not available"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="admin-info-box">
+
+                <div class="admin-info-label">
+                    Username
+                </div>
+
+                <div class="admin-info-value">
+                    ${escapeHTML(
+                        user.display_name ||
+                        "Not available"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="admin-info-box">
+
+                <div class="admin-info-label">
+                    Email
+                </div>
+
+                <div class="admin-info-value">
+                    ${escapeHTML(
+                        user.email ||
+                        "Not available"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="admin-info-box">
+
+                <div class="admin-info-label">
+                    Login Provider
+                </div>
+
+                <div class="admin-info-value">
+                    ${escapeHTML(
+                        provider
+                            .charAt(0)
+                            .toUpperCase() +
+                        provider.slice(1)
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="admin-info-box">
+
+                <div class="admin-info-label">
+                    Account Created
+                </div>
+
+                <div class="admin-info-value">
+                    ${escapeHTML(
+                        accountCreated
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="admin-info-box">
+
+                <div class="admin-info-label">
+                    Admin Status
+                </div>
+
+                <div class="admin-info-value">
+
+                    ${
+                        isAdmin
+                            ? "Administrator"
+                            : "Normal User"
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="admin-stat-row">
+
+            <div class="admin-stat">
+
+                <strong>
+                    ${
+                        quizzesCreated.length
+                    }
+                </strong>
+
+                <span>
+                    Quizzes
+                </span>
+
+            </div>
+
+
+            <div class="admin-stat">
+
+                <strong>
+                    ${
+                        userAttempts.length
+                    }
+                </strong>
+
+                <span>
+                    Attempts
+                </span>
+
+            </div>
+
+
+            <div class="admin-stat">
+
+                <strong>
+                    ${
+                        avatarHistory.length
+                    }
+                </strong>
+
+                <span>
+                    Avatar Records
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <h3
+                class="admin-section-title">
+
+                User Quizzes
+
+            </h3>
+
+
+            ${
+                quizError
+
+                    ? `
+                    <div class="empty">
+                        Unable to load quizzes.
+                    </div>
+                    `
+
+                    : quizzesCreated.length === 0
+
+                        ? `
+                        <div class="empty">
+                            This user has not created any quizzes.
+                        </div>
+                        `
+
+                        : `
+
+                        <div
+                            class="admin-mini-list">
+
+                            ${
+                                quizzesCreated.map(
+                                    quiz => `
+
+                                    <div
+                                        class="admin-mini-item">
+
+                                        <strong>
+                                            ${escapeHTML(
+                                                quiz.title ||
+                                                "Untitled Quiz"
+                                            )}
+                                        </strong>
+
+                                        <small>
+
+                                            ${
+                                                escapeHTML(
+                                                    quiz.quiz_id ||
+                                                    "No Quiz ID"
+                                                )
+                                            }
+
+                                            •
+
+                                            ${
+                                                Array.isArray(
+                                                    quiz.questions
+                                                )
+                                                    ? quiz.questions.length
+                                                    : 0
+                                            }
+                                            question(s)
+
+                                            •
+
+                                            ${
+                                                quiz.created_at
+                                                    ? new Date(
+                                                        quiz.created_at
+                                                    ).toLocaleString()
+                                                    : "Date unavailable"
+                                            }
+
+                                        </small>
+
+                                    </div>
+
+                                `
+                                ).join("")
+                            }
+
+                        </div>
+
+                        `
+
+            }
+
+        </div>
+
+
+        <div>
+
+            <h3
+                class="admin-section-title">
+
+                Quiz Attempts
+
+            </h3>
+
+
+            ${
+                attemptError
+
+                    ? `
+                    <div class="empty">
+                        Unable to load attempts.
+                    </div>
+                    `
+
+                    : userAttempts.length === 0
+
+                        ? `
+                        <div class="empty">
+                            No quiz attempts recorded.
+                        </div>
+                        `
+
+                        : `
+
+                        <div
+                            class="admin-mini-list">
+
+                            ${
+                                userAttempts.map(
+                                    attempt => `
+
+                                    <div
+                                        class="admin-mini-item">
+
+                                        <strong>
+
+                                            ${
+                                                escapeHTML(
+                                                    attempt.quiz_code ||
+                                                    "Quiz"
+                                                )
+                                            }
+
+                                            — Score:
+                                            ${
+                                                attempt.score ??
+                                                0
+                                            }/${
+                                                attempt.total_questions ??
+                                                0
+                                            }
+
+                                        </strong>
+
+                                        <small>
+
+                                            ${
+                                                attempt.completed_at
+                                                    ? new Date(
+                                                        attempt.completed_at
+                                                    ).toLocaleString()
+                                                    : "Date unavailable"
+                                            }
+
+                                        </small>
+
+                                    </div>
+
+                                `
+                                ).join("")
+                            }
+
+                        </div>
+
+                        `
+
+            }
+
+        </div>
+
+
+        <div>
+
+            <h3
+                class="admin-section-title">
+
+                Current Avatar
+
+            </h3>
+
+
+            <div
+                class="admin-mini-item">
+
+                <small>
+                    ${
+                        user.avatar_url
+                            ? escapeHTML(
+                                user.avatar_url
+                            )
+                            : "Default avatar"
+                    }
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <h3
+                class="admin-section-title">
+
+                Avatar History
+
+            </h3>
+
+
+            ${
+                avatarHistory.length === 0
+
+                    ? `
+
+                    <div class="empty">
+
+                        No previous avatar records available.
+
+                    </div>
+
+                    `
+
+                    : `
+
+                    <div
+                        class="admin-mini-list">
+
+                        ${
+                            avatarHistory.map(
+                                record => `
+
+                                <div
+                                    class="admin-mini-item">
+
+                                    <strong>
+
+                                        Avatar record
+
+                                    </strong>
+
+                                    <small>
+
+                                        ${
+                                            escapeHTML(
+                                                record.avatar_url ||
+                                                record.url ||
+                                                "Avatar URL unavailable"
+                                            )
+                                        }
+
+                                        ${
+                                            record.created_at
+                                                ? " • " +
+                                                  new Date(
+                                                      record.created_at
+                                                  ).toLocaleString()
+                                                : ""
+                                        }
+
+                                    </small>
+
+                                </div>
+
+                            `
+                            ).join("")
+                        }
+
+                    </div>
+
+                    `
+
+            }
+
+        </div>
+
+    `;
+
+}
+
+
+async function isUserAdmin(
+    userId
+) {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+
+            .from("admin_users")
+
+            .select("user_id")
+
+            .eq(
+                "user_id",
+                userId
+            )
+
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Admin user check error:",
+            error
+        );
+
+        return false;
+
+    }
+
+
+    return !!data;
+
+}
+
+
+function showAdminUsers() {
+
+    const mainView =
+        document.getElementById(
+            "adminMainView"
+        );
+
+
+    const detailView =
+        document.getElementById(
+            "adminDetailView"
+        );
+
+
+    if (mainView) {
+
+        mainView.style.display =
+            "block";
+
+    }
+
+
+    if (detailView) {
+
+        detailView.style.display =
+            "none";
+
+    }
+
+
+    loadAdminUsers();
+
+}
+
+
+/* =========================
+   AUTH STATE
+========================= */
+
+supabaseClient.auth.onAuthStateChange(
+    (
+        event,
+        session
+    ) => {
+
+        setTimeout(
+            async () => {
+
+                if (
+                    session?.user
+                ) {
+
+                    await handleUserProfile();
+
+                    closeModal(
+                        "loginModal"
+                    );
+
+                } else {
+
+                    currentProfile =
+                        null;
+
+                    isCurrentUserAdmin =
+                        false;
+
+                    updateLoginUI(
+                        null
+                    );
+
+                }
+
+            },
+            0
+        );
+
+    }
+);
+
+
+/* =========================
+   RESTORE LOGIN
+========================= */
+
+(async function restoreLoginState() {
+
+    const {
+        data: {
+            session
+        }
+    } =
+        await supabaseClient.auth
+            .getSession();
+
+
+    if (
+        session?.user
+    ) {
+
+        await handleUserProfile();
+
+        closeModal(
+            "loginModal"
+        );
+
+    } else {
+
+        updateLoginUI(
+            null
+        );
+
+    }
+
+})();
+
+
+/* =========================
+   PROFILE MENU OUTSIDE CLICK
+========================= */
+
+window.addEventListener(
+    "click",
+    function(event) {
+
+        const area =
+            document.querySelector(
+                ".account-area"
+            );
+
+
+        if (
+            area &&
+            !area.contains(
+                event.target
+            )
+        ) {
+
+            closeProfileMenu();
+
+        }
+
+    }
+);
+
+
+/* =========================
+   MODAL OUTSIDE CLICK
 ========================= */
 
 window.onclick =
@@ -2579,509 +6497,7 @@ window.onclick =
 
     };
 
-
-function showLogin() {
-    openModal("loginModal");
-}
-
-async function loginWithGoogle() {
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-            redirectTo: window.location.origin + window.location.pathname
-        }
-    });
-
-    if (error) {
-        alert(error.message);
-    }
-}
-
-async function loginWithDiscord() {
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: "discord",
-        options: {
-            redirectTo: window.location.origin + window.location.pathname
-        }
-    });
-
-    if (error) {
-        alert(error.message);
-    }
-}
-
-let currentProfile = null;
-
-function getDefaultAvatar() {
-    return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="50" fill="#242833"/>
-            <circle cx="50" cy="38" r="18" fill="#9da3b0"/>
-            <path d="M20 88c3-20 16-30 30-30s27 10 30 30" fill="#9da3b0"/>
-        </svg>
-    `);
-}
-
-function setProfileImage(elementId, url) {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-
-    element.src = url || getDefaultAvatar();
-    element.onerror = function() {
-        this.onerror = null;
-        this.src = getDefaultAvatar();
-    };
-}
-
-function updateLoginUI(profile) {
-    const loginButton = document.getElementById("loginButton");
-    const profileButton = document.getElementById("profileButton");
-    const profileName = document.getElementById("profileName");
-    const profileAvatar = document.getElementById("profileAvatar");
-    const menuName = document.getElementById("menuName");
-    const menuUserId = document.getElementById("menuUserId");
-
-    if (!profile) {
-        if (loginButton) loginButton.style.display = "block";
-        if (profileButton) profileButton.style.display = "none";
-        closeProfileMenu();
-        return;
-    }
-
-    const name = profile.display_name || "User";
-    const userId = profile.user_id || "USER-000001";
-    const avatar = profile.avatar_url || getDefaultAvatar();
-
-    if (loginButton) loginButton.style.display = "none";
-    if (profileButton) profileButton.style.display = "flex";
-    if (profileName) profileName.textContent = name;
-    if (menuName) menuName.textContent = name;
-    if (menuUserId) menuUserId.textContent = userId;
-
-    setProfileImage("profileAvatar", avatar);
-    setProfileImage("menuAvatar", avatar);
-}
-
-function closeProfileMenu() {
-    const menu = document.getElementById("profileMenu");
-    if (menu) menu.style.display = "none";
-}
-
-function toggleProfileMenu() {
-    const menu = document.getElementById("profileMenu");
-    if (!menu) return;
-
-    menu.style.display = menu.style.display === "none" ? "block" : "none";
-}
-
-async function handleUserProfile() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-
-    if (!user) {
-        currentProfile = null;
-        updateLoginUI(null);
-        return;
-    }
-
-    const { data: profile, error } = await supabaseClient
-        .from("profile")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-    if (error || !profile) {
-        console.error("Profile error:", error);
-        const metadata = user.user_metadata || {};
-        const fallbackProfile = {
-            id: user.id,
-            user_id: "USER-" + user.id.replace(/-/g, "").slice(0, 6).toUpperCase(),
-            display_name: metadata.full_name || metadata.name || metadata.user_name || (user.email ? user.email.split("@")[0] : "User"),
-            email: user.email || "",
-            provider: user.app_metadata?.provider || "unknown",
-            avatar_url: metadata.avatar_url || metadata.picture || ""
-        };
-        currentProfile = fallbackProfile;
-        updateLoginUI(fallbackProfile);
-        await migrateLocalQuizzesToSupabase();
-        await loadQuizzesFromSupabase();
-        return;
-    }
-
-    currentProfile = profile;
-    updateLoginUI(profile);
-    await migrateLocalQuizzesToSupabase();
-
-    const profileModalName = document.getElementById("profileModalName");
-    const profileModalUserId = document.getElementById("profileModalUserId");
-    const profileModalProvider = document.getElementById("profileModalProvider");
-
-    if (profileModalName) profileModalName.textContent = profile.display_name || "User";
-    if (profileModalUserId) profileModalUserId.textContent = "User ID: " + (profile.user_id || "");
-    if (profileModalProvider) {
-        const provider = profile.provider || "unknown";
-        profileModalProvider.textContent = "Login: " + provider.charAt(0).toUpperCase() + provider.slice(1);
-    }
-
-    setProfileImage("profileModalAvatar", profile.avatar_url);
-
-    await loadQuizzesFromSupabase();
-
-    const profileQuizList = document.getElementById("profileQuizList");
-
-    if (profileQuizList) {
-        if (quizzes.length === 0) {
-            profileQuizList.className = "empty";
-            profileQuizList.textContent = "No quizzes created yet.";
-        } else {
-            profileQuizList.className = "quiz-list";
-            profileQuizList.innerHTML = quizzes.map(quiz => `
-                <div class="quiz-item">
-                    <h3>${escapeHTML(quiz.name)}</h3>
-                    <p>${escapeHTML(quiz.description || "No description")}</p>
-                    <p style="margin-top:7px; color:#9da3b0; font-size:12px;">
-                        ${escapeHTML(quiz.quiz_id || "")} • ${quiz.questions.length} question(s)
-                    </p>
-                </div>
-            `).join("");
-        }
-    }
-
-    console.log("Logged in User ID:", profile.user_id);
-    console.log("Profile:", profile);
-}
-
-function openProfile() {
-    closeProfileMenu();
-    if (!currentProfile) return;
-    handleUserProfile();
-    openModal("profileModal");
-}
-
-function openEditProfile() {
-    closeProfileMenu();
-    if (!currentProfile) return;
-
-    document.getElementById("editDisplayName").value = currentProfile.display_name || "";
-    document.getElementById("editAvatarUrl").value = currentProfile.avatar_url || "";
-    openModal("editProfileModal");
-}
-
-async function saveProfile() {
-    if (!currentProfile) return;
-
-    const displayName = document.getElementById("editDisplayName").value.trim();
-    const avatarUrl = document.getElementById("editAvatarUrl").value.trim();
-
-    if (!displayName) {
-        alert("Please enter a username.");
-        return;
-    }
-
-    const { data: updatedProfile, error } = await supabaseClient
-        .from("profile")
-        .update({
-            display_name: displayName,
-            avatar_url: avatarUrl || null
-        })
-        .eq("id", currentProfile.id)
-        .select("*")
-        .single();
-
-    if (error) {
-        alert(error.message);
-        return;
-    }
-
-    currentProfile = updatedProfile;
-    updateLoginUI(updatedProfile);
-    closeModal("editProfileModal");
-    await handleUserProfile();
-}
-
-async function logoutUser() {
-    closeProfileMenu();
-
-    const { error } = await supabaseClient.auth.signOut();
-
-    if (error) {
-        alert(error.message);
-        return;
-    }
-
-    currentProfile = null;
-    updateLoginUI(null);
-}
-
-supabaseClient.auth.onAuthStateChange((event, session) => {
-    setTimeout(async () => {
-        if (session?.user) {
-            await handleUserProfile();
-            closeModal("loginModal");
-        } else {
-            currentProfile = null;
-            updateLoginUI(null);
-        }
-    }, 0);
-});
-
-window.addEventListener("click", function(event) {
-    const area = document.querySelector(".account-area");
-    if (area && !area.contains(event.target)) {
-        closeProfileMenu();
-    }
-});
-
-(async function restoreLoginState() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session?.user) {
-        await handleUserProfile();
-        closeModal("loginModal");
-    } else {
-        updateLoginUI(null);
-    }
-})();
-
-/* =========================
-   SUPABASE PARTICIPANTS + LEADERBOARD
-========================= */
-
-async function saveParticipantResult(quiz, score) {
-
-    if (!currentProfile) return;
-
-    const { error } = await supabaseClient
-        .from("quiz_attempts")
-        .insert({
-            quiz_id: quiz.id,
-            quiz_code: quiz.quiz_id || "",
-            user_id: currentProfile.id,
-            participant_user_id: currentProfile.user_id || "",
-            participant_name: currentProfile.display_name || "User",
-            score: score,
-            total_questions: quiz.questions.length
-        });
-
-    if (error) {
-        console.error("Participant save error:", error);
-        alert("Unable to save quiz result: " + error.message);
-        return;
-    }
-
-    console.log("Quiz result saved to Supabase.");
-}
-
-
-/* =========================
-   PARTICIPANTS
-========================= */
-
-async function openParticipants() {
-
-    if (!requireLogin()) return;
-
-    await loadQuizzesFromSupabase();
-
-    populateResultQuizSelect("participantsQuizSelect");
-
-    await renderParticipants();
-
-    openModal("participantsModal");
-}
-
-
-async function renderParticipants() {
-
-    const select =
-        document.getElementById("participantsQuizSelect");
-
-    const list =
-        document.getElementById("participantsList");
-
-    if (!select || !list) return;
-
-    const quizId = select.value;
-
-    if (!quizId) {
-        list.innerHTML =
-            '<div class="empty">No quizzes available.</div>';
-        return;
-    }
-
-    list.innerHTML =
-        '<div class="empty">Loading participants...</div>';
-
-    const { data, error } = await supabaseClient
-        .from("quiz_attempts")
-        .select("*")
-        .eq("quiz_id", quizId)
-        .order("completed_at", { ascending: false });
-
-    if (error) {
-
-        console.error("Participants load error:", error);
-
-        list.innerHTML =
-            '<div class="empty">Unable to load participants.</div>';
-
-        return;
-    }
-
-    const entries = data || [];
-
-    if (entries.length === 0) {
-
-        list.innerHTML =
-            '<div class="empty">No participants yet. Complete a quiz to appear here.</div>';
-
-        return;
-    }
-
-    list.innerHTML = entries.map(entry => `
-        <div class="result-item">
-
-            <div class="result-main">
-
-                <div class="result-name">
-                    ${escapeHTML(entry.participant_name || "User")}
-                </div>
-
-                <div class="result-meta">
-                    ${escapeHTML(entry.participant_user_id || "USER")}
-                    •
-                    ${new Date(entry.completed_at).toLocaleString()}
-                </div>
-
-            </div>
-
-            <div class="result-score">
-                ${entry.score}/${entry.total_questions}
-            </div>
-
-        </div>
-    `).join("");
-}
-
-
-/* =========================
-   LEADERBOARD
-========================= */
-
-async function openLeaderboard() {
-
-    if (!requireLogin()) return;
-
-    await loadQuizzesFromSupabase();
-
-    populateResultQuizSelect("leaderboardQuizSelect");
-
-    await renderLeaderboard();
-
-    openModal("leaderboardModal");
-}
-
-
-async function renderLeaderboard() {
-
-    const select =
-        document.getElementById("leaderboardQuizSelect");
-
-    const list =
-        document.getElementById("leaderboardList");
-
-    if (!select || !list) return;
-
-    const quizId = select.value;
-
-    if (!quizId) {
-        list.innerHTML =
-            '<div class="empty">No quizzes available.</div>';
-        return;
-    }
-
-    list.innerHTML =
-        '<div class="empty">Loading leaderboard...</div>';
-
-    const { data, error } = await supabaseClient
-        .from("quiz_attempts")
-        .select("*")
-        .eq("quiz_id", quizId)
-        .order("score", { ascending: false });
-
-    if (error) {
-
-        console.error("Leaderboard load error:", error);
-
-        list.innerHTML =
-            '<div class="empty">Unable to load leaderboard.</div>';
-
-        return;
-    }
-
-    const entries = data || [];
-
-    entries.sort((a, b) => {
-
-        const percentageA =
-            a.total_questions
-                ? a.score / a.total_questions
-                : 0;
-
-        const percentageB =
-            b.total_questions
-                ? b.score / b.total_questions
-                : 0;
-
-        if (percentageB !== percentageA) {
-            return percentageB - percentageA;
-        }
-
-        return b.score - a.score;
-    });
-
-
-    if (entries.length === 0) {
-
-        list.innerHTML =
-            '<div class="empty">No leaderboard entries yet. Complete a quiz to appear here.</div>';
-
-        return;
-    }
-
-
-    list.innerHTML = entries.map((entry, index) => `
-
-        <div class="result-item">
-
-            <div class="result-row">
-
-                <div class="rank-badge">
-                    ${index + 1}
-                </div>
-
-                <div class="result-main">
-
-                    <div class="result-name">
-                        ${escapeHTML(entry.participant_name || "User")}
-                    </div>
-
-                    <div class="result-meta">
-                        ${escapeHTML(entry.participant_user_id || "USER")}
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="result-score">
-                ${entry.score}/${entry.total_questions}
-            </div>
-
-        </div>
-
-    `).join("");
-}
 </script>
-
 
 </body>
 </html>
