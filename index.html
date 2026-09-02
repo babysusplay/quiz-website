@@ -2840,6 +2840,246 @@ window.addEventListener("click", function(event) {
         updateLoginUI(null);
     }
 })();
+
+/* =========================
+   SUPABASE PARTICIPANTS + LEADERBOARD
+========================= */
+
+async function saveParticipantResult(quiz, score) {
+
+    if (!currentProfile) return;
+
+    const { error } = await supabaseClient
+        .from("quiz_attempts")
+        .insert({
+            quiz_id: quiz.id,
+            quiz_code: quiz.quiz_id || "",
+            user_id: currentProfile.id,
+            participant_user_id: currentProfile.user_id || "",
+            participant_name: currentProfile.display_name || "User",
+            score: score,
+            total_questions: quiz.questions.length
+        });
+
+    if (error) {
+        console.error("Participant save error:", error);
+        alert("Unable to save quiz result: " + error.message);
+        return;
+    }
+
+    console.log("Quiz result saved to Supabase.");
+}
+
+
+/* =========================
+   PARTICIPANTS
+========================= */
+
+async function openParticipants() {
+
+    if (!requireLogin()) return;
+
+    await loadQuizzesFromSupabase();
+
+    populateResultQuizSelect("participantsQuizSelect");
+
+    await renderParticipants();
+
+    openModal("participantsModal");
+}
+
+
+async function renderParticipants() {
+
+    const select =
+        document.getElementById("participantsQuizSelect");
+
+    const list =
+        document.getElementById("participantsList");
+
+    if (!select || !list) return;
+
+    const quizId = select.value;
+
+    if (!quizId) {
+        list.innerHTML =
+            '<div class="empty">No quizzes available.</div>';
+        return;
+    }
+
+    list.innerHTML =
+        '<div class="empty">Loading participants...</div>';
+
+    const { data, error } = await supabaseClient
+        .from("quiz_attempts")
+        .select("*")
+        .eq("quiz_id", quizId)
+        .order("completed_at", { ascending: false });
+
+    if (error) {
+
+        console.error("Participants load error:", error);
+
+        list.innerHTML =
+            '<div class="empty">Unable to load participants.</div>';
+
+        return;
+    }
+
+    const entries = data || [];
+
+    if (entries.length === 0) {
+
+        list.innerHTML =
+            '<div class="empty">No participants yet. Complete a quiz to appear here.</div>';
+
+        return;
+    }
+
+    list.innerHTML = entries.map(entry => `
+        <div class="result-item">
+
+            <div class="result-main">
+
+                <div class="result-name">
+                    ${escapeHTML(entry.participant_name || "User")}
+                </div>
+
+                <div class="result-meta">
+                    ${escapeHTML(entry.participant_user_id || "USER")}
+                    •
+                    ${new Date(entry.completed_at).toLocaleString()}
+                </div>
+
+            </div>
+
+            <div class="result-score">
+                ${entry.score}/${entry.total_questions}
+            </div>
+
+        </div>
+    `).join("");
+}
+
+
+/* =========================
+   LEADERBOARD
+========================= */
+
+async function openLeaderboard() {
+
+    if (!requireLogin()) return;
+
+    await loadQuizzesFromSupabase();
+
+    populateResultQuizSelect("leaderboardQuizSelect");
+
+    await renderLeaderboard();
+
+    openModal("leaderboardModal");
+}
+
+
+async function renderLeaderboard() {
+
+    const select =
+        document.getElementById("leaderboardQuizSelect");
+
+    const list =
+        document.getElementById("leaderboardList");
+
+    if (!select || !list) return;
+
+    const quizId = select.value;
+
+    if (!quizId) {
+        list.innerHTML =
+            '<div class="empty">No quizzes available.</div>';
+        return;
+    }
+
+    list.innerHTML =
+        '<div class="empty">Loading leaderboard...</div>';
+
+    const { data, error } = await supabaseClient
+        .from("quiz_attempts")
+        .select("*")
+        .eq("quiz_id", quizId)
+        .order("score", { ascending: false });
+
+    if (error) {
+
+        console.error("Leaderboard load error:", error);
+
+        list.innerHTML =
+            '<div class="empty">Unable to load leaderboard.</div>';
+
+        return;
+    }
+
+    const entries = data || [];
+
+    entries.sort((a, b) => {
+
+        const percentageA =
+            a.total_questions
+                ? a.score / a.total_questions
+                : 0;
+
+        const percentageB =
+            b.total_questions
+                ? b.score / b.total_questions
+                : 0;
+
+        if (percentageB !== percentageA) {
+            return percentageB - percentageA;
+        }
+
+        return b.score - a.score;
+    });
+
+
+    if (entries.length === 0) {
+
+        list.innerHTML =
+            '<div class="empty">No leaderboard entries yet. Complete a quiz to appear here.</div>';
+
+        return;
+    }
+
+
+    list.innerHTML = entries.map((entry, index) => `
+
+        <div class="result-item">
+
+            <div class="result-row">
+
+                <div class="rank-badge">
+                    ${index + 1}
+                </div>
+
+                <div class="result-main">
+
+                    <div class="result-name">
+                        ${escapeHTML(entry.participant_name || "User")}
+                    </div>
+
+                    <div class="result-meta">
+                        ${escapeHTML(entry.participant_user_id || "USER")}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="result-score">
+                ${entry.score}/${entry.total_questions}
+            </div>
+
+        </div>
+
+    `).join("");
+}
 </script>
 
 
