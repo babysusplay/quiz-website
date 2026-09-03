@@ -1741,38 +1741,57 @@ textarea {
 </style>
 
 
-<style id="final-social-and-mobile-home-polish">
-/* Social button: fix vertical alignment on desktop and desktop-site mode.
-   The button position itself is unchanged; only its contents are centered. */
-header .social-header-btn {
+<style id="v19-final-targeted-ui-fix">
+/* =========================================================
+   QUIZ = HOME
+   Make the Quiz/Home control clearly stand out EVERYWHERE.
+   This is intentionally outside a media query.
+   ========================================================= */
+header .home-logo {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    font-size: 1.12em !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    padding: 7px 12px !important;
+    margin: 0 !important;
+    border-radius: 10px !important;
+    background: rgba(255,255,255,.08) !important;
+    border: 1px solid rgba(255,255,255,.12) !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,.12) !important;
+    white-space: nowrap !important;
     vertical-align: middle !important;
-    line-height: 1 !important;
-    text-align: center !important;
-    margin-bottom: 0 !important;
-    box-sizing: border-box !important;
 }
 
-header .social-header-btn > span:not(.social-notification-badge) {
-    display: inline-flex !important;
-    align-items: center !important;
-    line-height: 1 !important;
-}
+/* =========================================================
+   ONLY phone + Desktop Site:
+   Social button content is centered without changing the
+   button's location or touching normal mobile/desktop.
+   ========================================================= */
+@media screen and (min-width: 769px) and (max-width: 1100px)
+       and (hover: none) and (pointer: coarse) {
 
-/* Only normal mobile: make the Quiz logo clearly read as the Home button.
-   This does not affect desktop or phone Desktop-Site mode. */
-@media screen and (max-width: 650px) {
-    header .home-logo {
-        font-size: 22px !important;
-        font-weight: 800 !important;
+    header .social-header-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        vertical-align: middle !important;
         line-height: 1 !important;
-        padding: 7px 10px !important;
-        border-radius: 10px !important;
-        background: rgba(255,255,255,.07) !important;
-        border: 1px solid rgba(255,255,255,.10) !important;
-        box-shadow: 0 4px 14px rgba(0,0,0,.14) !important;
+        text-align: center !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    header .social-header-btn > * {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1 !important;
+        vertical-align: middle !important;
     }
 }
 </style>
