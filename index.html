@@ -2063,6 +2063,129 @@ header .home-logo {
 }
 </style>
 
+
+<style id="v23-chat-composer-final">
+/* The image/+ control is intentionally removed from the composer. */
+.chat-composer .chat-image-btn,
+#directChatImage {
+    display: none !important;
+}
+
+/* Message box and Send stay directly beside each other. */
+.chat-composer {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: end !important;
+    gap: 8px !important;
+    width: 100% !important;
+}
+
+.chat-composer #directChatInput {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.chat-composer .chat-send-btn {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: end !important;
+    margin: 0 !important;
+}
+
+/* Narrow phones: still only Message box + Send, with no middle control. */
+@media (max-width: 650px) {
+    .chat-composer {
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        gap: 6px !important;
+    }
+
+    .chat-composer #directChatInput {
+        min-height: 64px !important;
+    }
+
+    .chat-composer .chat-send-btn {
+        min-width: 62px !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+}
+</style>
+
+
+<style id="v24-chat-plus-moved">
+/* Picture control lives on its own row; Message and Send touch only each other. */
+.chat-image-picker-row {
+    display: flex;
+    align-items: center;
+    margin: 0 0 6px 0;
+}
+
+.chat-image-picker-row .chat-image-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 10px;
+    font-size: 23px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.chat-composer {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: end !important;
+    gap: 8px !important;
+    width: 100% !important;
+}
+
+.chat-composer #directChatInput {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.chat-composer .chat-send-btn {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+}
+
+/* Keep the same clean arrangement on phones. */
+@media (max-width: 650px) {
+    .chat-image-picker-row {
+        margin-bottom: 6px;
+    }
+
+    .chat-image-picker-row .chat-image-btn {
+        width: 38px;
+        height: 38px;
+    }
+
+    .chat-composer {
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        gap: 6px !important;
+    }
+
+    .chat-composer #directChatInput {
+        min-height: 64px !important;
+    }
+
+    .chat-composer .chat-send-btn {
+        min-width: 62px !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+}
+</style>
+
 </head>
 
 <body>
@@ -2737,6 +2860,17 @@ header .home-logo {
             <button class="close" onclick="closeModal('directChatModal')">×</button>
         </div>
         <div id="directChatMessages" class="chat-messages-box"></div>
+        <div class="chat-image-picker-row">
+            <input id="directChatImage" type="file" accept="image/*" hidden onchange="previewChatImage(event)">
+            <button
+                class="chat-image-btn"
+                type="button"
+                onclick="document.getElementById('directChatImage').click()"
+                title="Add picture">
+                +
+            </button>
+        </div>
+
         <form onsubmit="sendDirectMessage(event)" class="chat-composer">
             <textarea
                 id="directChatInput"
@@ -2751,18 +2885,7 @@ header .home-logo {
                 accept="image/*"
                 hidden
                 onchange="previewChatImage(event)">
-
-            <button
-                class="chat-image-btn"
-                type="button"
-                onclick="document.getElementById('directChatImage').click()"
-                title="Add image">
-
-                +
-
-            </button>
-
-            <button
+<button
                 class="save-btn chat-send-btn"
                 type="submit">
 
