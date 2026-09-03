@@ -1471,25 +1471,6 @@ textarea {
 }
 </style>
 
-
-<style>
-@media (max-width: 768px) {
-    #profileBtn {
-        font-size: 0 !important;
-        gap: 0 !important;
-        white-space: nowrap;
-    }
-
-    #profileBtn img,
-    #profileBtn svg,
-    #profileBtn .profile-avatar,
-    #profileBtn .avatar,
-    #profileBtn .profile-icon {
-        font-size: initial !important;
-    }
-}
-</style>
-
 </head>
 
 <body>
@@ -3641,59 +3622,6 @@ function addQuestion(data = null) {
             </select>
 
         </div>
-
-
-        <div class="question-settings-grid">
-
-            <div class="form-group" style="margin-bottom:0;">
-
-                <label>
-                    Question Time Override (seconds)
-                </label>
-
-                <input
-                    type="number"
-                    class="question-time"
-                    min="1"
-                    max="600"
-                    placeholder="Use quiz default">
-
-            </div>
-
-
-            <div class="form-group" style="margin-bottom:0;">
-
-                <label>
-                    Minimum Points Override
-                </label>
-
-                <input
-                    type="number"
-                    class="question-min-points"
-                    min="0"
-                    max="1000000"
-                    placeholder="Use quiz default">
-
-            </div>
-
-
-            <div class="form-group" style="margin-bottom:0;">
-
-                <label>
-                    Maximum Points Override
-                </label>
-
-                <input
-                    type="number"
-                    class="question-max-points"
-                    min="1"
-                    max="1000000"
-                    placeholder="Use quiz default">
-
-            </div>
-
-        </div>
-
     `;
 
 
@@ -3749,42 +3677,6 @@ function addQuestion(data = null) {
             String(
                 data.correct
             );
-
-        if (
-            data.timeLimit !== undefined &&
-            data.timeLimit !== null
-        ) {
-
-            box.querySelector(
-                ".question-time"
-            ).value =
-                data.timeLimit;
-
-        }
-
-        if (
-            data.pointsMin !== undefined &&
-            data.pointsMin !== null
-        ) {
-
-            box.querySelector(
-                ".question-min-points"
-            ).value =
-                data.pointsMin;
-
-        }
-
-        if (
-            data.pointsMax !== undefined &&
-            data.pointsMax !== null
-        ) {
-
-            box.querySelector(
-                ".question-max-points"
-            ).value =
-                data.pointsMax;
-
-        }
 
     }
 
@@ -4075,30 +3967,6 @@ async function saveQuiz() {
                 ".correct-answer"
             ).value;
 
-        const timeInput =
-            box.querySelector(
-                ".question-time"
-            );
-
-        const minPointsInput =
-            box.querySelector(
-                ".question-min-points"
-            );
-
-        const maxPointsInput =
-            box.querySelector(
-                ".question-max-points"
-            );
-
-        const timeValue =
-            timeInput?.value.trim();
-
-        const minPointsValue =
-            minPointsInput?.value.trim();
-
-        const maxPointsValue =
-            maxPointsInput?.value.trim();
-
         if (
             !question ||
             options.some(option => !option) ||
@@ -4122,46 +3990,6 @@ async function saveQuiz() {
             correct: Number(correct)
 
         };
-
-        if (timeValue) {
-
-            questionData.timeLimit =
-                Math.max(
-                    1,
-                    Number(timeValue) || defaultTime
-                );
-
-        }
-
-        if (minPointsValue || maxPointsValue) {
-
-            let minPoints =
-                minPointsValue
-                    ? Math.max(0, Number(minPointsValue))
-                    : defaultMinPoints;
-
-            let maxPoints =
-                maxPointsValue
-                    ? Math.max(1, Number(maxPointsValue))
-                    : defaultMaxPoints;
-
-            if (!Number.isFinite(minPoints)) {
-                minPoints = defaultMinPoints;
-            }
-
-            if (!Number.isFinite(maxPoints)) {
-                maxPoints = defaultMaxPoints;
-            }
-
-            if (maxPoints < minPoints) {
-                [minPoints, maxPoints] =
-                    [maxPoints, minPoints];
-            }
-
-            questionData.pointsMin = minPoints;
-            questionData.pointsMax = maxPoints;
-
-        }
 
         questions.push(questionData);
 
@@ -5666,18 +5494,6 @@ async function playQuizObject(quiz) {
 
 function getQuestionTime(question) {
 
-    const value =
-        Number(question?.timeLimit);
-
-    if (
-        Number.isFinite(value) &&
-        value > 0
-    ) {
-
-        return value;
-
-    }
-
     return Math.max(
         1,
         Number(currentQuiz?.settings?.defaultTime) || 15
@@ -5689,35 +5505,22 @@ function getQuestionTime(question) {
 function getQuestionPointsRange(question) {
 
     let minPoints =
-        Number(question?.pointsMin);
+        Number(currentQuiz?.settings?.defaultMinPoints);
 
     let maxPoints =
-        Number(question?.pointsMax);
-
-    if (!Number.isFinite(maxPoints) || maxPoints <= 0) {
-
-        const oldPoints = Number(question?.points);
-
-        maxPoints =
-            Number.isFinite(oldPoints) && oldPoints > 0
-                ? oldPoints
-                : Number(currentQuiz?.settings?.defaultMaxPoints) || 1000;
-
-    }
+        Number(currentQuiz?.settings?.defaultMaxPoints);
 
     if (!Number.isFinite(minPoints) || minPoints < 0) {
+        minPoints = 100;
+    }
 
-        minPoints =
-            Number(currentQuiz?.settings?.defaultMinPoints);
-
-        if (!Number.isFinite(minPoints) || minPoints < 0) {
-            minPoints = 100;
-        }
-
+    if (!Number.isFinite(maxPoints) || maxPoints <= 0) {
+        maxPoints = 1000;
     }
 
     if (maxPoints < minPoints) {
-        [minPoints, maxPoints] = [maxPoints, minPoints];
+        [minPoints, maxPoints] =
+            [maxPoints, minPoints];
     }
 
     return {
@@ -8833,9 +8636,40 @@ function closeProfileMoreMenu() {
     if (menu) menu.classList.remove("show");
 }
 
+function closeAllMoreMenus() {
+    const publicMenu = document.getElementById("publicProfileMoreMenu");
+    if (publicMenu) publicMenu.classList.remove("show");
+
+    const socialMenu = document.getElementById("socialMoreMenu");
+    if (socialMenu) socialMenu.remove();
+}
+
+document.addEventListener("click", function(event) {
+    const insideMore = event.target.closest && (
+        event.target.closest(".profile-more-wrap") ||
+        event.target.closest(".social-more-btn") ||
+        event.target.closest("#socialMoreMenu")
+    );
+
+    if (!insideMore) closeAllMoreMenus();
+});
+
+document.addEventListener("touchstart", function(event) {
+    const insideMore = event.target.closest && (
+        event.target.closest(".profile-more-wrap") ||
+        event.target.closest(".social-more-btn") ||
+        event.target.closest("#socialMoreMenu")
+    );
+
+    if (!insideMore) closeAllMoreMenus();
+}, { passive: true });
+
 function toggleSocialMore(userId, button) {
     const existing = document.getElementById("socialMoreMenu");
-    if (existing) existing.remove();
+    if (existing) {
+        existing.remove();
+        return;
+    }
     const menu = document.createElement("div");
     menu.id = "socialMoreMenu";
     menu.className = "profile-more-menu show";
