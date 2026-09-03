@@ -1099,6 +1099,178 @@ textarea {
         align-items: flex-start;
     }
 }
+
+
+/* =========================
+   MULTIPLAYER QUIZ LOBBY
+========================= */
+
+.lobby-grid {
+    display: grid;
+    grid-template-columns: 1.1fr .9fr;
+    gap: 16px;
+}
+
+.lobby-panel {
+    background: #10131a;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    padding: 18px;
+}
+
+.lobby-panel h3 {
+    margin-bottom: 12px;
+}
+
+.lobby-player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    max-height: 330px;
+    overflow-y: auto;
+}
+
+.lobby-player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #171a22;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 11px;
+}
+
+.lobby-player-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: 0 0 38px;
+}
+
+.lobby-player-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.lobby-player-name {
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lobby-player-role {
+    color: #8f95a2;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.lobby-chat {
+    height: 330px;
+    display: flex;
+    flex-direction: column;
+}
+
+.lobby-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 3px;
+}
+
+.lobby-chat-message {
+    background: #171a22;
+    border-radius: 10px;
+    padding: 8px 10px;
+}
+
+.lobby-chat-message strong {
+    font-size: 12px;
+}
+
+.lobby-chat-message p {
+    margin-top: 3px;
+    color: #c4c8d1;
+    font-size: 13px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.lobby-chat-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.lobby-chat-form input {
+    flex: 1;
+}
+
+.lobby-chat-form button {
+    background: white;
+    color: #111;
+}
+
+.lobby-header-card {
+    background: linear-gradient(135deg, #171a22, #10131a);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 16px;
+}
+
+.lobby-status {
+    color: #9da3b0;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.lobby-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.lobby-actions button {
+    flex: 1;
+}
+
+.lobby-countdown {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    background: rgba(8,10,14,.94);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.lobby-countdown.show {
+    display: flex;
+}
+
+.lobby-countdown-label {
+    color: #aab0bb;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.lobby-countdown-number {
+    font-size: clamp(70px, 14vw, 150px);
+    line-height: 1;
+    font-weight: 800;
+}
+
+@media (max-width: 760px) {
+    .lobby-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 </style>
 </head>
 
@@ -1922,7 +2094,7 @@ textarea {
                         id="quizDefaultTime"
                         min="1"
                         max="600"
-                        value="10">
+                        placeholder="e.g. 15">
 
                 </div>
 
@@ -1930,12 +2102,28 @@ textarea {
                 <div class="form-group" style="margin-bottom:0;">
 
                     <label>
-                        Default Points
+                        Default Minimum Points
                     </label>
 
                     <input
                         type="number"
-                        id="quizDefaultPoints"
+                        id="quizDefaultMinPoints"
+                        min="0"
+                        max="1000000"
+                        value="100">
+
+                </div>
+
+
+                <div class="form-group" style="margin-bottom:0;">
+
+                    <label>
+                        Default Maximum Points
+                    </label>
+
+                    <input
+                        type="number"
+                        id="quizDefaultMaxPoints"
                         min="1"
                         max="1000000"
                         value="1000">
@@ -2066,6 +2254,138 @@ textarea {
 
     </div>
 
+</div>
+
+
+<!-- MULTIPLAYER QUIZ LOBBY -->
+
+<div
+    class="modal"
+    id="quizLobbyModal">
+
+    <div class="modal-content" style="max-width:900px;">
+
+        <div class="modal-header">
+
+            <h2 id="lobbyTitle">Quiz Lobby</h2>
+
+            <button
+                class="close"
+                onclick="closeModal('quizLobbyModal')">
+
+                ×
+
+            </button>
+
+        </div>
+
+        <div id="lobbyJoinView">
+
+            <div class="lobby-header-card">
+                <h3 id="lobbyJoinQuizName">Quiz</h3>
+                <p id="lobbyJoinQuizDescription" class="lobby-status"></p>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Display Name
+                </label>
+
+                <input
+                    type="text"
+                    id="lobbyDisplayName"
+                    maxlength="40"
+                    placeholder="Enter the name everyone will see">
+            </div>
+
+            <button
+                class="save-btn"
+                type="button"
+                onclick="joinQuizLobby()">
+
+                Join Lobby
+
+            </button>
+
+        </div>
+
+        <div id="lobbyRoomView" style="display:none;">
+
+            <div class="lobby-header-card">
+                <h3 id="lobbyRoomQuizName">Quiz Lobby</h3>
+                <p id="lobbyRoomStatus" class="lobby-status">Waiting for players...</p>
+            </div>
+
+            <div class="lobby-grid">
+
+                <div class="lobby-panel">
+                    <h3>Players <span id="lobbyPlayerCount">0</span></h3>
+                    <div
+                        id="lobbyPlayerList"
+                        class="lobby-player-list">
+                    </div>
+                </div>
+
+                <div class="lobby-panel lobby-chat">
+                    <h3>Lobby Chat</h3>
+                    <div
+                        id="lobbyChatMessages"
+                        class="lobby-chat-messages">
+                    </div>
+
+                    <form
+                        class="lobby-chat-form"
+                        onsubmit="sendLobbyChat(event)">
+
+                        <input
+                            type="text"
+                            id="lobbyChatInput"
+                            maxlength="300"
+                            placeholder="Type a message..."
+                            autocomplete="off">
+
+                        <button type="submit">Send</button>
+
+                    </form>
+                </div>
+
+            </div>
+
+            <div class="lobby-actions">
+
+                <button
+                    id="lobbyStartButton"
+                    class="primary-btn"
+                    type="button"
+                    onclick="startQuizLobby()"
+                    style="display:none;">
+
+                    Start Quiz
+
+                </button>
+
+                <button
+                    class="secondary-btn"
+                    type="button"
+                    onclick="leaveQuizLobby()">
+
+                    Leave Lobby
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="lobbyCountdown" class="lobby-countdown">
+    <div>
+        <div class="lobby-countdown-label">Quiz starting...</div>
+        <div id="lobbyCountdownNumber" class="lobby-countdown-number">5</div>
+    </div>
 </div>
 
 
@@ -2210,6 +2530,20 @@ let currentProfile = null;
 
 let isCurrentUserAdmin = false;
 
+let activeLobbyQuiz = null;
+
+let lobbyChannel = null;
+
+let lobbyJoined = false;
+
+let lobbyStarting = false;
+
+let lobbyCountdownTimer = null;
+
+let lobbyPlayers = new Map();
+
+let lobbyChatMessages = [];
+
 
 /* =========================
    MODAL
@@ -2234,6 +2568,10 @@ function closeModal(id) {
         modal.style.display = "none";
     }
 
+    if (id === "quizLobbyModal" && !lobbyStarting) {
+        leaveQuizLobby(false);
+    }
+
 }
 
 
@@ -2246,18 +2584,17 @@ function quizFromDatabase(row) {
     const rawQuestions =
         row.questions;
 
-
     let settings = {
 
-        defaultTime: 10,
+        defaultTime: 15,
 
-        defaultPoints: 1000
+        defaultMinPoints: 100,
+
+        defaultMaxPoints: 1000
 
     };
 
-
     let questions = [];
-
 
     if (
         rawQuestions &&
@@ -2268,6 +2605,9 @@ function quizFromDatabase(row) {
         questions =
             rawQuestions.items;
 
+        const oldDefaultPoints =
+            Number(rawQuestions.settings?.defaultPoints);
+
         settings = {
 
             ...settings,
@@ -2276,14 +2616,72 @@ function quizFromDatabase(row) {
 
         };
 
-    } else if (
-        Array.isArray(rawQuestions)
-    ) {
+        if (
+            !Number.isFinite(
+                Number(rawQuestions.settings?.defaultMinPoints)
+            )
+        ) {
+
+            settings.defaultMinPoints =
+                Number.isFinite(oldDefaultPoints)
+                    ? Math.max(0, Math.min(oldDefaultPoints, 100))
+                    : 100;
+
+        }
+
+        if (
+            !Number.isFinite(
+                Number(rawQuestions.settings?.defaultMaxPoints)
+            )
+        ) {
+
+            settings.defaultMaxPoints =
+                Number.isFinite(oldDefaultPoints)
+                    ? Math.max(1, oldDefaultPoints)
+                    : 1000;
+
+        }
+
+    } else if (Array.isArray(rawQuestions)) {
 
         questions = rawQuestions;
 
     }
 
+    settings.defaultTime = Math.max(1, Number(settings.defaultTime) || 15);
+    settings.defaultMinPoints = Math.max(0, Number(settings.defaultMinPoints) || 100);
+    settings.defaultMaxPoints = Math.max(1, Number(settings.defaultMaxPoints) || 1000);
+
+    if (settings.defaultMaxPoints < settings.defaultMinPoints) {
+
+        const temp = settings.defaultMinPoints;
+        settings.defaultMinPoints = settings.defaultMaxPoints;
+        settings.defaultMaxPoints = temp;
+
+    }
+
+    questions = questions.map(question => {
+
+        const normalized = { ...question };
+
+        const oldPoints = Number(question?.points);
+
+        if (
+            normalized.pointsMax === undefined &&
+            Number.isFinite(oldPoints)
+        ) {
+
+            normalized.pointsMax = oldPoints;
+            normalized.pointsMin =
+                normalized.pointsMin !== undefined
+                    ? normalized.pointsMin
+                    : 0;
+
+        }
+
+        return normalized;
+
+    });
 
     return {
 
@@ -2295,11 +2693,9 @@ function quizFromDatabase(row) {
 
         description: row.description || "",
 
-        questions:
-            questions,
+        questions: questions,
 
-        settings:
-            settings,
+        settings: settings,
 
         creator_id: row.creator_id,
 
@@ -2430,9 +2826,11 @@ async function migrateLocalQuizzesToSupabase() {
 
                         settings: {
 
-                            defaultTime: 10,
+                            defaultTime: 15,
 
-                            defaultPoints: 1000
+                            defaultMinPoints: 100,
+
+                            defaultMaxPoints: 1000
 
                         },
 
@@ -2526,26 +2924,65 @@ function openCreateQuiz() {
         "quizDescription"
     ).value = "";
 
+    const defaultTimeInput =
+        document.getElementById(
+            "quizDefaultTime"
+        );
+
+    if (defaultTimeInput) {
+        defaultTimeInput.value = "";
+    }
+
+    const defaultMinPointsInput =
+        document.getElementById(
+            "quizDefaultMinPoints"
+        );
+
+    if (defaultMinPointsInput) {
+        defaultMinPointsInput.value = "100";
+    }
+
+    const defaultMaxPointsInput =
+        document.getElementById(
+            "quizDefaultMaxPoints"
+        );
+
+    if (defaultMaxPointsInput) {
+        defaultMaxPointsInput.value = "1000";
+    }
+
     const defaultTime =
         document.getElementById(
             "quizDefaultTime"
         );
 
-    const defaultPoints =
+    const defaultMinPoints =
         document.getElementById(
-            "quizDefaultPoints"
+            "quizDefaultMinPoints"
+        );
+
+    const defaultMaxPoints =
+        document.getElementById(
+            "quizDefaultMaxPoints"
         );
 
     if (defaultTime) {
 
         defaultTime.value =
-            "10";
+            "15";
 
     }
 
-    if (defaultPoints) {
+    if (defaultMinPoints) {
 
-        defaultPoints.value =
+        defaultMinPoints.value =
+            "100";
+
+    }
+
+    if (defaultMaxPoints) {
+
+        defaultMaxPoints.value =
             "1000";
 
     }
@@ -2738,12 +3175,28 @@ function addQuestion(data = null) {
             <div class="form-group" style="margin-bottom:0;">
 
                 <label>
-                    Question Points Override
+                    Minimum Points Override
                 </label>
 
                 <input
                     type="number"
-                    class="question-points"
+                    class="question-min-points"
+                    min="0"
+                    max="1000000"
+                    placeholder="Use quiz default">
+
+            </div>
+
+
+            <div class="form-group" style="margin-bottom:0;">
+
+                <label>
+                    Maximum Points Override
+                </label>
+
+                <input
+                    type="number"
+                    class="question-max-points"
                     min="1"
                     max="1000000"
                     placeholder="Use quiz default">
@@ -2821,14 +3274,26 @@ function addQuestion(data = null) {
         }
 
         if (
-            data.points !== undefined &&
-            data.points !== null
+            data.pointsMin !== undefined &&
+            data.pointsMin !== null
         ) {
 
             box.querySelector(
-                ".question-points"
+                ".question-min-points"
             ).value =
-                data.points;
+                data.pointsMin;
+
+        }
+
+        if (
+            data.pointsMax !== undefined &&
+            data.pointsMax !== null
+        ) {
+
+            box.querySelector(
+                ".question-max-points"
+            ).value =
+                data.pointsMax;
 
         }
 
@@ -2973,14 +3438,12 @@ async function saveQuiz() {
 
     }
 
-
     const name =
         document.getElementById(
             "quizName"
         )
         .value
         .trim();
-
 
     const description =
         document.getElementById(
@@ -2989,34 +3452,63 @@ async function saveQuiz() {
         .value
         .trim();
 
+    const defaultTimeInput =
+        document.getElementById(
+            "quizDefaultTime"
+        );
+
+    const defaultTimeValue =
+        defaultTimeInput
+            ? defaultTimeInput.value.trim()
+            : "";
+
+    if (!defaultTimeValue) {
+        alert("Please set the default question time.");
+        return;
+    }
 
     const defaultTime =
         Math.max(
             1,
-            Number(
-                document.getElementById(
-                    "quizDefaultTime"
-                ).value
-            ) || 10
+            Number(defaultTimeValue)
         );
 
+    if (!Number.isFinite(defaultTime)) {
+        alert("Please enter a valid default question time.");
+        return;
+    }
 
-    const defaultPoints =
+    let defaultMinPoints =
+        Math.max(
+            0,
+            Number(
+                document.getElementById(
+                    "quizDefaultMinPoints"
+                ).value
+            ) || 100
+        );
+
+    let defaultMaxPoints =
         Math.max(
             1,
             Number(
                 document.getElementById(
-                    "quizDefaultPoints"
+                    "quizDefaultMaxPoints"
                 ).value
             ) || 1000
         );
 
+    if (defaultMaxPoints < defaultMinPoints) {
+
+        [defaultMinPoints, defaultMaxPoints] =
+            [defaultMaxPoints, defaultMinPoints];
+
+    }
 
     const questionBoxes =
         document.querySelectorAll(
             ".question-box"
         );
-
 
     if (!name) {
 
@@ -3028,10 +3520,7 @@ async function saveQuiz() {
 
     }
 
-
-    if (
-        questionBoxes.length === 0
-    ) {
+    if (questionBoxes.length === 0) {
 
         alert(
             "Please add at least one question."
@@ -3041,9 +3530,7 @@ async function saveQuiz() {
 
     }
 
-
     const questions = [];
-
 
     for (
         let i = 0;
@@ -3051,20 +3538,11 @@ async function saveQuiz() {
         i++
     ) {
 
-        const box =
-            questionBoxes[i];
+        const box = questionBoxes[i];
 
-
-        if (
-            isQuestionCompletelyBlank(
-                box
-            )
-        ) {
-
+        if (isQuestionCompletelyBlank(box)) {
             continue;
-
         }
-
 
         const question =
             box.querySelector(
@@ -3073,50 +3551,46 @@ async function saveQuiz() {
             .value
             .trim();
 
-
         const options =
             [
                 ...box.querySelectorAll(
                     ".option"
                 )
             ]
-            .map(
-                input =>
-                    input.value.trim()
-            );
-
+            .map(input => input.value.trim());
 
         const correct =
             box.querySelector(
                 ".correct-answer"
             ).value;
 
-
         const timeInput =
             box.querySelector(
                 ".question-time"
             );
 
-
-        const pointsInput =
+        const minPointsInput =
             box.querySelector(
-                ".question-points"
+                ".question-min-points"
             );
 
+        const maxPointsInput =
+            box.querySelector(
+                ".question-max-points"
+            );
 
         const timeValue =
             timeInput?.value.trim();
 
+        const minPointsValue =
+            minPointsInput?.value.trim();
 
-        const pointsValue =
-            pointsInput?.value.trim();
-
+        const maxPointsValue =
+            maxPointsInput?.value.trim();
 
         if (
             !question ||
-            options.some(
-                option => !option
-            ) ||
+            options.some(option => !option) ||
             correct === ""
         ) {
 
@@ -3128,55 +3602,61 @@ async function saveQuiz() {
 
         }
 
-
         const questionData = {
 
-            question:
-                question,
+            question: question,
 
-            options:
-                options,
+            options: options,
 
-            correct:
-                Number(correct)
+            correct: Number(correct)
 
         };
-
 
         if (timeValue) {
 
             questionData.timeLimit =
                 Math.max(
                     1,
-                    Number(timeValue) ||
-                    defaultTime
+                    Number(timeValue) || defaultTime
                 );
 
         }
 
+        if (minPointsValue || maxPointsValue) {
 
-        if (pointsValue) {
+            let minPoints =
+                minPointsValue
+                    ? Math.max(0, Number(minPointsValue))
+                    : defaultMinPoints;
 
-            questionData.points =
-                Math.max(
-                    1,
-                    Number(pointsValue) ||
-                    defaultPoints
-                );
+            let maxPoints =
+                maxPointsValue
+                    ? Math.max(1, Number(maxPointsValue))
+                    : defaultMaxPoints;
+
+            if (!Number.isFinite(minPoints)) {
+                minPoints = defaultMinPoints;
+            }
+
+            if (!Number.isFinite(maxPoints)) {
+                maxPoints = defaultMaxPoints;
+            }
+
+            if (maxPoints < minPoints) {
+                [minPoints, maxPoints] =
+                    [maxPoints, minPoints];
+            }
+
+            questionData.pointsMin = minPoints;
+            questionData.pointsMax = maxPoints;
 
         }
 
-
-        questions.push(
-            questionData
-        );
+        questions.push(questionData);
 
     }
 
-
-    if (
-        questions.length === 0
-    ) {
+    if (questions.length === 0) {
 
         alert(
             "Please add at least one completed question."
@@ -3186,101 +3666,57 @@ async function saveQuiz() {
 
     }
 
-
     const questionData = {
 
         settings: {
 
-            defaultTime:
-                defaultTime,
+            defaultTime: defaultTime,
 
-            defaultPoints:
-                defaultPoints
+            defaultMinPoints: defaultMinPoints,
+
+            defaultMaxPoints: defaultMaxPoints
 
         },
 
-        items:
-            questions
+        items: questions
 
     };
 
-
     let error = null;
 
-
-    if (
-        editingQuizId
-    ) {
+    if (editingQuizId) {
 
         const result =
             await supabaseClient
-
                 .from("quizzes")
-
                 .update({
-
-                    title:
-                        name,
-
-                    description:
-                        description,
-
-                    questions:
-                        questionData,
-
-                    updated_at:
-                        new Date()
-                            .toISOString()
-
+                    title: name,
+                    description: description,
+                    questions: questionData,
+                    updated_at: new Date().toISOString()
                 })
+                .eq("id", editingQuizId)
+                .eq("creator_id", currentProfile.id);
 
-                .eq(
-                    "id",
-                    editingQuizId
-                )
-
-                .eq(
-                    "creator_id",
-                    currentProfile.id
-                );
-
-
-        error =
-            result.error;
+        error = result.error;
 
     } else {
 
         const result =
             await supabaseClient
-
                 .from("quizzes")
-
                 .insert({
-
-                    creator_id:
-                        currentProfile.id,
-
-                    title:
-                        name,
-
-                    description:
-                        description,
-
-                    questions:
-                        questionData
-
+                    creator_id: currentProfile.id,
+                    title: name,
+                    description: description,
+                    questions: questionData
                 })
-
                 .select("*")
-
                 .single();
 
-
-        error =
-            result.error;
+        error = result.error;
 
     }
-
 
     if (error) {
 
@@ -3298,27 +3734,13 @@ async function saveQuiz() {
 
     }
 
+    editingQuizId = null;
 
     await loadQuizzesFromSupabase();
 
+    closeModal("createModal");
 
-    closeModal(
-        "createModal"
-    );
-
-
-    const savedQuizMessage =
-        editingQuizId
-            ? "Quiz updated successfully!"
-            : "Quiz created successfully!";
-
-
-    alert(
-        savedQuizMessage
-    );
-
-
-    editingQuizId = null;
+    renderQuizList();
 
 }
 
@@ -3649,9 +4071,14 @@ async function editQuiz(id) {
         );
 
 
-    const defaultPoints =
+    const defaultMinPoints =
         document.getElementById(
-            "quizDefaultPoints"
+            "quizDefaultMinPoints"
+        );
+
+    const defaultMaxPoints =
+        document.getElementById(
+            "quizDefaultMaxPoints"
         );
 
 
@@ -3659,15 +4086,25 @@ async function editQuiz(id) {
 
         defaultTime.value =
             quiz.settings?.defaultTime ||
-            10;
+            15;
 
     }
 
 
-    if (defaultPoints) {
+    if (defaultMinPoints) {
 
-        defaultPoints.value =
-            quiz.settings?.defaultPoints ||
+        defaultMinPoints.value =
+            quiz.settings?.defaultMinPoints ??
+            100;
+
+    }
+
+
+    if (defaultMaxPoints) {
+
+        defaultMaxPoints.value =
+            quiz.settings?.defaultMaxPoints ??
+            quiz.settings?.defaultPoints ??
             1000;
 
     }
@@ -3934,82 +4371,60 @@ async function openSharedQuizFromUrl() {
         );
 
     const sharedQuizId =
-        params.get(
-            "quiz"
-        );
+        params.get("quiz") ||
+        sessionStorage.getItem("pendingSharedQuizId") ||
+        "";
 
     if (!sharedQuizId) {
-
         return;
-
     }
 
     if (!currentProfile) {
+        sessionStorage.setItem(
+            "pendingSharedQuizId",
+            sharedQuizId
+        );
 
+        const loginMessage =
+            document.getElementById("loginMessage");
+
+        if (loginMessage) {
+            loginMessage.textContent =
+                "Please login first to join this quiz.";
+        }
+
+        showLogin();
         return;
-
     }
 
     try {
 
-        const {
-            data,
-            error
-        } =
+        const { data, error } =
             await supabaseClient
                 .from("quizzes")
                 .select("*")
-                .eq(
-                    "id",
-                    sharedQuizId
-                )
+                .eq("id", sharedQuizId)
                 .maybeSingle();
 
-        if (
-            error
-        ) {
-
-            console.error(
-                "Shared quiz load error:",
-                error
-            );
-
-            alert(
-                "Unable to load this shared quiz: " +
-                error.message
-            );
-
+        if (error) {
+            console.error("Shared quiz load error:", error);
+            alert("Unable to load this shared quiz: " + error.message);
             return;
-
         }
 
         if (!data) {
-
-            alert(
-                "This quiz could not be found or you do not have access to it."
-            );
-
+            alert("This quiz could not be found or you do not have access to it.");
             return;
-
         }
 
-        const sharedQuiz =
-            quizFromDatabase(
-                data
-            );
+        const sharedQuiz = quizFromDatabase(data);
 
-        if (
-            !sharedQuiz.questions ||
-            sharedQuiz.questions.length === 0
-        ) {
-
-            alert(
-                "This quiz has no questions."
-            );
-
+        if (!sharedQuiz.questions || sharedQuiz.questions.length === 0) {
+            alert("This quiz has no questions.");
             return;
-
         }
+
+        sessionStorage.removeItem("pendingSharedQuizId");
 
         window.history.replaceState(
             {},
@@ -4017,21 +4432,423 @@ async function openSharedQuizFromUrl() {
             window.location.pathname
         );
 
-        await playQuizObject(
-            sharedQuiz
-        );
+        openQuizLobby(sharedQuiz);
 
     } catch (error) {
 
-        console.error(
-            "Shared quiz error:",
-            error
-        );
+        console.error("Shared quiz error:", error);
+        alert("Unable to open the shared quiz.");
 
-        alert(
-            "Unable to open the shared quiz."
-        );
+    }
 
+}
+
+
+/* =========================
+   MULTIPLAYER QUIZ LOBBY
+========================= */
+
+function getLobbyPlayerPayload() {
+
+    return {
+        userId: currentProfile?.id || "",
+        displayName: currentProfile?.display_name || "User",
+        userCode: currentProfile?.user_id || "USER",
+        avatarUrl: currentProfile?.avatar_url || getDefaultAvatar(),
+        isHost: activeLobbyQuiz?.creator_id === currentProfile?.id,
+        joinedAt: new Date().toISOString()
+    };
+
+}
+
+
+function renderLobbyPlayers() {
+
+    const list = document.getElementById("lobbyPlayerList");
+    const count = document.getElementById("lobbyPlayerCount");
+    const startButton = document.getElementById("lobbyStartButton");
+
+    if (!list) return;
+
+    const players = [...lobbyPlayers.values()]
+        .filter(player => player && player.userId);
+
+    players.sort((a, b) => {
+        if (a.isHost && !b.isHost) return -1;
+        if (!a.isHost && b.isHost) return 1;
+        return String(a.displayName || "").localeCompare(String(b.displayName || ""));
+    });
+
+    if (count) {
+        count.textContent = `(${players.length})`;
+    }
+
+    if (startButton) {
+        startButton.style.display =
+            activeLobbyQuiz &&
+            currentProfile &&
+            activeLobbyQuiz.creator_id === currentProfile.id &&
+            lobbyJoined &&
+            !lobbyStarting
+                ? "block"
+                : "none";
+    }
+
+    if (players.length === 0) {
+        list.innerHTML = '<div class="empty">Waiting for players...</div>';
+        return;
+    }
+
+    list.innerHTML = players.map(player => `
+        <div class="lobby-player">
+            <img
+                class="lobby-player-avatar"
+                src="${escapeHTML(player.avatarUrl || getDefaultAvatar())}"
+                alt="Avatar">
+            <div class="lobby-player-info">
+                <div class="lobby-player-name">
+                    ${escapeHTML(player.displayName || "User")}
+                </div>
+                <div class="lobby-player-role">
+                    ${player.isHost ? "👑 Host" : "Player"}
+                </div>
+            </div>
+        </div>
+    `).join("");
+
+}
+
+
+function renderLobbyChat() {
+
+    const container = document.getElementById("lobbyChatMessages");
+
+    if (!container) return;
+
+    if (lobbyChatMessages.length === 0) {
+        container.innerHTML = '<div class="empty">No messages yet. Say hello!</div>';
+        return;
+    }
+
+    container.innerHTML = lobbyChatMessages.slice(-100).map(message => `
+        <div class="lobby-chat-message">
+            <strong>${escapeHTML(message.displayName || "User")}</strong>
+            <p>${escapeHTML(message.text || "")}</p>
+        </div>
+    `).join("");
+
+    container.scrollTop = container.scrollHeight;
+
+}
+
+
+function handleLobbyPresenceSync() {
+
+    if (!lobbyChannel) return;
+
+    const state = lobbyChannel.presenceState();
+    const map = new Map();
+
+    Object.keys(state || {}).forEach(key => {
+        const entries = state[key] || [];
+        const latest = entries[entries.length - 1];
+        if (latest && latest.userId) {
+            map.set(latest.userId, latest);
+        }
+    });
+
+    lobbyPlayers = map;
+    renderLobbyPlayers();
+
+    const status = document.getElementById("lobbyRoomStatus");
+    if (status) {
+        status.textContent =
+            `${map.size} player${map.size === 1 ? "" : "s"} in the lobby • Waiting for the host to start`;
+    }
+
+}
+
+
+async function openQuizLobby(quiz) {
+
+    if (!currentProfile) {
+        showLogin();
+        return;
+    }
+
+    if (!quiz || !quiz.id) {
+        alert("Unable to open this quiz lobby.");
+        return;
+    }
+
+    await leaveQuizLobby(false);
+
+    activeLobbyQuiz = quiz;
+    lobbyJoined = false;
+    lobbyStarting = false;
+    lobbyPlayers = new Map();
+    lobbyChatMessages = [];
+
+    const title = document.getElementById("lobbyTitle");
+    const joinName = document.getElementById("lobbyJoinQuizName");
+    const joinDescription = document.getElementById("lobbyJoinQuizDescription");
+    const roomName = document.getElementById("lobbyRoomQuizName");
+    const nameInput = document.getElementById("lobbyDisplayName");
+    const joinView = document.getElementById("lobbyJoinView");
+    const roomView = document.getElementById("lobbyRoomView");
+
+    if (title) title.textContent = `${quiz.name} • Lobby`;
+    if (joinName) joinName.textContent = quiz.name;
+    if (joinDescription) joinDescription.textContent = quiz.description || "Join the lobby and wait for the host to start.";
+    if (roomName) roomName.textContent = quiz.name;
+    if (nameInput) nameInput.value = currentProfile.display_name && currentProfile.display_name !== "User" ? currentProfile.display_name : "";
+    if (joinView) joinView.style.display = "block";
+    if (roomView) roomView.style.display = "none";
+
+    renderLobbyChat();
+    openModal("quizLobbyModal");
+
+}
+
+
+async function joinQuizLobby() {
+
+    if (!currentProfile || !activeLobbyQuiz) {
+        return;
+    }
+
+    const input = document.getElementById("lobbyDisplayName");
+    const displayName = input ? input.value.trim() : "";
+
+    if (!displayName) {
+        alert("Please enter a display name before joining.");
+        return;
+    }
+
+    if (displayName.length > 40) {
+        alert("Display name must be 40 characters or less.");
+        return;
+    }
+
+    if (displayName !== (currentProfile.display_name || "")) {
+        const { data, error } = await supabaseClient
+            .from("profiles")
+            .update({ display_name: displayName })
+            .eq("id", currentProfile.id)
+            .select("*")
+            .single();
+
+        if (error) {
+            alert("Unable to save display name: " + error.message);
+            return;
+        }
+
+        currentProfile = data;
+        updateLoginUI(data);
+    }
+
+    const joinView = document.getElementById("lobbyJoinView");
+    const roomView = document.getElementById("lobbyRoomView");
+
+    if (joinView) joinView.style.display = "none";
+    if (roomView) roomView.style.display = "block";
+
+    lobbyChatMessages = [];
+    renderLobbyChat();
+
+    lobbyChannel = supabaseClient.channel(
+        `quiz-lobby-${activeLobbyQuiz.id}`,
+        {
+            config: {
+                presence: {
+                    key: currentProfile.id
+                }
+            }
+        }
+    );
+
+    lobbyChannel
+        .on("presence", { event: "sync" }, () => {
+            handleLobbyPresenceSync();
+        })
+        .on("presence", { event: "join" }, () => {
+            handleLobbyPresenceSync();
+        })
+        .on("presence", { event: "leave" }, () => {
+            handleLobbyPresenceSync();
+        })
+        .on("broadcast", { event: "lobby_chat" }, ({ payload }) => {
+            if (!payload || !payload.text) return;
+            lobbyChatMessages.push(payload);
+            renderLobbyChat();
+        })
+        .on("broadcast", { event: "quiz_start" }, ({ payload }) => {
+            if (!payload || !payload.startsAt) return;
+            if (lobbyStarting) return;
+            runLobbyCountdown(payload.startsAt);
+        })
+        .subscribe(async status => {
+            if (status !== "SUBSCRIBED") return;
+
+            lobbyJoined = true;
+
+            await lobbyChannel.track(
+                getLobbyPlayerPayload()
+            );
+
+            handleLobbyPresenceSync();
+
+            const statusText = document.getElementById("lobbyRoomStatus");
+            if (statusText) {
+                statusText.textContent = "Lobby connected • Waiting for the host to start";
+            }
+        });
+
+    renderLobbyPlayers();
+
+}
+
+
+async function sendLobbyChat(event) {
+
+    if (event) event.preventDefault();
+
+    if (!lobbyChannel || !lobbyJoined || !currentProfile) return;
+
+    const input = document.getElementById("lobbyChatInput");
+    const text = input ? input.value.trim() : "";
+
+    if (!text) return;
+
+    const payload = {
+        userId: currentProfile.id,
+        displayName: currentProfile.display_name || "User",
+        text: text.slice(0, 300),
+        sentAt: new Date().toISOString()
+    };
+
+    lobbyChatMessages.push(payload);
+    renderLobbyChat();
+
+    if (input) input.value = "";
+
+    await lobbyChannel.send({
+        type: "broadcast",
+        event: "lobby_chat",
+        payload: payload
+    });
+
+}
+
+
+function startQuizLobby() {
+
+    if (!activeLobbyQuiz || !currentProfile || !lobbyJoined || !lobbyChannel) return;
+
+    if (activeLobbyQuiz.creator_id !== currentProfile.id) {
+        alert("Only the host can start this quiz.");
+        return;
+    }
+
+    if (lobbyStarting) return;
+
+    const startsAt = Date.now() + 5500;
+    lobbyStarting = true;
+
+    const status = document.getElementById("lobbyRoomStatus");
+    if (status) status.textContent = "The host started the quiz. Get ready!";
+
+    lobbyChannel.send({
+        type: "broadcast",
+        event: "quiz_start",
+        payload: {
+            startsAt: startsAt,
+            quizId: activeLobbyQuiz.id
+        }
+    });
+
+    runLobbyCountdown(startsAt);
+
+}
+
+
+function runLobbyCountdown(startsAt) {
+
+    if (!activeLobbyQuiz) return;
+
+    if (lobbyCountdownTimer) {
+        clearInterval(lobbyCountdownTimer);
+        lobbyCountdownTimer = null;
+    }
+
+    lobbyStarting = true;
+
+    const overlay = document.getElementById("lobbyCountdown");
+    const number = document.getElementById("lobbyCountdownNumber");
+
+    if (overlay) overlay.classList.add("show");
+
+    const tick = () => {
+        const remaining = Math.max(0, startsAt - Date.now());
+        const seconds = Math.ceil(remaining / 1000);
+
+        if (number) number.textContent = String(Math.max(1, seconds));
+
+        if (remaining <= 0) {
+            if (lobbyCountdownTimer) {
+                clearInterval(lobbyCountdownTimer);
+                lobbyCountdownTimer = null;
+            }
+
+            if (number) number.textContent = "GO";
+
+            setTimeout(async () => {
+                if (overlay) overlay.classList.remove("show");
+
+                const quizToPlay = activeLobbyQuiz;
+                await leaveQuizLobby(false);
+                await playQuizObject(quizToPlay);
+            }, 250);
+        }
+    };
+
+    tick();
+    lobbyCountdownTimer = setInterval(tick, 100);
+
+}
+
+
+async function leaveQuizLobby(closeLobby = true) {
+
+    if (lobbyCountdownTimer) {
+        clearInterval(lobbyCountdownTimer);
+        lobbyCountdownTimer = null;
+    }
+
+    const overlay = document.getElementById("lobbyCountdown");
+    if (overlay) overlay.classList.remove("show");
+
+    if (lobbyChannel) {
+        try {
+            await lobbyChannel.untrack();
+        } catch (error) {
+            console.warn("Lobby untrack error:", error);
+        }
+
+        try {
+            await supabaseClient.removeChannel(lobbyChannel);
+        } catch (error) {
+            console.warn("Lobby channel removal error:", error);
+        }
+    }
+
+    lobbyChannel = null;
+    lobbyJoined = false;
+    lobbyStarting = false;
+    lobbyPlayers = new Map();
+
+    if (closeLobby) {
+        closeModal("quizLobbyModal");
     }
 
 }
@@ -4202,9 +5019,7 @@ async function playQuizObject(quiz) {
 function getQuestionTime(question) {
 
     const value =
-        Number(
-            question?.timeLimit
-        );
+        Number(question?.timeLimit);
 
     if (
         Number.isFinite(value) &&
@@ -4217,36 +5032,50 @@ function getQuestionTime(question) {
 
     return Math.max(
         1,
-        Number(
-            currentQuiz?.settings?.defaultTime
-        ) || 10
+        Number(currentQuiz?.settings?.defaultTime) || 15
     );
 
 }
 
 
-function getQuestionPoints(question) {
+function getQuestionPointsRange(question) {
 
-    const value =
-        Number(
-            question?.points
-        );
+    let minPoints =
+        Number(question?.pointsMin);
 
-    if (
-        Number.isFinite(value) &&
-        value > 0
-    ) {
+    let maxPoints =
+        Number(question?.pointsMax);
 
-        return value;
+    if (!Number.isFinite(maxPoints) || maxPoints <= 0) {
+
+        const oldPoints = Number(question?.points);
+
+        maxPoints =
+            Number.isFinite(oldPoints) && oldPoints > 0
+                ? oldPoints
+                : Number(currentQuiz?.settings?.defaultMaxPoints) || 1000;
 
     }
 
-    return Math.max(
-        1,
-        Number(
-            currentQuiz?.settings?.defaultPoints
-        ) || 1000
-    );
+    if (!Number.isFinite(minPoints) || minPoints < 0) {
+
+        minPoints =
+            Number(currentQuiz?.settings?.defaultMinPoints);
+
+        if (!Number.isFinite(minPoints) || minPoints < 0) {
+            minPoints = 100;
+        }
+
+    }
+
+    if (maxPoints < minPoints) {
+        [minPoints, maxPoints] = [maxPoints, minPoints];
+    }
+
+    return {
+        min: minPoints,
+        max: maxPoints
+    };
 
 }
 
@@ -4405,8 +5234,8 @@ function showCurrentQuestion() {
         );
 
 
-    const points =
-        getQuestionPoints(
+    const pointsRange =
+        getQuestionPointsRange(
             question
         );
 
@@ -4469,7 +5298,7 @@ function showCurrentQuestion() {
                 margin-top:6px;
             ">
 
-            Correct answer • Up to ${points} points
+            Correct answer • ${pointsRange.min}–${pointsRange.max} points based on speed
 
         </div>
 
@@ -4671,16 +5500,16 @@ async function submitCurrentAnswer(
         remaining > 0
     ) {
 
-        const basePoints =
-            getQuestionPoints(
+        const pointsRange =
+            getQuestionPointsRange(
                 question
             );
 
         earnedPoints =
             Math.round(
-                basePoints *
-                (remaining /
-                    timeLimit)
+                pointsRange.min +
+                (pointsRange.max - pointsRange.min) *
+                (remaining / timeLimit)
             );
 
     }
@@ -5671,6 +6500,49 @@ function showLogin() {
 }
 
 
+function getPendingSharedQuizId() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    return (
+        params.get("quiz") ||
+        sessionStorage.getItem("pendingSharedQuizId") ||
+        ""
+    );
+
+}
+
+
+function getAuthRedirectUrl() {
+
+    const quizId =
+        getPendingSharedQuizId();
+
+    if (!quizId) {
+        return (
+            window.location.origin +
+            window.location.pathname
+        );
+    }
+
+    sessionStorage.setItem(
+        "pendingSharedQuizId",
+        quizId
+    );
+
+    return (
+        window.location.origin +
+        window.location.pathname +
+        "?quiz=" +
+        encodeURIComponent(quizId)
+    );
+
+}
+
+
 async function loginWithGoogle() {
 
     const {
@@ -5685,8 +6557,7 @@ async function loginWithGoogle() {
                 options: {
 
                     redirectTo:
-                        window.location.origin +
-                        window.location.pathname
+                        getAuthRedirectUrl()
 
                 }
 
@@ -5718,8 +6589,7 @@ async function loginWithDiscord() {
                 options: {
 
                     redirectTo:
-                        window.location.origin +
-                        window.location.pathname
+                        getAuthRedirectUrl()
 
                 }
 
@@ -6471,48 +7341,44 @@ async function saveProfile() {
 
     if (!currentProfile) return;
 
-
-    const displayName =
+    const displayNameInput =
         document.getElementById(
             "editDisplayName"
-        )
-        .value
-        .trim();
-
+        );
 
     const avatarUrlInput =
         document.getElementById(
             "editAvatarUrl"
         );
 
-
     const avatarFileInput =
         document.getElementById(
             "editAvatarFile"
         );
 
-
-    const avatarFile =
-        avatarFileInput?.files?.[0] ||
-        null;
-
+    const displayName =
+        displayNameInput
+            ? displayNameInput.value.trim()
+            : "";
 
     const typedAvatarUrl =
         avatarUrlInput
             ? avatarUrlInput.value.trim()
             : "";
 
+    const avatarFile =
+        avatarFileInput?.files?.[0] ||
+        null;
 
-    if (!displayName) {
+    const newDisplayName =
+        displayName ||
+        currentProfile.display_name ||
+        "User";
 
-        alert(
-            "Please enter a username."
-        );
-
-        return;
-
-    }
-
+    let newAvatarUrl =
+        typedAvatarUrl ||
+        currentProfile.avatar_url ||
+        "";
 
     if (avatarFile) {
 
@@ -6523,12 +7389,7 @@ async function saveProfile() {
             "image/gif"
         ];
 
-
-        if (
-            !allowedTypes.includes(
-                avatarFile.type
-            )
-        ) {
+        if (!allowedTypes.includes(avatarFile.type)) {
 
             alert(
                 "Please select a JPG, PNG, WebP, or GIF image."
@@ -6538,11 +7399,7 @@ async function saveProfile() {
 
         }
 
-
-        if (
-            avatarFile.size >
-            10 * 1024 * 1024
-        ) {
+        if (avatarFile.size > 10 * 1024 * 1024) {
 
             alert(
                 "Image size must be 10 MB or less."
@@ -6552,21 +7409,11 @@ async function saveProfile() {
 
         }
 
-    }
-
-
-    let newAvatarUrl =
-        typedAvatarUrl;
-
-
-    if (avatarFile) {
-
         const fileExtension =
             avatarFile.name
                 .split(".")
                 .pop()
                 .toLowerCase();
-
 
         const filePath =
             currentProfile.id +
@@ -6574,7 +7421,6 @@ async function saveProfile() {
             Date.now() +
             "." +
             fileExtension;
-
 
         const {
             error: uploadError
@@ -6587,11 +7433,9 @@ async function saveProfile() {
                     avatarFile,
                     {
                         upsert: false,
-                        contentType:
-                            avatarFile.type
+                        contentType: avatarFile.type
                     }
                 );
-
 
         if (uploadError) {
 
@@ -6604,32 +7448,29 @@ async function saveProfile() {
 
         }
 
-
         const {
             data: publicUrlData
         } =
             supabaseClient
                 .storage
                 .from("avatars")
-                .getPublicUrl(
-                    filePath
-                );
-
+                .getPublicUrl(filePath);
 
         newAvatarUrl =
             publicUrlData.publicUrl;
 
     }
 
-
     const oldAvatarUrl =
         currentProfile.avatar_url ||
         "";
 
+    const avatarChanged =
+        newAvatarUrl !== oldAvatarUrl;
 
     if (
-        oldAvatarUrl &&
-        newAvatarUrl !== oldAvatarUrl
+        avatarChanged &&
+        oldAvatarUrl
     ) {
 
         const {
@@ -6638,15 +7479,10 @@ async function saveProfile() {
             await supabaseClient
                 .from("avatar_history")
                 .insert({
-
-                    user_id:
-                        currentProfile.id,
-
-                    avatar_url:
-                        oldAvatarUrl
-
+                    user_id: currentProfile.id,
+                    avatar_url: oldAvatarUrl,
+                    provider: currentProfile.provider || null
                 });
-
 
         if (historyError) {
 
@@ -6666,35 +7502,43 @@ async function saveProfile() {
 
     }
 
+    const usernameChanged =
+        newDisplayName !==
+        (currentProfile.display_name || "User");
+
+    if (!usernameChanged && !avatarChanged) {
+
+        closeModal(
+            "editProfileModal"
+        );
+
+        return;
+
+    }
+
+    const updateData = {};
+
+    if (usernameChanged) {
+        updateData.display_name = newDisplayName;
+    }
+
+    if (avatarChanged) {
+        updateData.avatar_url = newAvatarUrl || null;
+    }
 
     const {
         data: updatedProfile,
         error
     } =
         await supabaseClient
-
             .from("profiles")
-
-            .update({
-
-                display_name:
-                    displayName,
-
-                avatar_url:
-                    newAvatarUrl ||
-                    null
-
-            })
-
+            .update(updateData)
             .eq(
                 "id",
                 currentProfile.id
             )
-
             .select("*")
-
             .single();
-
 
     if (error) {
 
@@ -6706,74 +7550,18 @@ async function saveProfile() {
 
     }
 
-
     currentProfile =
         updatedProfile;
-
 
     updateLoginUI(
         updatedProfile
     );
 
-
     closeModal(
         "editProfileModal"
     );
 
-
     await handleUserProfile();
-
-}
-
-
-const editAvatarFile =
-    document.getElementById(
-        "editAvatarFile"
-    );
-
-const editAvatarPreview =
-    document.getElementById(
-        "editAvatarPreview"
-    );
-
-
-if (
-    editAvatarFile &&
-    editAvatarPreview
-) {
-
-    editAvatarFile.addEventListener(
-        "change",
-        function() {
-
-            const file =
-                this.files?.[0];
-
-            if (!file) return;
-
-
-            const reader =
-                new FileReader();
-
-
-            reader.onload =
-                function(event) {
-
-                    editAvatarPreview.src =
-                        event.target.result;
-
-                    editAvatarPreview.style.display =
-                        "block";
-
-                };
-
-
-            reader.readAsDataURL(
-                file
-            );
-
-        }
-    );
 
 }
 
@@ -6789,6 +7577,8 @@ if (
 async function logoutUser() {
 
     closeProfileMenu();
+
+    await leaveQuizLobby(false);
 
 
     const {
@@ -7999,6 +8789,8 @@ supabaseClient.auth.onAuthStateChange(
 
                 } else {
 
+                    await leaveQuizLobby(false);
+
                     currentProfile =
                         null;
 
@@ -8049,6 +8841,17 @@ supabaseClient.auth.onAuthStateChange(
         updateLoginUI(
             null
         );
+
+        if (getPendingSharedQuizId()) {
+
+            sessionStorage.setItem(
+                "pendingSharedQuizId",
+                getPendingSharedQuizId()
+            );
+
+            showLogin();
+
+        }
 
     }
 
