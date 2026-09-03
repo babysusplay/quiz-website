@@ -3046,6 +3046,41 @@ function renderCurrentIdentityName(name) {
 }
 </style>
 
+
+<style id="v42-public-profile-stats-polish">
+#publicProfileSocialStats .social-stat:nth-child(5),
+#publicProfileSocialStats .social-stat:nth-child(6) {
+    cursor: default;
+}
+</style>
+
+
+<style id="v42-mobile-room-icon-fix">
+@media (max-width: 768px) {
+    header .header-action-btn[onclick="openRoomMenu()"] {
+        font-size: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1 !important;
+        gap: 0 !important;
+        min-width: 54px !important;
+        padding-left: 7px !important;
+        padding-right: 7px !important;
+    }
+
+    header .header-action-btn[onclick="openRoomMenu()"]::before {
+        content: "🚪 Room";
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px !important;
+        line-height: 1 !important;
+        white-space: nowrap;
+    }
+}
+</style>
+
 </head>
 
 <body>
@@ -11598,23 +11633,80 @@ async function openPublicProfile(userId) {
     );
     document.getElementById("publicProfileUserId").textContent = "User ID: " + (profile.user_id || "");
 
-    const [{ data: stats }, { data: liked }, { data: following }, { data: reverseFollow }] = await Promise.all([
+    const [
+        { data: stats },
+        { data: liked },
+        { data: following },
+        { data: reverseFollow },
+        { count: likesCount, error: likesCountError },
+        { count: followersCount, error: followersCountError },
+        { count: followingCount, error: followingCountError }
+    ] = await Promise.all([
         supabaseClient.rpc("get_profile_stats", { target_user: userId }),
-        supabaseClient.from("profile_likes").select("id").eq("user_id", userId).eq("liked_by", currentProfile.id).eq("like_day", new Date().toISOString().slice(0,10)).maybeSingle(),
-        supabaseClient.from("profile_follows").select("id").eq("following_id", userId).eq("follower_id", currentProfile.id).maybeSingle(),
-        supabaseClient.from("profile_follows").select("id").eq("following_id", currentProfile.id).eq("follower_id", userId).maybeSingle()
+        supabaseClient
+            .from("profile_likes")
+            .select("id")
+            .eq("user_id", userId)
+            .eq("liked_by", currentProfile.id)
+            .eq("like_day", new Date().toISOString().slice(0,10))
+            .maybeSingle(),
+        supabaseClient
+            .from("profile_follows")
+            .select("id")
+            .eq("following_id", userId)
+            .eq("follower_id", currentProfile.id)
+            .maybeSingle(),
+        supabaseClient
+            .from("profile_follows")
+            .select("id")
+            .eq("following_id", currentProfile.id)
+            .eq("follower_id", userId)
+            .maybeSingle(),
+        supabaseClient
+            .from("profile_likes")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", userId),
+        supabaseClient
+            .from("profile_follows")
+            .select("id", { count: "exact", head: true })
+            .eq("following_id", userId),
+        supabaseClient
+            .from("profile_follows")
+            .select("id", { count: "exact", head: true })
+            .eq("follower_id", userId)
     ]);
 
     const s = stats?.[0] || {};
     const isMutual = !!following && !!reverseFollow;
 
+    /*
+       Use direct table counts for Likes / Followers / Following.
+       This keeps the public card in sync immediately after a follow
+       or like, even if the optional get_profile_stats RPC is stale
+       or has not been migrated yet.
+    */
+    const totalLikes =
+        likesCountError
+            ? Number(s.likes || 0)
+            : Number(likesCount || 0);
+
+    const totalFollowers =
+        followersCountError
+            ? Number(s.followers || 0)
+            : Number(followersCount || 0);
+
+    const totalFollowing =
+        followingCountError
+            ? Number(s.following || 0)
+            : Number(followingCount || 0);
+
     document.getElementById("publicProfileSocialStats").innerHTML = `
         <div class="social-stat"><strong>${Number(s.quizzes_played || 0)}</strong><small>Quizzes Played</small></div>
         <div class="social-stat"><strong>${Number(s.total_score || 0)}</strong><small>Total Score</small></div>
         <div class="social-stat"><strong>${Number(s.all_time_rank || 0) || "—"}</strong><small>All-Time Rank</small></div>
-        <div class="social-stat"><strong>${Number(s.likes || 0)}</strong><small>Total Likes</small></div>
-        <div class="social-stat"><strong>${Number(s.followers || 0)}</strong><small>Followers</small></div>
-        <div class="social-stat"><strong>${Number(s.following || 0)}</strong><small>Following</small></div>
+        <div class="social-stat"><strong>${totalLikes}</strong><small>Likes</small></div>
+        <div class="social-stat"><strong>${totalFollowers}</strong><small>Followers</small></div>
+        <div class="social-stat"><strong>${totalFollowing}</strong><small>Following</small></div>
     `;
 
     const actions = document.getElementById("publicProfileActions");
