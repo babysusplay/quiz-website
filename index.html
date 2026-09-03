@@ -2187,49 +2187,57 @@ header .home-logo {
 </style>
 
 
-<style id="v25-admin-dev-style">
-.dev-name {
-    color: #ff4d5f !important;
-}
-
-.dev-name-badge {
+<style id="v26-admin-badge-style">
+.admin-name-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     margin-left: 5px;
     padding: 2px 6px;
     border-radius: 999px;
-    background: rgba(255, 77, 95, .14);
-    border: 1px solid rgba(255, 77, 95, .38);
-    color: #ff4d5f;
+    background: rgba(255,77,95,.12);
+    border: 1px solid rgba(255,77,95,.32);
+    color: #ff4d5f !important;
     font-size: .62em;
     font-weight: 800;
-    letter-spacing: .06em;
+    letter-spacing: .05em;
     vertical-align: middle;
     line-height: 1;
 }
 </style>
 
-<script id="v25-admin-dev-helper">
-/* Admin identity styling: only the logged-in admin account gets DEV + red name. */
+<script id="v26-admin-badge-helper">
 function renderIdentityName(name, userId) {
     const safeName = escapeHTML(name || "User");
-    const isDev =
+    const isAdminIdentity =
         !!isCurrentUserAdmin &&
         !!currentProfile?.id &&
         String(userId || "") === String(currentProfile.id);
 
-    return isDev
-        ? `${safeName} <span class="dev-name-badge">DEV</span>`
+    return isAdminIdentity
+        ? `${safeName} <span class="admin-name-badge">ADMIN</span>`
         : safeName;
 }
 
 function renderCurrentIdentityName(name) {
     return isCurrentUserAdmin
-        ? `${escapeHTML(name || "User")} <span class="dev-name-badge">DEV</span>`
+        ? `${escapeHTML(name || "User")} <span class="admin-name-badge">ADMIN</span>`
         : escapeHTML(name || "User");
 }
 </script>
+
+
+<style id="v27-public-profile-overlay">
+/* A profile opened from a leaderboard must appear above the leaderboard modal. */
+#publicProfileModal {
+    z-index: 3000 !important;
+}
+
+#publicProfileModal .modal-content {
+    position: relative;
+    z-index: 3001;
+}
+</style>
 
 </head>
 
@@ -5784,7 +5792,7 @@ function renderLobbyPlayers() {
                 src="${escapeHTML(player.avatarUrl || getDefaultAvatar())}"
                 alt="Avatar">
             <div class="lobby-player-info">
-                <div class="lobby-player-name ${String(player.userId) === String(currentProfile?.id) && isCurrentUserAdmin ? "dev-name" : ""}">
+                <div class="lobby-player-name ${String(player.userId) === String(currentProfile?.id) && isCurrentUserAdmin ? "admin-name" : ""}">
                     ${renderIdentityName(
                         player.displayName || "User",
                         player.userId
@@ -5813,7 +5821,7 @@ function renderLobbyChat() {
 
     container.innerHTML = lobbyChatMessages.slice(-100).map(message => `
         <div class="lobby-chat-message">
-            <strong class="${String(message.userId) === String(currentProfile?.id) && isCurrentUserAdmin ? "dev-name" : ""}">${renderIdentityName(message.displayName || "User", message.userId)}</strong>
+            <strong class="${String(message.userId) === String(currentProfile?.id) && isCurrentUserAdmin ? "admin-name" : ""}">${renderIdentityName(message.displayName || "User", message.userId)}</strong>
             <p>${escapeHTML(message.text || "")}</p>
         </div>
     `).join("");
@@ -8466,7 +8474,7 @@ function updateLoginUI(
         menuName.innerHTML =
             renderCurrentIdentityName(name);
         menuName.classList.toggle(
-            "dev-name",
+            "admin-name",
             !!isCurrentUserAdmin
         );
 
@@ -8735,7 +8743,7 @@ async function handleUserProfile() {
                 profile.id
             );
         profileModalName.classList.toggle(
-            "dev-name",
+            "admin-name",
             !!isCurrentUserAdmin &&
             String(profile.id) === String(currentProfile?.id)
         );
@@ -9279,7 +9287,7 @@ async function loadGlobalLeaderboard() {
                 <div class="global-board-rank">#${Number(row.rank || 0)}</div>
                 <img class="global-board-avatar" src="${escapeHTML(row.avatar_url || getDefaultAvatar())}" alt="Avatar">
                 <div class="global-board-main">
-                    <strong class="${String(row.user_id) === String(currentProfile?.id) && isCurrentUserAdmin ? "dev-name" : ""}">${renderIdentityName(row.display_name || "User", row.user_id)}</strong>
+                    <strong class="${String(row.user_id) === String(currentProfile?.id) && isCurrentUserAdmin ? "admin-name" : ""}">${renderIdentityName(row.display_name || "User", row.user_id)}</strong>
                     <small>${Number(row.quizzes_played || 0)} quiz${Number(row.quizzes_played || 0) === 1 ? "" : "zes"}</small>
                 </div>
                 <div class="global-board-score">${Number(row.total_score || 0)}</div>
@@ -9666,7 +9674,7 @@ async function openLikeLeaderboard() {
                 <div class="global-board-rank">#${Number(row.rank || 0)}</div>
                 <img class="global-board-avatar" src="${escapeHTML(row.avatar_url || getDefaultAvatar())}" alt="Avatar">
                 <div class="global-board-main">
-                    <strong class="${String(row.user_id) === String(currentProfile?.id) && isCurrentUserAdmin ? "dev-name" : ""}">${renderIdentityName(row.display_name || "User", row.user_id)}</strong>
+                    <strong class="${String(row.user_id) === String(currentProfile?.id) && isCurrentUserAdmin ? "admin-name" : ""}">${renderIdentityName(row.display_name || "User", row.user_id)}</strong>
                     <small>${Number(row.total_likes || 0)} like${Number(row.total_likes || 0) === 1 ? "" : "s"}</small>
                 </div>
                 <div class="global-board-score">${Number(row.total_likes || 0)}</div>
@@ -9707,7 +9715,7 @@ async function openPublicProfile(userId) {
     document.getElementById("publicProfileName").innerHTML =
         renderIdentityName(profile.display_name || "User", profile.id);
     document.getElementById("publicProfileName").classList.toggle(
-        "dev-name",
+        "admin-name",
         !!isCurrentUserAdmin &&
         String(profile.id) === String(currentProfile?.id)
     );
@@ -10196,12 +10204,49 @@ function toggleSocialMore(userId, button) {
 
 function openPlayerSearch() {
     if (!requireLogin()) return;
+
+    /*
+       Search Player is a destination, not a second modal on top of
+       the profile/leaderboard. Close the current overlays first.
+    */
+    [
+        "publicProfileModal",
+        "leaderboardModal",
+        "socialCenterModal",
+        "directChatModal",
+        "playerSearchModal"
+    ].forEach(id => {
+        const modal = document.getElementById(id);
+        if (modal) modal.style.display = "none";
+    });
+
+    if (typeof closeProfileMoreMenu === "function") {
+        closeProfileMoreMenu();
+    }
+
+    const socialMoreMenu = document.getElementById("socialMoreMenu");
+    if (socialMoreMenu) socialMoreMenu.remove();
+
     const input = document.getElementById("playerSearchInput");
-    if (input) input.value = "";
+    if (input) {
+        input.value = "";
+        setTimeout(() => input.focus(), 0);
+    }
+
     const results = document.getElementById("playerSearchResults");
-    if (results) results.innerHTML = '<div class="empty">Search for a player by username or User ID.</div>';
-    const suggestions = document.getElementById("playerSearchSuggestions");
-    if (suggestions) suggestions.innerHTML = '<small style="color:#8f95a2;">Mutual players will be prioritized in search results.</small>';
+    if (results) {
+        results.innerHTML =
+            '<div class="empty">Search for a player by username or User ID.</div>';
+    }
+
+    const suggestions =
+        document.getElementById("playerSearchSuggestions");
+
+    if (suggestions) {
+        suggestions.innerHTML =
+            '<small style="color:#8f95a2;">Mutual players will be prioritized in search results.</small>';
+    }
+
     openModal("playerSearchModal");
 }
 
@@ -10329,7 +10374,9 @@ async function loadAdminSocialModeration(userId) {
     section.style.marginTop = "18px";
     section.innerHTML = `
         <h3 class="admin-section-title">Social & Moderation</h3>
-        <p style="color:#8f95a2;font-size:12px;">Admin moderation access to this user's direct-message conversations.</p>
+        <p style="color:#8f95a2;font-size:12px;">
+    Admin-only view of this user's direct-message conversations. You can open any conversation whenever you need to review it.
+</p>
         <div class="admin-mini-list">
             ${[...grouped.entries()].map(([otherId, msgs], index) => {
                 const person = profilesById[otherId] || {};
@@ -10338,7 +10385,7 @@ async function loadAdminSocialModeration(userId) {
                     <div class="admin-mini-item">
                         <strong>${escapeHTML(person.display_name || "User")} ${person.user_id ? "• " + escapeHTML(person.user_id) : ""}</strong>
                         <small>${msgs.length} message${msgs.length === 1 ? "" : "s"}</small>
-                        <button class="secondary-btn" style="margin-top:8px;" type="button" onclick="document.getElementById('${panelId}').style.display = document.getElementById('${panelId}').style.display === 'none' ? 'block' : 'none'">View Conversation</button>
+                        <button class="secondary-btn" style="margin-top:8px;" type="button" onclick="document.getElementById('${panelId}').style.display = document.getElementById('${panelId}').style.display === 'none' ? 'block' : 'none'">View Chat</button>
                         <div id="${panelId}" style="display:none;margin-top:8px;">
                             ${msgs.sort((a,b) => new Date(a.created_at)-new Date(b.created_at)).map(m => `
                                 <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);">
