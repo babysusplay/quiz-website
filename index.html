@@ -15290,6 +15290,8 @@ supabaseClient.auth.onAuthStateChange(
                         "loginModal"
                     );
 
+                    await openQuizFromUrl();
+
                 } else {
 
                     await leaveQuizLobby(false);
