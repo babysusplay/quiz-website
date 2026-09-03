@@ -2239,6 +2239,128 @@ function renderCurrentIdentityName(name) {
 }
 </style>
 
+
+<style id="v30-admin-chat-monitor-style">
+.admin-chat-monitor-section {
+    margin: 18px 0 22px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px;
+    background: rgba(255,255,255,.025);
+}
+.admin-chat-monitor-head {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+.admin-chat-monitor-subtitle {
+    color:#777d8a;
+    font-size:12px;
+    margin-top:4px;
+}
+.admin-chat-subsection {
+    margin-top:16px;
+    padding:14px;
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:14px;
+    background:rgba(0,0,0,.08);
+}
+.admin-chat-subsection-head {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+.admin-chat-subsection h4 {
+    margin:0;
+}
+.admin-chat-subsection p {
+    color:#777d8a;
+    font-size:12px;
+    margin:4px 0 0;
+}
+.admin-active-chats-count {
+    min-width:32px;
+    height:32px;
+    padding:0 9px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:999px;
+    background:rgba(255,77,95,.14);
+    border:1px solid rgba(255,77,95,.3);
+    color:#ff4d5f;
+    font-weight:800;
+}
+.admin-active-chat-item {
+    margin-top:10px;
+    padding:12px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:12px;
+    background:#10131a;
+}
+.admin-active-chat-main {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+.admin-active-chat-names {
+    min-width:0;
+    font-weight:700;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.admin-active-chat-meta {
+    color:#8f95a2;
+    font-size:11px;
+    margin-top:4px;
+}
+.admin-active-chat-view {
+    margin-top:10px;
+    display:none;
+    max-height:280px;
+    overflow-y:auto;
+    border-top:1px solid rgba(255,255,255,.06);
+    padding-top:8px;
+}
+.admin-active-chat-message {
+    padding:7px 0;
+    border-bottom:1px solid rgba(255,255,255,.05);
+}
+.admin-active-chat-message strong {
+    font-size:11px;
+}
+.admin-active-chat-message small {
+    display:block;
+    color:#8f95a2;
+    margin-top:2px;
+    overflow-wrap:anywhere;
+}
+.admin-active-chat-image {
+    max-width:180px;
+    max-height:180px;
+    border-radius:8px;
+    margin-top:5px;
+}
+@media (max-width:650px) {
+    .admin-chat-monitor-section {
+        padding:12px;
+    }
+    .admin-chat-subsection {
+        padding:10px;
+    }
+    .admin-active-chat-main {
+        align-items:flex-start;
+    }
+    .admin-active-chat-names {
+        white-space:normal;
+    }
+}
+</style>
+
 </head>
 
 <body>
@@ -3682,6 +3804,65 @@ function renderCurrentIdentityName(name) {
 
 
         <div id="adminMainView">
+
+
+            
+<div id="adminChatMonitorSection" class="admin-chat-monitor-section">
+
+    <div class="admin-chat-monitor-head">
+        <div>
+            <h3 class="admin-section-title">💬 Chat Monitor</h3>
+            <p class="admin-chat-monitor-subtitle">
+                Active chats, recent activity and complete conversations.
+            </p>
+        </div>
+    </div>
+
+    <section class="admin-chat-subsection">
+        <div class="admin-chat-subsection-head">
+            <div>
+                <h4>🟢 Active Chats</h4>
+                <p>Users who exchanged messages in the last 30 minutes.</p>
+            </div>
+            <div id="adminActiveChatsCount" class="admin-active-chats-count">0</div>
+        </div>
+        <div id="adminActiveChatsList" class="admin-active-chats-list">
+            <div class="empty">No active chats right now.</div>
+        </div>
+    </section>
+
+    <section class="admin-chat-subsection">
+        <div class="admin-chat-subsection-head">
+            <div>
+                <h4>🔔 Recent Chat Activity</h4>
+                <p>Recent conversations remain here even after users stop chatting.</p>
+            </div>
+        </div>
+        <div id="adminRecentChatActivityList" class="admin-active-chats-list">
+            <div class="empty">No recent chat activity.</div>
+        </div>
+    </section>
+
+    <section class="admin-chat-subsection">
+        <div class="admin-chat-subsection-head">
+            <div>
+                <h4>📚 All Conversations</h4>
+                <p>Every conversation found in the direct-messages database.</p>
+            </div>
+            <button
+                class="secondary-btn"
+                type="button"
+                onclick="loadAdminAllConversations()">
+                Refresh
+            </button>
+        </div>
+        <div id="adminAllConversationsList" class="admin-active-chats-list">
+            <div class="empty">Loading conversations...</div>
+        </div>
+    </section>
+
+</div>
+
 
             <div class="admin-stat-row">
 
@@ -10333,6 +10514,378 @@ async function searchPlayers() {
 }
 
 
+
+/* =========================
+   ADMIN CHAT MONITOR
+========================= */
+
+let adminActiveChatsTimer = null;
+
+function adminChatPairKey(a, b) {
+    return [String(a), String(b)].sort().join(":");
+}
+
+function adminChatName(profile) {
+    return (
+        profile?.display_name ||
+        profile?.user_id ||
+        "User"
+    );
+}
+
+async function fetchAdminChatMessages(limit = 5000) {
+    const { data, error } =
+        await supabaseClient
+            .from("direct_messages")
+            .select(
+                "id,sender_id,recipient_id,message,message_type,created_at"
+            )
+            .order("created_at", { ascending: false })
+            .limit(limit);
+
+    if (error) {
+        console.error("Admin chat monitor:", error);
+        return { rows: [], error };
+    }
+
+    return { rows: data || [], error: null };
+}
+
+async function fetchAdminProfiles(ids) {
+    const map = {};
+
+    if (!ids.length) return map;
+
+    const { data, error } =
+        await supabaseClient
+            .from("profiles")
+            .select("id,display_name,user_id,avatar_url")
+            .in("id", ids);
+
+    if (error) {
+        console.error("Admin chat profiles:", error);
+        return map;
+    }
+
+    (data || []).forEach(p => {
+        map[p.id] = p;
+    });
+
+    return map;
+}
+
+function adminRenderChatMessages(messages, profiles) {
+    return [...messages]
+        .sort(
+            (a, b) =>
+                new Date(a.created_at) -
+                new Date(b.created_at)
+        )
+        .map(m => {
+            const sender = profiles[m.sender_id] || {};
+            const senderName = adminChatName(sender);
+            const time = new Date(m.created_at).toLocaleString();
+
+            const body =
+                m.message_type === "image"
+                    ? `
+                        <img
+                            class="admin-active-chat-image"
+                            src="${escapeHTML(m.message || "")}"
+                            alt="Shared image">
+                      `
+                    : `
+                        <small>
+                            ${escapeHTML(m.message || "")}
+                        </small>
+                      `;
+
+            return `
+                <div class="admin-active-chat-message">
+                    <strong>${escapeHTML(senderName)}</strong>
+                    ${body}
+                    <small>${escapeHTML(time)}</small>
+                </div>
+            `;
+        })
+        .join("");
+}
+
+function adminConversationCard(
+    key,
+    messages,
+    profiles,
+    index,
+    options = {}
+) {
+    const latest = messages[0];
+
+    const ids = [
+        latest?.sender_id,
+        latest?.recipient_id
+    ];
+
+    const a = profiles[ids[0]] || {};
+    const b = profiles[ids[1]] || {};
+
+    const aName = adminChatName(a);
+    const bName = adminChatName(b);
+
+    const panelId =
+        `adminConversation_${options.prefix || "all"}_${index}`;
+
+    const active =
+        Date.now() -
+        new Date(latest.created_at).getTime()
+        <= 30 * 60 * 1000;
+
+    return `
+        <div class="admin-active-chat-item">
+
+            <div class="admin-active-chat-main">
+
+                <div style="min-width:0;">
+                    <div class="admin-active-chat-names">
+                        ${active ? "🟢" : "💬"}
+                        ${escapeHTML(aName)}
+                        &amp;
+                        ${escapeHTML(bName)}
+                        ${active ? " are chatting" : " chatted"}
+                    </div>
+
+                    <div class="admin-active-chat-meta">
+                        Last message:
+                        ${escapeHTML(
+                            new Date(
+                                latest.created_at
+                            ).toLocaleString()
+                        )}
+                        · ${messages.length} message${messages.length === 1 ? "" : "s"}
+                    </div>
+                </div>
+
+                <button
+                    class="secondary-btn"
+                    type="button"
+                    onclick="toggleAdminActiveChat('${panelId}')">
+                    View Chat
+                </button>
+
+            </div>
+
+            <div
+                id="${panelId}"
+                class="admin-active-chat-view">
+                ${adminRenderChatMessages(messages, profiles)}
+            </div>
+
+        </div>
+    `;
+}
+
+async function loadAdminChatMonitor() {
+    if (!isCurrentUserAdmin) return;
+
+    const {
+        rows,
+        error
+    } = await fetchAdminChatMessages(5000);
+
+    const activeList =
+        document.getElementById("adminActiveChatsList");
+
+    const recentList =
+        document.getElementById("adminRecentChatActivityList");
+
+    const allList =
+        document.getElementById("adminAllConversationsList");
+
+    const count =
+        document.getElementById("adminActiveChatsCount");
+
+    if (error) {
+        if (activeList)
+            activeList.innerHTML =
+                '<div class="empty">Unable to load chats.</div>';
+
+        if (recentList)
+            recentList.innerHTML =
+                '<div class="empty">Unable to load chat activity.</div>';
+
+        if (allList)
+            allList.innerHTML =
+                '<div class="empty">Unable to load conversations.</div>';
+
+        if (count) count.textContent = "0";
+
+        return;
+    }
+
+    if (!rows.length) {
+        if (activeList)
+            activeList.innerHTML =
+                '<div class="empty">No active chats right now.</div>';
+
+        if (recentList)
+            recentList.innerHTML =
+                '<div class="empty">No recent chat activity.</div>';
+
+        if (allList)
+            allList.innerHTML =
+                '<div class="empty">No conversations found.</div>';
+
+        if (count) count.textContent = "0";
+
+        return;
+    }
+
+    const ids = [
+        ...new Set(
+            rows.flatMap(m => [
+                m.sender_id,
+                m.recipient_id
+            ])
+        )
+    ];
+
+    const profiles =
+        await fetchAdminProfiles(ids);
+
+    const grouped = new Map();
+
+    rows.forEach(m => {
+        if (!m.sender_id || !m.recipient_id) return;
+
+        const key =
+            adminChatPairKey(
+                m.sender_id,
+                m.recipient_id
+            );
+
+        if (!grouped.has(key)) {
+            grouped.set(key, []);
+        }
+
+        grouped.get(key).push(m);
+    });
+
+    const conversations =
+        [...grouped.entries()]
+            .sort(
+                (a, b) =>
+                    new Date(b[1][0].created_at) -
+                    new Date(a[1][0].created_at)
+            );
+
+    const active =
+        conversations.filter(
+            ([key, msgs]) =>
+                Date.now() -
+                new Date(msgs[0].created_at).getTime()
+                <= 30 * 60 * 1000
+        );
+
+    if (count) {
+        count.textContent =
+            String(active.length);
+    }
+
+    if (activeList) {
+        activeList.innerHTML =
+            active.length
+                ? active
+                    .map(
+                        ([key, msgs], i) =>
+                            adminConversationCard(
+                                key,
+                                msgs,
+                                profiles,
+                                i,
+                                { prefix: "active" }
+                            )
+                    )
+                    .join("")
+                : '<div class="empty">No active chats right now.</div>';
+    }
+
+    /*
+       Recent activity intentionally includes inactive
+       conversations too. This gives Admin a notification-like
+       record after users leave a chat.
+    */
+    const recent =
+        conversations.slice(0, 20);
+
+    if (recentList) {
+        recentList.innerHTML =
+            recent
+                .map(
+                    ([key, msgs], i) =>
+                        adminConversationCard(
+                            key,
+                            msgs,
+                            profiles,
+                            i,
+                            { prefix: "recent" }
+                        )
+                )
+                .join("");
+    }
+
+    if (allList) {
+        allList.innerHTML =
+            conversations.length
+                ? conversations
+                    .map(
+                        ([key, msgs], i) =>
+                            adminConversationCard(
+                                key,
+                                msgs,
+                                profiles,
+                                i,
+                                { prefix: "all" }
+                            )
+                    )
+                    .join("")
+                : '<div class="empty">No conversations found.</div>';
+    }
+}
+
+async function loadAdminAllConversations() {
+    await loadAdminChatMonitor();
+}
+
+function toggleAdminActiveChat(panelId) {
+    const panel =
+        document.getElementById(panelId);
+
+    if (!panel) return;
+
+    panel.style.display =
+        panel.style.display === "block"
+            ? "none"
+            : "block";
+}
+
+function startAdminActiveChatsWatcher() {
+    stopAdminActiveChatsWatcher();
+
+    loadAdminChatMonitor();
+
+    adminActiveChatsTimer =
+        setInterval(
+            loadAdminChatMonitor,
+            10000
+        );
+}
+
+function stopAdminActiveChatsWatcher() {
+    if (adminActiveChatsTimer) {
+        clearInterval(adminActiveChatsTimer);
+        adminActiveChatsTimer = null;
+    }
+}
+
 /* =========================
    ADMIN SOCIAL MODERATION
 ========================= */
@@ -10550,6 +11103,8 @@ async function openAdminPanel() {
     openModal(
         "adminModal"
     );
+
+    startAdminActiveChatsWatcher();
 
 }
 
@@ -11809,6 +12364,25 @@ document.addEventListener("keydown", function(event) {
     }
 
 });
+</script>
+
+
+<script id="v30-admin-active-chats-close-hook">
+(function () {
+    const originalCloseModal = window.closeModal;
+    if (typeof originalCloseModal !== "function") return;
+
+    window.closeModal = function (id) {
+        if (
+            id === "adminModal" &&
+            typeof stopAdminActiveChatsWatcher === "function"
+        ) {
+            stopAdminActiveChatsWatcher();
+        }
+
+        return originalCloseModal.apply(this, arguments);
+    };
+})();
 </script>
 
 </body>
