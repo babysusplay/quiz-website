@@ -1311,6 +1311,16 @@ textarea {
     font-size: 13px;
 }
 .header-action-btn:hover { background: rgba(255,255,255,.08); }
+.player-search-box { display:flex; gap:8px; margin-bottom:14px; }
+.player-search-box input { flex:1; }
+.player-search-results { display:flex; flex-direction:column; gap:8px; max-height:420px; overflow:auto; }
+.player-search-result { display:flex; align-items:center; gap:10px; padding:10px; border:1px solid rgba(255,255,255,.08); border-radius:12px; background:rgba(255,255,255,.03); cursor:pointer; }
+.player-search-result:hover { background:rgba(255,255,255,.06); }
+.player-search-result img { width:42px; height:42px; border-radius:50%; object-fit:cover; flex:0 0 42px; }
+.player-search-result-main { flex:1; min-width:0; }
+.player-search-result-main strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.player-search-result-main small { color:#8f95a2; }
+.search-badge { font-size:10px; padding:4px 7px; border-radius:999px; background:rgba(255,255,255,.08); color:#cfd3dc; }
 
 .social-stats-grid {
     display: grid;
@@ -1349,7 +1359,7 @@ textarea {
 
 @media (max-width: 650px) {
     .social-stats-grid { grid-template-columns:repeat(2,1fr); }
-    .account-area { gap: 8px; }
+    .account-area { gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .header-action-btn { padding:8px 9px; font-size:12px; }
     .chat-messages-box { height:300px; }
 }
@@ -1399,6 +1409,13 @@ textarea {
             type="button"
             onclick="openJoinRoomModal()">
             🚪 Join Room
+        </button>
+
+        <button
+            class="header-action-btn"
+            type="button"
+            onclick="openPlayerSearch()">
+            🔎 Search
         </button>
 
         <button
@@ -1944,6 +1961,22 @@ textarea {
 </div>
 
 
+<!-- PLAYER SEARCH MODAL -->
+<div class="modal" id="playerSearchModal">
+    <div class="modal-content" style="max-width:620px;">
+        <div class="modal-header">
+            <h2>Search Players</h2>
+            <button class="close" onclick="closeModal('playerSearchModal')">×</button>
+        </div>
+        <div class="player-search-box">
+            <input id="playerSearchInput" type="search" maxlength="60" placeholder="Search username or User ID..." oninput="searchPlayers()">
+            <button class="secondary-btn" type="button" onclick="searchPlayers()">Search</button>
+        </div>
+        <div id="playerSearchSuggestions" style="margin-bottom:14px;"></div>
+        <div id="playerSearchResults" class="player-search-results"></div>
+    </div>
+</div>
+
 <!-- PUBLIC PROFILE MODAL -->
 <div class="modal" id="publicProfileModal">
     <div class="modal-content" style="max-width:620px;">
@@ -2307,6 +2340,20 @@ textarea {
                         min="1"
                         max="1000000"
                         value="1000">
+
+                </div>
+
+                <div class="form-group" style="margin-bottom:0;">
+
+                    <label>
+                        Room ID
+                    </label>
+
+                    <input
+                        type="text"
+                        id="quizRoomId"
+                        maxlength="40"
+                        placeholder="Leave blank to generate automatically">
 
                 </div>
 
@@ -2966,7 +3013,10 @@ function quizFromDatabase(row) {
 
         questions: questions,
 
-        settings: settings,
+        settings: {
+            ...settings,
+            roomPassword: settings.roomPassword || ""
+        },
 
         creator_id: row.creator_id,
 
@@ -3221,6 +3271,9 @@ function openCreateQuiz() {
     if (defaultMaxPointsInput) {
         defaultMaxPointsInput.value = "1000";
     }
+
+    const roomIdInput = document.getElementById("quizRoomId");
+    if (roomIdInput) roomIdInput.value = "";
 
     const defaultTime =
         document.getElementById(
@@ -3733,6 +3786,18 @@ async function saveQuiz() {
             ? roomPasswordInput.value.trim()
             : "";
 
+    const roomIdInput = document.getElementById("quizRoomId");
+    let roomId = roomIdInput ? roomIdInput.value.trim() : "";
+
+    if (!roomId) {
+        roomId = "ROOM-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+    }
+
+    if (!/^[A-Za-z0-9_-]{4,40}$/.test(roomId)) {
+        alert("Room ID must be 4-40 characters using letters, numbers, hyphen, or underscore.");
+        return;
+    }
+
     const defaultTimeInput =
         document.getElementById(
             "quizDefaultTime"
@@ -3947,6 +4012,24 @@ async function saveQuiz() {
 
     }
 
+    const { data: existingRoom, error: roomLookupError } = await supabaseClient
+        .from("quizzes")
+        .select("id")
+        .eq("quiz_id", roomId)
+        .neq("id", editingQuizId || "00000000-0000-0000-0000-000000000000")
+        .maybeSingle();
+
+    if (roomLookupError) {
+        console.error("Room ID lookup error:", roomLookupError);
+        alert("Unable to validate the Room ID: " + roomLookupError.message);
+        return;
+    }
+
+    if (existingRoom) {
+        alert("That Room ID is already in use. Please choose another one.");
+        return;
+    }
+
     const questionData = {
 
         settings: {
@@ -3975,6 +4058,7 @@ async function saveQuiz() {
                 .update({
                     title: name,
                     description: description,
+                    quiz_id: roomId,
                     questions: questionData,
                     updated_at: new Date().toISOString()
                 })
@@ -3990,6 +4074,7 @@ async function saveQuiz() {
                 .from("quizzes")
                 .insert({
                     creator_id: currentProfile.id,
+                    quiz_id: roomId,
                     title: name,
                     description: description,
                     questions: questionData
@@ -4201,7 +4286,7 @@ function renderQuizList() {
                         type="button"
                         onclick='hostQuizLobby(${JSON.stringify(quiz.id)})'>
 
-                        Open Lobby
+                        Join Your Room
 
                     </button>
 
@@ -4401,6 +4486,11 @@ async function editQuiz(id) {
 
     }
 
+    const roomIdInput = document.getElementById("quizRoomId");
+    if (roomIdInput) {
+        roomIdInput.value = quiz.quiz_id || "";
+    }
+
     const roomPassword =
         document.getElementById(
             "quizRoomPassword"
@@ -4573,91 +4663,48 @@ async function shareQuiz(id) {
     if (!requireLogin()) return;
 
     if (!id) {
-
-        alert(
-            "Unable to share this quiz."
-        );
-
+        alert("Unable to share this quiz.");
         return;
-
     }
 
     const shareUrl =
         window.location.origin +
         window.location.pathname +
         "?quiz=" +
-        encodeURIComponent(
-            String(id)
-        );
+        encodeURIComponent(String(id));
 
     const shareData = {
-
-        title:
-            "Play my quiz",
-
-        text:
-            "Play this quiz on BabySusPlay!",
-
-        url:
-            shareUrl
-
+        title: "Play my quiz",
+        text: "Play this quiz on BabySusPlay!",
+        url: shareUrl
     };
 
+    let shared = false;
+
     try {
-
-        if (
-            navigator.share
-        ) {
-
-            await navigator.share(
-                shareData
-            );
-
-            return;
-
+        if (navigator.share) {
+            await navigator.share(shareData);
+            shared = true;
+        } else if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(shareUrl);
+            alert("Quiz share link copied!");
+            shared = true;
         }
-
-        if (
-            navigator.clipboard &&
-            window.isSecureContext
-        ) {
-
-            await navigator.clipboard.writeText(
-                shareUrl
-            );
-
-            alert(
-                "Quiz share link copied!"
-            );
-
-            return;
-
-        }
-
     } catch (error) {
-
-        if (
-            error &&
-            error.name ===
-                "AbortError"
-        ) {
-
-            return;
-
-        }
-
-        console.error(
-            "Quiz share error:",
-            error
-        );
-
+        if (error && error.name === "AbortError") return;
+        console.error("Quiz share error:", error);
     }
 
-    window.prompt(
-        "Copy this quiz link:",
-        shareUrl
-    );
+    if (!shared) {
+        const copied = window.prompt("Copy this quiz link:", shareUrl);
+        if (copied === null) return;
+        shared = true;
+    }
 
+    const quiz = quizzes.find(q => String(q.id) === String(id));
+    if (quiz && quiz.creator_id === currentProfile.id) {
+        await hostQuizLobby(id);
+    }
 }
 
 
@@ -4915,7 +4962,7 @@ function renderLobbyPlayers() {
     }
 
     list.innerHTML = players.map(player => `
-        <div class="lobby-player">
+        <div class="lobby-player" onclick="openPublicProfile('${escapeHTML(player.userId)}')" style="cursor:pointer;">
             <img
                 class="lobby-player-avatar"
                 src="${escapeHTML(player.avatarUrl || getDefaultAvatar())}"
@@ -6302,7 +6349,7 @@ async function showQuizResult(
                         ${index + 1}
                     </div>
 
-                    <div class="result-main">
+                    <div class="result-main" ${entry.user_id ? `onclick="openPublicProfile('${escapeHTML(entry.user_id)}')" style="cursor:pointer;"` : ""}>
 
                         <div class="result-name">
 
@@ -8051,10 +8098,10 @@ async function loadGlobalLeaderboard() {
         list.innerHTML = '<div class="empty">No scores yet.</div>';
     } else {
         list.innerHTML = top.map(row => `
-            <div class="global-board-row ${row.is_current_user ? "current" : ""}">
+            <div class="global-board-row ${row.is_current_user ? "current" : ""}" onclick="openPublicProfile('${escapeHTML(row.user_id)}')" style="cursor:pointer;">
                 <div class="global-board-rank">#${Number(row.rank || 0)}</div>
                 <img class="global-board-avatar" src="${escapeHTML(row.avatar_url || getDefaultAvatar())}" alt="Avatar">
-                <div class="global-board-main" onclick="openPublicProfile('${escapeHTML(row.user_id)}')">
+                <div class="global-board-main">
                     <strong>${escapeHTML(row.display_name || "User")}</strong>
                     <small>${Number(row.quizzes_played || 0)} quiz${Number(row.quizzes_played || 0) === 1 ? "" : "zes"}</small>
                 </div>
@@ -8097,57 +8144,93 @@ async function openPublicProfile(userId) {
     document.getElementById("publicProfileName").textContent = profile.display_name || "User";
     document.getElementById("publicProfileUserId").textContent = "User ID: " + (profile.user_id || "");
 
-    const { data: stats } = await supabaseClient.rpc("get_profile_stats", { target_user: userId });
+    const [{ data: stats }, { data: liked }, { data: following }, { data: reverseFollow }] = await Promise.all([
+        supabaseClient.rpc("get_profile_stats", { target_user: userId }),
+        supabaseClient.from("profile_likes").select("id").eq("user_id", userId).eq("liked_by", currentProfile.id).eq("like_day", new Date().toISOString().slice(0,10)).maybeSingle(),
+        supabaseClient.from("profile_follows").select("id").eq("following_id", userId).eq("follower_id", currentProfile.id).maybeSingle(),
+        supabaseClient.from("profile_follows").select("id").eq("following_id", currentProfile.id).eq("follower_id", userId).maybeSingle()
+    ]);
+
     const s = stats?.[0] || {};
+    const isMutual = !!following && !!reverseFollow;
+
     document.getElementById("publicProfileSocialStats").innerHTML = `
         <div class="social-stat"><strong>${Number(s.quizzes_played || 0)}</strong><small>Quizzes Played</small></div>
         <div class="social-stat"><strong>${Number(s.total_score || 0)}</strong><small>Total Score</small></div>
         <div class="social-stat"><strong>${Number(s.all_time_rank || 0) || "—"}</strong><small>All-Time Rank</small></div>
-        <div class="social-stat"><strong>${Number(s.likes || 0)}</strong><small>Likes</small></div>
+        <div class="social-stat"><strong>${Number(s.likes || 0)}</strong><small>Total Likes</small></div>
         <div class="social-stat"><strong>${Number(s.followers || 0)}</strong><small>Followers</small></div>
         <div class="social-stat"><strong>${Number(s.following || 0)}</strong><small>Following</small></div>
-        <div class="social-stat"><strong>${mutualCount}</strong><small>Mutuals</small></div>
     `;
 
-    const [{ data: liked }, { data: following }, { data: mutualFollowing }, { data: mutualFollowers }] = await Promise.all([
-        supabaseClient.from("profile_likes").select("id").eq("user_id", userId).eq("liked_by", currentProfile.id).maybeSingle(),
-        supabaseClient.from("profile_follows").select("id").eq("following_id", userId).eq("follower_id", currentProfile.id).maybeSingle(),
-        supabaseClient.from("profile_follows").select("following_id").eq("follower_id", userId),
-        supabaseClient.from("profile_follows").select("follower_id").eq("following_id", userId)
-    ]);
-
-    const followerSet = new Set((mutualFollowers || []).map(row => row.follower_id));
-    const mutualCount = (mutualFollowing || []).filter(row => followerSet.has(row.following_id)).length;
-
-    const { data: reverseFollow } = await supabaseClient
-        .from("profile_follows")
-        .select("id")
-        .eq("following_id", currentProfile.id)
-        .eq("follower_id", userId)
-        .maybeSingle();
-
-    const isMutual = !!following && !!reverseFollow;
     const actions = document.getElementById("publicProfileActions");
-    actions.innerHTML = `
-        ${userId !== currentProfile.id ? `<button class="secondary-btn" onclick="toggleProfileLike('${escapeHTML(userId)}', ${!!liked})">${liked ? "♥ Liked" : "♡ Like"}</button>` : ""}
-        ${userId !== currentProfile.id ? `<button class="secondary-btn" onclick="toggleProfileFollow('${escapeHTML(userId)}', ${!!following})">${following ? "Following" : "Follow"}</button>` : ""}
-        ${userId !== currentProfile.id && isMutual ? `<button class="primary-btn" onclick="openDirectChat('${escapeHTML(userId)}')">💬 Message</button>` : ""}
-    `;
+    actions.innerHTML = userId !== currentProfile.id ? `
+        <button class="secondary-btn" onclick="toggleProfileLike('${escapeHTML(userId)}', ${!!liked})">${liked ? "♥ Liked Today" : "♡ Like Today"}</button>
+        <button class="secondary-btn" onclick="toggleProfileFollow('${escapeHTML(userId)}', ${!!following})">${following ? "Following" : "Follow"}</button>
+        ${isMutual ? `<button class="primary-btn" onclick="openDirectChat('${escapeHTML(userId)}')">💬 Message</button>` : ""}
+    ` : "";
 
     const mutualBox = document.getElementById("publicProfileMutuals");
-    mutualBox.innerHTML = isMutual ? "<small>✓ You both follow each other. Direct chat is available.</small>" : "<small style='color:#8f95a2;'>Follow each other to unlock direct chat.</small>";
+    mutualBox.innerHTML = '<small>Loading mutuals...</small>';
+
+    const [{ data: myFollowing }, { data: theirFollowing }] = await Promise.all([
+        supabaseClient.from("profile_follows").select("following_id").eq("follower_id", userId),
+        supabaseClient.from("profile_follows").select("following_id").eq("follower_id", currentProfile.id)
+    ]);
+
+    const mine = new Set((theirFollowing || []).map(r => r.following_id));
+    const mutualIds = (myFollowing || []).map(r => r.following_id).filter(id => mine.has(id));
+
+    let mutualProfiles = [];
+    if (mutualIds.length) {
+        const { data } = await supabaseClient
+            .from("profiles")
+            .select("id,display_name,user_id,avatar_url")
+            .in("id", mutualIds.slice(0, 50));
+        mutualProfiles = data || [];
+    }
+
+    mutualBox.innerHTML = `
+        <div style="font-weight:700;margin-bottom:8px;">Mutual Following (${mutualProfiles.length})</div>
+        ${mutualProfiles.length ? `<div class="player-search-results">${mutualProfiles.map(person => `
+            <div class="player-search-result" onclick="openPublicProfile('${escapeHTML(person.id)}')">
+                <img src="${escapeHTML(person.avatar_url || getDefaultAvatar())}" alt="Avatar">
+                <div class="player-search-result-main"><strong>${escapeHTML(person.display_name || "User")}</strong><small>${escapeHTML(person.user_id || "")}</small></div>
+            </div>`).join("")}</div>` : '<small style="color:#8f95a2;">No mutual followers yet.</small>'}
+    `;
 
     openModal("publicProfileModal");
 }
 
+
 async function toggleProfileLike(userId, currentlyLiked) {
+    if (!currentProfile || userId === currentProfile.id) return;
+
     if (currentlyLiked) {
-        await supabaseClient.from("profile_likes").delete().eq("user_id", userId).eq("liked_by", currentProfile.id);
-    } else {
-        await supabaseClient.from("profile_likes").insert({ user_id: userId, liked_by: currentProfile.id });
+        alert("You already liked this player today. You can like them again tomorrow.");
+        return;
     }
+
+    const { error } = await supabaseClient
+        .from("profile_likes")
+        .insert({
+            user_id: userId,
+            liked_by: currentProfile.id,
+            like_day: new Date().toISOString().slice(0,10)
+        });
+
+    if (error) {
+        if (String(error.message || "").toLowerCase().includes("duplicate")) {
+            alert("You already liked this player today.");
+        } else {
+            alert("Like could not be saved: " + error.message);
+        }
+        return;
+    }
+
     await openPublicProfile(userId);
 }
+
 
 async function toggleProfileFollow(userId, currentlyFollowing) {
     if (currentlyFollowing) {
@@ -8254,6 +8337,98 @@ async function sendDirectMessage(event) {
 }
 
 
+
+
+/* =========================
+   PLAYER SEARCH
+========================= */
+
+function openPlayerSearch() {
+    if (!requireLogin()) return;
+    const input = document.getElementById("playerSearchInput");
+    if (input) input.value = "";
+    const results = document.getElementById("playerSearchResults");
+    if (results) results.innerHTML = '<div class="empty">Search for a player by username or User ID.</div>';
+    const suggestions = document.getElementById("playerSearchSuggestions");
+    if (suggestions) suggestions.innerHTML = '<small style="color:#8f95a2;">Mutual players will be prioritized in search results.</small>';
+    openModal("playerSearchModal");
+}
+
+async function searchPlayers() {
+    if (!currentProfile) return;
+    const input = document.getElementById("playerSearchInput");
+    const results = document.getElementById("playerSearchResults");
+    const suggestions = document.getElementById("playerSearchSuggestions");
+    const term = input ? input.value.trim() : "";
+    if (!results) return;
+
+    if (!term) {
+        results.innerHTML = '<div class="empty">Type a username or User ID to search.</div>';
+        return;
+    }
+
+    results.innerHTML = '<div class="empty">Searching...</div>';
+
+    const { data: profiles, error } = await supabaseClient
+        .from("profiles")
+        .select("id,user_id,display_name,avatar_url")
+        .or(`display_name.ilike.%${term}%,user_id.ilike.%${term}%`)
+        .neq("id", currentProfile.id)
+        .limit(50);
+
+    if (error) {
+        results.innerHTML = '<div class="empty">Unable to search players.</div>';
+        console.error("Player search error:", error);
+        return;
+    }
+
+    const people = profiles || [];
+    if (!people.length) {
+        results.innerHTML = '<div class="empty">No players found.</div>';
+        return;
+    }
+
+    const [{ data: mine }, { data: theirs }] = await Promise.all([
+        supabaseClient.from("profile_follows").select("following_id").eq("follower_id", currentProfile.id),
+        supabaseClient.from("profile_follows").select("following_id").eq("follower_id", currentProfile.id)
+    ]);
+
+    const myFollowing = new Set((mine || []).map(r => r.following_id));
+    const ids = people.map(p => p.id);
+    const { data: reverseRows } = await supabaseClient
+        .from("profile_follows")
+        .select("follower_id")
+        .eq("following_id", currentProfile.id)
+        .in("follower_id", ids);
+    const followsMe = new Set((reverseRows || []).map(r => r.follower_id));
+
+    const ranked = people.sort((a,b) => {
+        const am = myFollowing.has(a.id) && followsMe.has(a.id) ? 1 : 0;
+        const bm = myFollowing.has(b.id) && followsMe.has(b.id) ? 1 : 0;
+        return bm - am || String(a.display_name || "").localeCompare(String(b.display_name || ""));
+    });
+
+    const mutuals = ranked.filter(p => myFollowing.has(p.id) && followsMe.has(p.id));
+    if (suggestions) {
+        suggestions.innerHTML = mutuals.length
+            ? `<div style="font-weight:700;margin-bottom:6px;">Mutual suggestions</div><div style="display:flex;gap:7px;flex-wrap:wrap;">${mutuals.slice(0,8).map(p => `<button class="secondary-btn" type="button" onclick="openPublicProfile('${escapeHTML(p.id)}')">${escapeHTML(p.display_name || "User")}</button>`).join("")}</div>`
+            : '<small style="color:#8f95a2;">No mutual matches for this search.</small>';
+    }
+
+    results.innerHTML = ranked.map(person => {
+        const isMutual = myFollowing.has(person.id) && followsMe.has(person.id);
+        return `
+            <div class="player-search-result" onclick="openPublicProfile('${escapeHTML(person.id)}')">
+                <img src="${escapeHTML(person.avatar_url || getDefaultAvatar())}" alt="Avatar">
+                <div class="player-search-result-main">
+                    <strong>${escapeHTML(person.display_name || "User")}</strong>
+                    <small>${escapeHTML(person.user_id || "")}</small>
+                </div>
+                ${isMutual ? '<span class="search-badge">Mutual</span>' : ''}
+            </div>
+        `;
+    }).join("");
+}
 
 
 /* =========================
