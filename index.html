@@ -2186,6 +2186,51 @@ header .home-logo {
 }
 </style>
 
+
+<style id="v25-admin-dev-style">
+.dev-name {
+    color: #ff4d5f !important;
+}
+
+.dev-name-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(255, 77, 95, .14);
+    border: 1px solid rgba(255, 77, 95, .38);
+    color: #ff4d5f;
+    font-size: .62em;
+    font-weight: 800;
+    letter-spacing: .06em;
+    vertical-align: middle;
+    line-height: 1;
+}
+</style>
+
+<script id="v25-admin-dev-helper">
+/* Admin identity styling: only the logged-in admin account gets DEV + red name. */
+function renderIdentityName(name, userId) {
+    const safeName = escapeHTML(name || "User");
+    const isDev =
+        !!isCurrentUserAdmin &&
+        !!currentProfile?.id &&
+        String(userId || "") === String(currentProfile.id);
+
+    return isDev
+        ? `${safeName} <span class="dev-name-badge">DEV</span>`
+        : safeName;
+}
+
+function renderCurrentIdentityName(name) {
+    return isCurrentUserAdmin
+        ? `${escapeHTML(name || "User")} <span class="dev-name-badge">DEV</span>`
+        : escapeHTML(name || "User");
+}
+</script>
+
 </head>
 
 <body>
@@ -5739,8 +5784,11 @@ function renderLobbyPlayers() {
                 src="${escapeHTML(player.avatarUrl || getDefaultAvatar())}"
                 alt="Avatar">
             <div class="lobby-player-info">
-                <div class="lobby-player-name">
-                    ${escapeHTML(player.displayName || "User")}
+                <div class="lobby-player-name ${String(player.userId) === String(currentProfile?.id) && isCurrentUserAdmin ? "dev-name" : ""}">
+                    ${renderIdentityName(
+                        player.displayName || "User",
+                        player.userId
+                    )}
                 </div>
                 <div class="lobby-player-role">
                     ${player.isHost ? "👑 Host" : "Player"}
@@ -5765,7 +5813,7 @@ function renderLobbyChat() {
 
     container.innerHTML = lobbyChatMessages.slice(-100).map(message => `
         <div class="lobby-chat-message">
-            <strong>${escapeHTML(message.displayName || "User")}</strong>
+            <strong class="${String(message.userId) === String(currentProfile?.id) && isCurrentUserAdmin ? "dev-name" : ""}">${renderIdentityName(message.displayName || "User", message.userId)}</strong>
             <p>${escapeHTML(message.text || "")}</p>
         </div>
     `).join("");
@@ -8415,8 +8463,12 @@ function updateLoginUI(
 
     if (menuName) {
 
-        menuName.textContent =
-            name;
+        menuName.innerHTML =
+            renderCurrentIdentityName(name);
+        menuName.classList.toggle(
+            "dev-name",
+            !!isCurrentUserAdmin
+        );
 
     }
 
@@ -8677,9 +8729,16 @@ async function handleUserProfile() {
 
     if (profileModalName) {
 
-        profileModalName.textContent =
-            profile.display_name ||
-            "User";
+        profileModalName.innerHTML =
+            renderIdentityName(
+                profile.display_name || "User",
+                profile.id
+            );
+        profileModalName.classList.toggle(
+            "dev-name",
+            !!isCurrentUserAdmin &&
+            String(profile.id) === String(currentProfile?.id)
+        );
 
     }
 
@@ -9220,7 +9279,7 @@ async function loadGlobalLeaderboard() {
                 <div class="global-board-rank">#${Number(row.rank || 0)}</div>
                 <img class="global-board-avatar" src="${escapeHTML(row.avatar_url || getDefaultAvatar())}" alt="Avatar">
                 <div class="global-board-main">
-                    <strong>${escapeHTML(row.display_name || "User")}</strong>
+                    <strong class="${String(row.user_id) === String(currentProfile?.id) && isCurrentUserAdmin ? "dev-name" : ""}">${renderIdentityName(row.display_name || "User", row.user_id)}</strong>
                     <small>${Number(row.quizzes_played || 0)} quiz${Number(row.quizzes_played || 0) === 1 ? "" : "zes"}</small>
                 </div>
                 <div class="global-board-score">${Number(row.total_score || 0)}</div>
@@ -9607,7 +9666,7 @@ async function openLikeLeaderboard() {
                 <div class="global-board-rank">#${Number(row.rank || 0)}</div>
                 <img class="global-board-avatar" src="${escapeHTML(row.avatar_url || getDefaultAvatar())}" alt="Avatar">
                 <div class="global-board-main">
-                    <strong>${escapeHTML(row.display_name || "User")}</strong>
+                    <strong class="${String(row.user_id) === String(currentProfile?.id) && isCurrentUserAdmin ? "dev-name" : ""}">${renderIdentityName(row.display_name || "User", row.user_id)}</strong>
                     <small>${Number(row.total_likes || 0)} like${Number(row.total_likes || 0) === 1 ? "" : "s"}</small>
                 </div>
                 <div class="global-board-score">${Number(row.total_likes || 0)}</div>
@@ -9645,7 +9704,13 @@ async function openPublicProfile(userId) {
 
     publicProfileUser = profile;
     setProfileImage("publicProfileAvatar", profile.avatar_url);
-    document.getElementById("publicProfileName").textContent = profile.display_name || "User";
+    document.getElementById("publicProfileName").innerHTML =
+        renderIdentityName(profile.display_name || "User", profile.id);
+    document.getElementById("publicProfileName").classList.toggle(
+        "dev-name",
+        !!isCurrentUserAdmin &&
+        String(profile.id) === String(currentProfile?.id)
+    );
     document.getElementById("publicProfileUserId").textContent = "User ID: " + (profile.user_id || "");
 
     const [{ data: stats }, { data: liked }, { data: following }, { data: reverseFollow }] = await Promise.all([
@@ -10015,7 +10080,7 @@ async function loadDirectChat() {
                             class="chat-message-name"
                             onclick="event.stopPropagation(); openPublicProfile('${escapeHTML(profileId)}')">
 
-                            ${escapeHTML(senderName)}
+                            ${renderIdentityName(senderName, profileId)}
 
                         </button>
 
