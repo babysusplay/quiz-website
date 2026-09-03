@@ -137,6 +137,7 @@ button {
     position: relative;
     display: flex;
     align-items: center;
+    gap: 12px;
 }
 
 .profile-btn {
@@ -1268,7 +1269,89 @@ textarea {
 @media (max-width: 760px) {
     .lobby-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
+
+    .lobby-panel {
+        padding: 14px;
+    }
+
+    .lobby-player-list {
+        max-height: 170px;
+    }
+
+    .lobby-chat {
+        height: 360px;
+        min-height: 360px;
+    }
+
+    .lobby-chat-messages {
+        min-height: 0;
+    }
+
+    #quizLobbyModal .modal-content {
+        max-height: 92vh;
+        overflow-y: auto;
+    }
+}
+
+
+
+/* =========================
+   GLOBAL LEADERBOARD + SOCIAL
+========================= */
+
+.header-action-btn {
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.04);
+    color: #fff;
+    border-radius: 10px;
+    padding: 9px 12px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.header-action-btn:hover { background: rgba(255,255,255,.08); }
+
+.social-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 14px 0;
+}
+.social-stat {
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    background: rgba(255,255,255,.03);
+    text-align: center;
+}
+.social-stat strong { display:block; font-size:18px; }
+.social-stat small { color:#8f95a2; }
+.social-actions { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
+
+.global-board-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.global-board-tabs button { padding:8px 12px; border-radius:9px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.04); color:#fff; cursor:pointer; }
+.global-board-tabs button.active { background:rgba(255,255,255,.12); }
+.global-board-row { display:flex; align-items:center; gap:12px; padding:11px 10px; border-bottom:1px solid rgba(255,255,255,.07); }
+.global-board-row.current { background:rgba(255,255,255,.05); border-radius:10px; }
+.global-board-rank { width:38px; font-weight:700; text-align:center; }
+.global-board-avatar { width:38px; height:38px; border-radius:50%; object-fit:cover; }
+.global-board-main { flex:1; min-width:0; cursor:pointer; }
+.global-board-main strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.global-board-main small { color:#8f95a2; }
+.global-board-score { font-weight:700; text-align:right; }
+.global-board-me { margin-top:12px; padding:12px; border:1px dashed rgba(255,255,255,.16); border-radius:10px; }
+
+.chat-messages-box { height:360px; overflow:auto; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px; margin-bottom:10px; }
+.chat-message-row { padding:8px 4px; border-bottom:1px solid rgba(255,255,255,.05); }
+.chat-message-row strong { display:block; font-size:13px; }
+.chat-message-row small { color:#8f95a2; font-size:11px; }
+
+@media (max-width: 650px) {
+    .social-stats-grid { grid-template-columns:repeat(2,1fr); }
+    .account-area { gap: 8px; }
+    .header-action-btn { padding:8px 9px; font-size:12px; }
+    .chat-messages-box { height:300px; }
 }
 
 </style>
@@ -1303,6 +1386,20 @@ textarea {
     </nav>
 
     <div class="account-area">
+
+        <button
+            class="header-action-btn"
+            type="button"
+            onclick="openGlobalLeaderboard()">
+            🏆 Leaderboard
+        </button>
+
+        <button
+            class="header-action-btn"
+            type="button"
+            onclick="openJoinRoomModal()">
+            🚪 Join Room
+        </button>
 
         <button
             class="login-btn"
@@ -1423,6 +1520,14 @@ textarea {
                 onclick="openQuizLibrary()">
 
                 View Quizzes
+
+            </button>
+
+            <button
+                class="secondary-btn"
+                onclick="openJoinRoomModal()">
+
+                Join Room
 
             </button>
 
@@ -1800,6 +1905,17 @@ textarea {
         </div>
 
 
+        <div id="publicProfileSocialArea">
+            <div class="social-stats-grid">
+                <div class="social-stat"><strong id="profileStatPlayed">0</strong><small>Quizzes Played</small></div>
+                <div class="social-stat"><strong id="profileStatScore">0</strong><small>Total Score</small></div>
+                <div class="social-stat"><strong id="profileStatRank">—</strong><small>All-Time Rank</small></div>
+                <div class="social-stat"><strong id="profileStatLikes">0</strong><small>Likes</small></div>
+            </div>
+            <div class="social-actions" id="profileSocialActions"></div>
+        </div>
+
+
         <div
             class="section-title"
             style="margin-top:10px; margin-bottom:10px;">
@@ -1827,6 +1943,42 @@ textarea {
 
 </div>
 
+
+<!-- PUBLIC PROFILE MODAL -->
+<div class="modal" id="publicProfileModal">
+    <div class="modal-content" style="max-width:620px;">
+        <div class="modal-header">
+            <h2 id="publicProfileTitle">Player Profile</h2>
+            <button class="close" onclick="closeModal('publicProfileModal')">×</button>
+        </div>
+        <div class="profile-info">
+            <img id="publicProfileAvatar" class="profile-info-avatar" src="" alt="Profile">
+            <div class="profile-details">
+                <h3 id="publicProfileName">User</h3>
+                <p id="publicProfileUserId">User ID</p>
+            </div>
+        </div>
+        <div id="publicProfileSocialStats" class="social-stats-grid"></div>
+        <div class="social-actions" id="publicProfileActions"></div>
+        <div id="publicProfileMutuals" style="margin-top:12px;"></div>
+    </div>
+</div>
+
+<!-- DIRECT CHAT MODAL -->
+<div class="modal" id="directChatModal">
+    <div class="modal-content" style="max-width:620px;">
+        <div class="modal-header">
+            <h2 id="directChatTitle">Chat</h2>
+            <button class="close" onclick="closeModal('directChatModal')">×</button>
+        </div>
+        <div id="directChatMessages" class="chat-messages-box"></div>
+        <form onsubmit="sendDirectMessage(event)" style="display:flex;gap:8px;">
+            <input id="directChatInput" maxlength="1000" placeholder="Write a message..." style="flex:1;">
+            <button class="save-btn" type="submit">Send</button>
+        </form>
+        <p style="color:#8f95a2;font-size:11px;margin-top:8px;">Direct chat is available only between mutual followers.</p>
+    </div>
+</div>
 
 <!-- EDIT PROFILE MODAL -->
 
@@ -1998,20 +2150,24 @@ textarea {
         </div>
 
 
-        <div class="participant-controls">
-
-            <select
-                id="leaderboardQuizSelect"
-                onchange="renderLeaderboard()">
-            </select>
-
+        <div class="global-board-tabs">
+            <button id="globalBoardAllBtn" onclick="setGlobalLeaderboardPeriod('all')">All Time</button>
+            <button id="globalBoardMonthlyBtn" onclick="setGlobalLeaderboardPeriod('monthly')">Monthly</button>
+            <button id="globalBoardWeeklyBtn" onclick="setGlobalLeaderboardPeriod('weekly')">Weekly</button>
+            <button id="globalBoardDailyBtn" onclick="setGlobalLeaderboardPeriod('daily')">Daily</button>
         </div>
 
+        <div id="globalLeaderboardList" class="results-list"></div>
 
-        <div
-            id="leaderboardList"
-            class="results-list">
-        </div>
+        <div id="globalLeaderboardMe" class="global-board-me" style="display:none;"></div>
+
+        <details style="margin-top:18px;">
+            <summary style="cursor:pointer;">Quiz-specific leaderboard</summary>
+            <div class="participant-controls" style="margin-top:10px;">
+                <select id="leaderboardQuizSelect" onchange="renderLeaderboard()"></select>
+            </div>
+            <div id="leaderboardList" class="results-list"></div>
+        </details>
 
     </div>
 
@@ -2127,6 +2283,20 @@ textarea {
                         min="1"
                         max="1000000"
                         value="1000">
+
+                </div>
+
+                <div class="form-group" style="margin-bottom:0;">
+
+                    <label>
+                        Room Password (optional)
+                    </label>
+
+                    <input
+                        type="text"
+                        id="quizRoomPassword"
+                        maxlength="40"
+                        placeholder="Leave empty for no password">
 
                 </div>
 
@@ -2257,6 +2427,72 @@ textarea {
 </div>
 
 
+<!-- JOIN ROOM MODAL -->
+
+<div
+    class="modal"
+    id="joinRoomModal">
+
+    <div class="modal-content" style="max-width:520px;">
+
+        <div class="modal-header">
+
+            <h2>
+                Join Room
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeModal('joinRoomModal')">
+
+                ×
+
+            </button>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Room ID
+            </label>
+
+            <input
+                type="text"
+                id="joinRoomId"
+                maxlength="80"
+                placeholder="Enter Room ID">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Room Password <span style="color:#8f95a2;">(if required)</span>
+            </label>
+
+            <input
+                type="password"
+                id="joinRoomPassword"
+                maxlength="40"
+                placeholder="Enter password">
+
+        </div>
+
+        <button
+            class="save-btn"
+            type="button"
+            onclick="joinRoomById()">
+
+            Join Room
+
+        </button>
+
+    </div>
+
+</div>
+
+
 <!-- MULTIPLAYER QUIZ LOBBY -->
 
 <div
@@ -2314,6 +2550,11 @@ textarea {
             <div class="lobby-header-card">
                 <h3 id="lobbyRoomQuizName">Quiz Lobby</h3>
                 <p id="lobbyRoomStatus" class="lobby-status">Waiting for players...</p>
+                <p
+                    id="lobbyRoomIdText"
+                    class="lobby-status"
+                    style="margin-top:10px;">
+                </p>
             </div>
 
             <div class="lobby-grid">
@@ -2570,6 +2811,12 @@ function closeModal(id) {
 
     if (id === "quizLobbyModal" && !lobbyStarting) {
         leaveQuizLobby(false);
+    }
+
+    if (id === "directChatModal" && directChatChannel) {
+        supabaseClient.removeChannel(directChatChannel);
+        directChatChannel = null;
+        directChatUser = null;
     }
 
 }
@@ -2969,7 +3216,7 @@ function openCreateQuiz() {
     if (defaultTime) {
 
         defaultTime.value =
-            "15";
+            "";
 
     }
 
@@ -3452,6 +3699,16 @@ async function saveQuiz() {
         .value
         .trim();
 
+    const roomPasswordInput =
+        document.getElementById(
+            "quizRoomPassword"
+        );
+
+    const roomPassword =
+        roomPasswordInput
+            ? roomPasswordInput.value.trim()
+            : "";
+
     const defaultTimeInput =
         document.getElementById(
             "quizDefaultTime"
@@ -3674,7 +3931,9 @@ async function saveQuiz() {
 
             defaultMinPoints: defaultMinPoints,
 
-            defaultMaxPoints: defaultMaxPoints
+            defaultMaxPoints: defaultMaxPoints,
+
+            roomPassword: roomPassword
 
         },
 
@@ -3913,6 +4172,15 @@ function renderQuizList() {
 
                     </button>
 
+                    <button
+                        class="secondary-btn"
+                        type="button"
+                        onclick='hostQuizLobby(${JSON.stringify(quiz.id)})'>
+
+                        Open Lobby
+
+                    </button>
+
 
                     <button
                         class="edit-btn"
@@ -4107,6 +4375,16 @@ async function editQuiz(id) {
             quiz.settings?.defaultPoints ??
             1000;
 
+    }
+
+    const roomPassword =
+        document.getElementById(
+            "quizRoomPassword"
+        );
+
+    if (roomPassword) {
+        roomPassword.value =
+            quiz.settings?.roomPassword || "";
     }
 
 
@@ -4360,6 +4638,119 @@ async function shareQuiz(id) {
 
 
 /* =========================
+   ROOM JOIN / HOST HELPERS
+========================= */
+
+function openJoinRoomModal() {
+
+    if (!requireLogin()) return;
+
+    const idInput =
+        document.getElementById("joinRoomId");
+
+    const passwordInput =
+        document.getElementById("joinRoomPassword");
+
+    if (idInput) idInput.value = "";
+    if (passwordInput) passwordInput.value = "";
+
+    openModal("joinRoomModal");
+
+}
+
+
+async function hostQuizLobby(id) {
+
+    if (!requireLogin()) return;
+
+    let quiz =
+        quizzes.find(
+            q => String(q.id) === String(id)
+        );
+
+    if (!quiz) {
+
+        const { data, error } =
+            await supabaseClient
+                .from("quizzes")
+                .select("*")
+                .eq("id", id)
+                .maybeSingle();
+
+        if (error || !data) {
+            alert("Unable to load this quiz.");
+            return;
+        }
+
+        quiz = quizFromDatabase(data);
+    }
+
+    if (quiz.creator_id !== currentProfile.id) {
+        alert("Only the quiz host can open this lobby.");
+        return;
+    }
+
+    closeModal("libraryModal");
+    openQuizLobby(quiz, true);
+
+}
+
+
+async function joinRoomById() {
+
+    if (!requireLogin()) return;
+
+    const idInput =
+        document.getElementById("joinRoomId");
+
+    const passwordInput =
+        document.getElementById("joinRoomPassword");
+
+    const roomId =
+        idInput ? idInput.value.trim() : "";
+
+    const password =
+        passwordInput ? passwordInput.value : "";
+
+    if (!roomId) {
+        alert("Please enter the Room ID.");
+        return;
+    }
+
+    const { data, error } =
+        await supabaseClient
+            .from("quizzes")
+            .select("*")
+            .eq("quiz_id", roomId)
+            .maybeSingle();
+
+    if (error) {
+        console.error("Room lookup error:", error);
+        alert("Unable to find this room: " + error.message);
+        return;
+    }
+
+    if (!data) {
+        alert("Room not found. Please check the Room ID.");
+        return;
+    }
+
+    const quiz = quizFromDatabase(data);
+    const savedPassword =
+        String(quiz.settings?.roomPassword || "");
+
+    if (savedPassword && password !== savedPassword) {
+        alert("Incorrect room password.");
+        return;
+    }
+
+    closeModal("joinRoomModal");
+    openQuizLobby(quiz, false);
+
+}
+
+
+/* =========================
    OPEN SHARED QUIZ
 ========================= */
 
@@ -4569,7 +4960,7 @@ function handleLobbyPresenceSync() {
 }
 
 
-async function openQuizLobby(quiz) {
+async function openQuizLobby(quiz, hostMode = false) {
 
     if (!currentProfile) {
         showLogin();
@@ -4602,16 +4993,32 @@ async function openQuizLobby(quiz) {
     if (joinDescription) joinDescription.textContent = quiz.description || "Join the lobby and wait for the host to start.";
     if (roomName) roomName.textContent = quiz.name;
     if (nameInput) nameInput.value = currentProfile.display_name && currentProfile.display_name !== "User" ? currentProfile.display_name : "";
-    if (joinView) joinView.style.display = "block";
-    if (roomView) roomView.style.display = "none";
+
+    const roomIdText = document.getElementById("lobbyRoomIdText");
+    if (roomIdText) {
+        roomIdText.innerHTML =
+            `Room ID: <strong>${escapeHTML(quiz.quiz_id || quiz.id || "N/A")}</strong>`;
+    }
+
+    if (hostMode || quiz.creator_id === currentProfile.id) {
+        if (joinView) joinView.style.display = "none";
+        if (roomView) roomView.style.display = "block";
+    } else {
+        if (joinView) joinView.style.display = "block";
+        if (roomView) roomView.style.display = "none";
+    }
 
     renderLobbyChat();
     openModal("quizLobbyModal");
 
+    if (hostMode || quiz.creator_id === currentProfile.id) {
+        await joinQuizLobby(true);
+    }
+
 }
 
 
-async function joinQuizLobby() {
+async function joinQuizLobby(hostMode = false) {
 
     if (!currentProfile || !activeLobbyQuiz) {
         return;
@@ -4620,20 +5027,25 @@ async function joinQuizLobby() {
     const input = document.getElementById("lobbyDisplayName");
     const displayName = input ? input.value.trim() : "";
 
-    if (!displayName) {
+    const finalDisplayName =
+        displayName ||
+        currentProfile.display_name ||
+        "User";
+
+    if (!finalDisplayName) {
         alert("Please enter a display name before joining.");
         return;
     }
 
-    if (displayName.length > 40) {
+    if (finalDisplayName.length > 40) {
         alert("Display name must be 40 characters or less.");
         return;
     }
 
-    if (displayName !== (currentProfile.display_name || "")) {
+    if (finalDisplayName !== (currentProfile.display_name || "")) {
         const { data, error } = await supabaseClient
             .from("profiles")
-            .update({ display_name: displayName })
+            .update({ display_name: finalDisplayName })
             .eq("id", currentProfile.id)
             .select("*")
             .single();
@@ -7566,6 +7978,327 @@ async function saveProfile() {
 }
 
 
+
+
+/* =========================
+   GLOBAL LEADERBOARD
+========================= */
+
+let globalLeaderboardPeriod = "all";
+let publicProfileUser = null;
+let directChatUser = null;
+let directChatChannel = null;
+
+async function openGlobalLeaderboard() {
+    if (!requireLogin()) return;
+    await loadGlobalLeaderboard();
+    openModal("leaderboardModal");
+}
+
+function setGlobalLeaderboardPeriod(period) {
+    globalLeaderboardPeriod = period;
+    loadGlobalLeaderboard();
+}
+
+async function loadGlobalLeaderboard() {
+    const list = document.getElementById("globalLeaderboardList");
+    if (!list) return;
+    list.innerHTML = '<div class="empty">Loading leaderboard...</div>';
+
+    ["all","monthly","weekly","daily"].forEach(p => {
+        const btn = document.getElementById("globalBoard" + p.charAt(0).toUpperCase() + p.slice(1) + "Btn");
+        if (btn) btn.classList.toggle("active", p === globalLeaderboardPeriod);
+    });
+
+    const { data, error } = await supabaseClient.rpc("get_global_leaderboard", {
+        period: globalLeaderboardPeriod,
+        requested_user: currentProfile?.id || null
+    });
+
+    if (error) {
+        console.error("Global leaderboard error:", error);
+        list.innerHTML = '<div class="empty">Leaderboard is not configured yet. Run the social_leaderboard_migration.sql file in Supabase first.</div>';
+        return;
+    }
+
+    const rows = data || [];
+    const top = rows.slice(0, 100);
+    if (!top.length) {
+        list.innerHTML = '<div class="empty">No scores yet.</div>';
+    } else {
+        list.innerHTML = top.map(row => `
+            <div class="global-board-row ${row.is_current_user ? "current" : ""}">
+                <div class="global-board-rank">#${Number(row.rank || 0)}</div>
+                <img class="global-board-avatar" src="${escapeHTML(row.avatar_url || getDefaultAvatar())}" alt="Avatar">
+                <div class="global-board-main" onclick="openPublicProfile('${escapeHTML(row.user_id)}')">
+                    <strong>${escapeHTML(row.display_name || "User")}</strong>
+                    <small>${Number(row.quizzes_played || 0)} quiz${Number(row.quizzes_played || 0) === 1 ? "" : "zes"}</small>
+                </div>
+                <div class="global-board-score">${Number(row.total_score || 0)}</div>
+            </div>
+        `).join("");
+    }
+
+    const me = rows.find(row => row.is_current_user);
+    const meBox = document.getElementById("globalLeaderboardMe");
+    if (meBox && me) {
+        meBox.style.display = "block";
+        meBox.innerHTML = `<strong>Your position: #${Number(me.rank)}</strong> · ${Number(me.total_score || 0)} points · Top ${Number(me.percentile || 0).toFixed(2)}%`;
+    } else if (meBox) {
+        meBox.style.display = "none";
+    }
+}
+
+/* =========================
+   PUBLIC PROFILE / SOCIAL
+========================= */
+
+async function openPublicProfile(userId) {
+    if (!requireLogin()) return;
+    if (!userId) return;
+
+    const { data: profile, error } = await supabaseClient
+        .from("profiles")
+        .select("id,user_id,display_name,avatar_url")
+        .eq("id", userId)
+        .maybeSingle();
+
+    if (error || !profile) {
+        alert("Unable to load this profile.");
+        return;
+    }
+
+    publicProfileUser = profile;
+    setProfileImage("publicProfileAvatar", profile.avatar_url);
+    document.getElementById("publicProfileName").textContent = profile.display_name || "User";
+    document.getElementById("publicProfileUserId").textContent = "User ID: " + (profile.user_id || "");
+
+    const { data: stats } = await supabaseClient.rpc("get_profile_stats", { target_user: userId });
+    const s = stats?.[0] || {};
+    document.getElementById("publicProfileSocialStats").innerHTML = `
+        <div class="social-stat"><strong>${Number(s.quizzes_played || 0)}</strong><small>Quizzes Played</small></div>
+        <div class="social-stat"><strong>${Number(s.total_score || 0)}</strong><small>Total Score</small></div>
+        <div class="social-stat"><strong>${Number(s.all_time_rank || 0) || "—"}</strong><small>All-Time Rank</small></div>
+        <div class="social-stat"><strong>${Number(s.likes || 0)}</strong><small>Likes</small></div>
+        <div class="social-stat"><strong>${Number(s.followers || 0)}</strong><small>Followers</small></div>
+        <div class="social-stat"><strong>${Number(s.following || 0)}</strong><small>Following</small></div>
+        <div class="social-stat"><strong>${mutualCount}</strong><small>Mutuals</small></div>
+    `;
+
+    const [{ data: liked }, { data: following }, { data: mutualFollowing }, { data: mutualFollowers }] = await Promise.all([
+        supabaseClient.from("profile_likes").select("id").eq("user_id", userId).eq("liked_by", currentProfile.id).maybeSingle(),
+        supabaseClient.from("profile_follows").select("id").eq("following_id", userId).eq("follower_id", currentProfile.id).maybeSingle(),
+        supabaseClient.from("profile_follows").select("following_id").eq("follower_id", userId),
+        supabaseClient.from("profile_follows").select("follower_id").eq("following_id", userId)
+    ]);
+
+    const followerSet = new Set((mutualFollowers || []).map(row => row.follower_id));
+    const mutualCount = (mutualFollowing || []).filter(row => followerSet.has(row.following_id)).length;
+
+    const { data: reverseFollow } = await supabaseClient
+        .from("profile_follows")
+        .select("id")
+        .eq("following_id", currentProfile.id)
+        .eq("follower_id", userId)
+        .maybeSingle();
+
+    const isMutual = !!following && !!reverseFollow;
+    const actions = document.getElementById("publicProfileActions");
+    actions.innerHTML = `
+        ${userId !== currentProfile.id ? `<button class="secondary-btn" onclick="toggleProfileLike('${escapeHTML(userId)}', ${!!liked})">${liked ? "♥ Liked" : "♡ Like"}</button>` : ""}
+        ${userId !== currentProfile.id ? `<button class="secondary-btn" onclick="toggleProfileFollow('${escapeHTML(userId)}', ${!!following})">${following ? "Following" : "Follow"}</button>` : ""}
+        ${userId !== currentProfile.id && isMutual ? `<button class="primary-btn" onclick="openDirectChat('${escapeHTML(userId)}')">💬 Message</button>` : ""}
+    `;
+
+    const mutualBox = document.getElementById("publicProfileMutuals");
+    mutualBox.innerHTML = isMutual ? "<small>✓ You both follow each other. Direct chat is available.</small>" : "<small style='color:#8f95a2;'>Follow each other to unlock direct chat.</small>";
+
+    openModal("publicProfileModal");
+}
+
+async function toggleProfileLike(userId, currentlyLiked) {
+    if (currentlyLiked) {
+        await supabaseClient.from("profile_likes").delete().eq("user_id", userId).eq("liked_by", currentProfile.id);
+    } else {
+        await supabaseClient.from("profile_likes").insert({ user_id: userId, liked_by: currentProfile.id });
+    }
+    await openPublicProfile(userId);
+}
+
+async function toggleProfileFollow(userId, currentlyFollowing) {
+    if (currentlyFollowing) {
+        await supabaseClient.from("profile_follows").delete().eq("following_id", userId).eq("follower_id", currentProfile.id);
+    } else {
+        await supabaseClient.from("profile_follows").insert({ following_id: userId, follower_id: currentProfile.id });
+    }
+    await openPublicProfile(userId);
+}
+
+async function openDirectChat(userId) {
+    if (!currentProfile || !userId) return;
+    const { data: target } = await supabaseClient
+        .from("profiles")
+        .select("id,display_name,avatar_url")
+        .eq("id", userId)
+        .maybeSingle();
+    if (!target) return;
+
+    const { data: a } = await supabaseClient
+        .from("profile_follows")
+        .select("id")
+        .eq("follower_id", currentProfile.id)
+        .eq("following_id", userId)
+        .maybeSingle();
+    const { data: b } = await supabaseClient
+        .from("profile_follows")
+        .select("id")
+        .eq("follower_id", userId)
+        .eq("following_id", currentProfile.id)
+        .maybeSingle();
+
+    if (!a || !b) {
+        alert("Direct chat is available only between mutual followers.");
+        return;
+    }
+
+    if (directChatChannel) {
+        await supabaseClient.removeChannel(directChatChannel);
+        directChatChannel = null;
+    }
+
+    directChatUser = target;
+    document.getElementById("directChatTitle").textContent = "Chat with " + (target.display_name || "User");
+    openModal("directChatModal");
+    await loadDirectChat();
+
+    directChatChannel = supabaseClient
+        .channel(`direct-chat-${currentProfile.id}-${userId}`)
+        .on("postgres_changes", {
+            event: "INSERT",
+            schema: "public",
+            table: "direct_messages"
+        }, payload => {
+            const m = payload.new;
+            if (!m) return;
+            const isThisConversation =
+                (m.sender_id === currentProfile.id && m.recipient_id === userId) ||
+                (m.sender_id === userId && m.recipient_id === currentProfile.id);
+            if (isThisConversation) loadDirectChat();
+        })
+        .subscribe();
+}
+
+async function loadDirectChat() {
+    if (!directChatUser || !currentProfile) return;
+    const box = document.getElementById("directChatMessages");
+    const { data, error } = await supabaseClient
+        .from("direct_messages")
+        .select("id,sender_id,recipient_id,message,created_at")
+        .or(`and(sender_id.eq.${currentProfile.id},recipient_id.eq.${directChatUser.id}),and(sender_id.eq.${directChatUser.id},recipient_id.eq.${currentProfile.id})`)
+        .order("created_at", { ascending: true });
+    if (error) {
+        box.innerHTML = '<div class="empty">Unable to load chat.</div>';
+        return;
+    }
+    box.innerHTML = (data || []).map(m => `
+        <div class="chat-message-row">
+            <strong>${escapeHTML(m.sender_id === currentProfile.id ? "You" : (directChatUser.display_name || "User"))}</strong>
+            <p>${escapeHTML(m.message)}</p>
+            <small>${new Date(m.created_at).toLocaleString()}</small>
+        </div>
+    `).join("") || '<div class="empty">No messages yet.</div>';
+    box.scrollTop = box.scrollHeight;
+}
+
+async function sendDirectMessage(event) {
+    event.preventDefault();
+    if (!directChatUser || !currentProfile) return;
+    const input = document.getElementById("directChatInput");
+    const message = input.value.trim();
+    if (!message) return;
+    const { error } = await supabaseClient.from("direct_messages").insert({
+        sender_id: currentProfile.id,
+        recipient_id: directChatUser.id,
+        message: message.slice(0, 1000)
+    });
+    if (error) {
+        alert("Message could not be sent: " + error.message);
+        return;
+    }
+    input.value = "";
+    await loadDirectChat();
+}
+
+
+
+
+/* =========================
+   ADMIN SOCIAL MODERATION
+========================= */
+
+async function loadAdminSocialModeration(userId) {
+    const detail = document.getElementById("adminUserDetail");
+    if (!detail || !isCurrentUserAdmin) return;
+
+    const { data: messages, error } = await supabaseClient
+        .from("direct_messages")
+        .select("id,sender_id,recipient_id,message,created_at")
+        .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
+        .order("created_at", { ascending:false })
+        .limit(500);
+
+    const old = document.getElementById("adminSocialModeration");
+    if (old) old.remove();
+
+    const rows = messages || [];
+    const counterpartIds = [...new Set(rows.map(m => m.sender_id === userId ? m.recipient_id : m.sender_id))];
+    let profilesById = {};
+    if (counterpartIds.length) {
+        const { data: people } = await supabaseClient
+            .from("profiles")
+            .select("id,display_name,user_id")
+            .in("id", counterpartIds);
+        (people || []).forEach(p => profilesById[p.id] = p);
+    }
+
+    const grouped = new Map();
+    rows.forEach(m => {
+        const otherId = m.sender_id === userId ? m.recipient_id : m.sender_id;
+        if (!grouped.has(otherId)) grouped.set(otherId, []);
+        grouped.get(otherId).push(m);
+    });
+
+    const section = document.createElement("div");
+    section.id = "adminSocialModeration";
+    section.style.marginTop = "18px";
+    section.innerHTML = `
+        <h3 class="admin-section-title">Social & Moderation</h3>
+        <p style="color:#8f95a2;font-size:12px;">Admin moderation access to this user's direct-message conversations.</p>
+        <div class="admin-mini-list">
+            ${[...grouped.entries()].map(([otherId, msgs], index) => {
+                const person = profilesById[otherId] || {};
+                const panelId = `adminChat_${userId}_${index}`;
+                return `
+                    <div class="admin-mini-item">
+                        <strong>${escapeHTML(person.display_name || "User")} ${person.user_id ? "• " + escapeHTML(person.user_id) : ""}</strong>
+                        <small>${msgs.length} message${msgs.length === 1 ? "" : "s"}</small>
+                        <button class="secondary-btn" style="margin-top:8px;" type="button" onclick="document.getElementById('${panelId}').style.display = document.getElementById('${panelId}').style.display === 'none' ? 'block' : 'none'">View Conversation</button>
+                        <div id="${panelId}" style="display:none;margin-top:8px;">
+                            ${msgs.sort((a,b) => new Date(a.created_at)-new Date(b.created_at)).map(m => `
+                                <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+                                    <strong style="font-size:11px;">${m.sender_id === userId ? "User" : escapeHTML(person.display_name || "Other")}</strong>
+                                    <small style="display:block;color:#8f95a2;">${escapeHTML(m.message)} • ${new Date(m.created_at).toLocaleString()}</small>
+                                </div>
+                            `).join("")}
+                        </div>
+                    </div>`;
+            }).join("") || '<div class="empty">No direct messages.</div>'}
+        </div>
+    `;
+    detail.appendChild(section);
+}
+
+
 /* =========================
    LOGOUT
 ========================= *//* =========================
@@ -7982,7 +8715,7 @@ async function loadAdminUsers() {
                         class="admin-view-btn"
                         onclick='openAdminUser(${JSON.stringify(
                             user.id
-                        )})'>
+                        )}).then(() => loadAdminSocialModeration(${JSON.stringify(user.id)}))'>
 
                         View
 
