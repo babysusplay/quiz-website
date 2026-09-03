@@ -1512,6 +1512,197 @@ textarea {
 }
 </style>
 
+
+<style id="desktop-site-phone-header-only-fix">
+/*
+  ONLY for a phone/tablet using "Desktop site".
+  Normal phone layout (<=768px) and normal computer desktop (>1100px)
+  are intentionally excluded.
+*/
+@media screen and (min-width: 769px) and (max-width: 1100px)
+       and (hover: none) and (pointer: coarse) {
+
+    header {
+        justify-content: flex-start !important;
+        align-items: center !important;
+        gap: 0 !important;
+        padding: 14px 18px !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    header .logo {
+        flex: 0 0 auto !important;
+        margin: 0 22px 0 0 !important;
+        white-space: nowrap !important;
+    }
+
+    header nav {
+        display: flex !important;
+        flex: 0 0 auto !important;
+        gap: 18px !important;
+        align-items: center !important;
+        white-space: nowrap !important;
+    }
+
+    header nav a {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        display: block !important;
+        font-size: 13px !important;
+        line-height: 1.2 !important;
+    }
+
+    header .account-area {
+        flex: 0 0 auto !important;
+        margin-left: auto !important;
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 8px !important;
+        min-width: max-content !important;
+    }
+
+    header .header-action-btn {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        height: 36px !important;
+        padding: 0 10px !important;
+        font-size: 12px !important;
+    }
+
+    header .login-btn,
+    header .profile-btn {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+    }
+}
+</style>
+
+
+<style id="home-logo-and-desktop-site-phone-fix">
+.home-logo {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.home-logo:focus-visible {
+    outline: 2px solid rgba(255,255,255,.45);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+/*
+  ONLY: touch/coarse-pointer device using a desktop-sized viewport.
+  This is the "Desktop site" mode on a phone.
+  Normal mobile and normal computer desktop are intentionally excluded.
+*/
+@media screen and (min-width: 769px) and (max-width: 1100px)
+       and (hover: none) and (pointer: coarse) {
+
+    header {
+        padding: 10px 14px !important;
+        gap: 0 !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
+        min-height: 54px !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    header .logo {
+        flex: 0 0 auto !important;
+        margin: 0 14px 0 0 !important;
+        font-size: 19px !important;
+        line-height: 1 !important;
+        white-space: nowrap !important;
+    }
+
+    header nav {
+        display: flex !important;
+        flex: 0 0 auto !important;
+        align-items: center !important;
+        gap: 9px !important;
+        margin: 0 !important;
+        min-width: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    header nav a {
+        flex: 0 0 auto !important;
+        display: block !important;
+        padding: 3px 0 !important;
+        font-size: 10px !important;
+        line-height: 1.05 !important;
+        white-space: nowrap !important;
+    }
+
+    header .account-area {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        margin-left: auto !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        flex-wrap: nowrap !important;
+        gap: 5px !important;
+        overflow: visible !important;
+    }
+
+    header .header-action-btn {
+        flex: 0 0 auto !important;
+        height: 31px !important;
+        min-width: 0 !important;
+        padding: 0 6px !important;
+        border-radius: 8px !important;
+        font-size: 9px !important;
+        line-height: 1 !important;
+        white-space: nowrap !important;
+    }
+
+    header .social-header-btn {
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+    }
+
+    header .login-btn {
+        flex: 0 0 auto !important;
+        height: 31px !important;
+        padding: 0 7px !important;
+        font-size: 10px !important;
+        white-space: nowrap !important;
+    }
+
+    header .profile-btn {
+        flex: 0 0 auto !important;
+        width: 31px !important;
+        min-width: 31px !important;
+        height: 31px !important;
+        padding: 2px !important;
+        gap: 0 !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+    }
+
+    header .profile-btn #profileName,
+    header .profile-btn .profile-arrow {
+        display: none !important;
+    }
+
+    header .profile-btn #profileAvatar {
+        width: 27px !important;
+        height: 27px !important;
+        min-width: 27px !important;
+    }
+}
+</style>
+
 </head>
 
 <body>
@@ -1520,22 +1711,17 @@ textarea {
 
     <button class="mobile-menu-btn" type="button" onclick="toggleMobileMenu(event)" aria-label="Menu">⋮</button>
 
-    <div class="logo">
+    <button class="logo home-logo" type="button" onclick="goHome()" aria-label="Home">
         Quiz
-    </div>
+    </button>
 
     <div id="mobileMenu" class="mobile-menu">
-        <button type="button" onclick="toggleMobileMenu(); goHome();">🏠 Home</button>
         <button type="button" onclick="toggleMobileMenu(); openQuizLibrary();">📚 My Quizzes</button>
         <button type="button" onclick="toggleMobileMenu(); openCreateQuiz();">➕ Create</button>
         <button type="button" onclick="toggleMobileMenu(); goAbout();">ℹ️ About</button>
     </div>
 
     <nav>
-
-        <a href="#" onclick="goHome(); return false;">
-            Home
-        </a>
 
         <a href="#" onclick="openQuizLibrary(); return false;">
             My Quizzes
