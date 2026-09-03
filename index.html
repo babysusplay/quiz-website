@@ -5427,9 +5427,8 @@ async function loadQuizzesFromSupabase() {
 
             .select("*")
 
-            .eq(
-                "creator_id",
-                currentProfile.id
+            .or(
+                `creator_id.eq.${currentProfile.id},creator_id.is.null`
             )
 
             .order(
@@ -6427,6 +6426,16 @@ function renderQuizList() {
    EDIT QUIZ
 ========================= */
 
+function showEditQuizLoading() {
+    const overlay = document.getElementById("editQuizLoadingOverlay");
+    if (overlay) overlay.classList.add("is-visible");
+}
+
+function hideEditQuizLoading() {
+    const overlay = document.getElementById("editQuizLoadingOverlay");
+    if (overlay) overlay.classList.remove("is-visible");
+}
+
 async function editQuiz(id) {
 
     if (!currentProfile) {
@@ -6442,41 +6451,35 @@ async function editQuiz(id) {
     }
 
 
+    const requestedQuizNumber =
+        /^\d+$/.test(String(id).trim())
+            ? Number(id)
+            : null;
+
     let quiz =
         quizzes.find(
             q =>
-                String(q.id) ===
-                String(id)
+                String(q.id) === String(id) ||
+                (requestedQuizNumber !== null &&
+                 Number(q.quiz_number) === requestedQuizNumber)
         );
-
-    // Discord bot uses the short quiz number in ?edit=10, ?edit=11, etc.
-    if (!quiz && /^\d+$/.test(String(id))) {
-        quiz = quizzes.find(
-            q =>
-                String(q.quiz_number) ===
-                String(id)
-        );
-    }
 
 
     if (!quiz) {
 
-        let quizQuery =
+        let query =
             supabaseClient
                 .from("quizzes")
                 .select("*");
 
-        if (/^\d+$/.test(String(id))) {
-            quizQuery = quizQuery.eq("quiz_number", Number(id));
+        if (requestedQuizNumber !== null) {
+            query = query.eq("quiz_number", requestedQuizNumber);
         } else {
-            quizQuery = quizQuery.eq("id", id);
+            query = query.eq("id", id);
         }
 
-        const {
-            data,
-            error
-        } =
-            await quizQuery.maybeSingle();
+        const { data, error } =
+            await query.maybeSingle();
 
 
         if (
@@ -6669,21 +6672,23 @@ async function editQuiz(id) {
 
 async function openQuizFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    const quizId =
-        params.get("edit") ||
-        sessionStorage.getItem("pendingEditQuizId") ||
-        "";
+    const quizId = params.get("edit");
 
     if (!quizId) return;
 
+    showEditQuizLoading();
+
     if (!currentProfile) {
+        hideEditQuizLoading();
         showLogin();
         return;
     }
 
-    sessionStorage.removeItem("pendingEditQuizId");
-
-    await editQuiz(quizId);
+    try {
+        await editQuiz(quizId);
+    } finally {
+        hideEditQuizLoading();
+    }
 
     // Remove the edit parameter from the URL
     window.history.replaceState(
@@ -10616,57 +10621,31 @@ function getAuthRedirectUrl() {
     const quizId =
         getPendingSharedQuizId();
 
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
+    const params = new URLSearchParams(window.location.search);
+    const editMode = params.get("edit") === "1";
 
-    const editQuizId =
-        params.get("edit") ||
-        sessionStorage.getItem("pendingEditQuizId") ||
-        "";
-
-    if (!quizId && !editQuizId) {
+    if (!quizId) {
         return (
             window.location.origin +
             window.location.pathname
         );
     }
 
-    if (quizId) {
-        sessionStorage.setItem(
-            "pendingSharedQuizId",
-            quizId
-        );
-    }
+    sessionStorage.setItem(
+        "pendingSharedQuizId",
+        quizId
+    );
 
-    if (editQuizId) {
-        sessionStorage.setItem(
-            "pendingEditQuizId",
-            editQuizId
-        );
-    }
-
-    let redirectUrl =
+    return (
         window.location.origin +
-        window.location.pathname;
-
-    if (quizId) {
-        redirectUrl +=
-            "?quiz=" +
-            encodeURIComponent(quizId);
-    }
-
-    if (editQuizId) {
-        redirectUrl +=
-            (redirectUrl.includes("?") ? "&" : "?") +
-            "edit=" +
-            encodeURIComponent(editQuizId);
-    }
-
-    return redirectUrl;
+        window.location.pathname +
+        "?quiz=" +
+        encodeURIComponent(quizId) +
+        (editMode ? "&edit=1" : "")
+    );
 
 }
+
 
 async function loginWithGoogle() {
 
@@ -16160,6 +16139,30 @@ document.addEventListener("DOMContentLoaded",function(){const i=document.getElem
     }
 }
 </style>
+<style id="edit-quiz-loading-spinner-style">
+#editQuizLoadingOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+#editQuizLoadingOverlay.is-visible { display: flex; }
+.edit-quiz-spinner {
+    width: 34px;
+    height: 34px;
+    border: 3px solid rgba(255,255,255,.28);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: editQuizSpin .75s linear infinite;
+}
+@keyframes editQuizSpin { to { transform: rotate(360deg); } }
+</style>
+
 
 
 <script>
@@ -16168,5 +16171,9 @@ if (typeof window.openAdminHistoryForQuiz !== "function") {
 }
 </script>
 
+
+<div id="editQuizLoadingOverlay" aria-live="polite" aria-label="Loading quiz">
+    <div class="edit-quiz-spinner"></div>
+</div>
 </body>
 </html>
