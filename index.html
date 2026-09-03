@@ -1703,6 +1703,80 @@ textarea {
 }
 </style>
 
+
+<style id="social-button-center-final-fix">
+@media screen and (min-width: 769px) and (max-width: 1100px)
+       and (hover: none) and (pointer: coarse) {
+
+    header .social-header-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        vertical-align: middle !important;
+        line-height: 1 !important;
+        text-align: center !important;
+        height: 31px !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    header .social-header-btn * {
+        vertical-align: middle !important;
+        line-height: 1 !important;
+    }
+}
+</style>
+
+
+<style id="quiz-history-ui">
+#myHistoryList .result-item,
+#adminHistoryResult .result-item {
+    transition: transform .15s ease, border-color .15s ease;
+}
+#myHistoryList .result-item:hover,
+#adminHistoryResult .result-item:hover {
+    transform: translateY(-1px);
+}
+</style>
+
+
+<style id="final-social-and-mobile-home-polish">
+/* Social button: fix vertical alignment on desktop and desktop-site mode.
+   The button position itself is unchanged; only its contents are centered. */
+header .social-header-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    margin-bottom: 0 !important;
+    box-sizing: border-box !important;
+}
+
+header .social-header-btn > span:not(.social-notification-badge) {
+    display: inline-flex !important;
+    align-items: center !important;
+    line-height: 1 !important;
+}
+
+/* Only normal mobile: make the Quiz logo clearly read as the Home button.
+   This does not affect desktop or phone Desktop-Site mode. */
+@media screen and (max-width: 650px) {
+    header .home-logo {
+        font-size: 22px !important;
+        font-weight: 800 !important;
+        line-height: 1 !important;
+        padding: 7px 10px !important;
+        border-radius: 10px !important;
+        background: rgba(255,255,255,.07) !important;
+        border: 1px solid rgba(255,255,255,.10) !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,.14) !important;
+    }
+}
+</style>
+
 </head>
 
 <body>
@@ -2283,6 +2357,9 @@ textarea {
                 <div class="social-stat"><strong id="profileStatLikes">0</strong><small>Likes</small></div>
             </div>
             <div class="social-actions" id="profileSocialActions"></div>
+            <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+                <button class="secondary-btn" type="button" onclick="openMyQuizHistory()">📜 History</button>
+            </div>
         </div>
 
 
@@ -2484,6 +2561,22 @@ textarea {
 
 </div>
 
+
+<!-- MY QUIZ HISTORY MODAL -->
+<div class="modal" id="myHistoryModal">
+    <div class="modal-content" style="max-width:620px;">
+        <div class="modal-header">
+            <h2>Quiz History</h2>
+            <button class="close" onclick="closeModal('myHistoryModal')">×</button>
+        </div>
+        <p style="color:#8f95a2;font-size:13px;margin-bottom:14px;">
+            Your completed quizzes and scores.
+        </p>
+        <div id="myHistoryList" class="results-list">
+            <div class="empty">Loading history...</div>
+        </div>
+    </div>
+</div>
 
 <!-- PARTICIPANTS MODAL -->
 
@@ -3120,6 +3213,28 @@ textarea {
 
             </div>
 
+
+            <div style="margin-top:20px;margin-bottom:20px;">
+                <h3 class="admin-section-title">Quiz History</h3>
+                <p style="color:#777d8a;font-size:12px;margin-bottom:10px;">
+                    Enter any Quiz ID to view the complete scoreboard for that quiz.
+                </p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <input
+                        id="adminHistoryQuizId"
+                        type="text"
+                        placeholder="Enter Quiz ID"
+                        autocomplete="off"
+                        style="flex:1 1 220px;min-width:0;">
+                    <button
+                        class="primary-btn"
+                        type="button"
+                        onclick="adminSearchQuizHistory()">
+                        View History
+                    </button>
+                </div>
+                <div id="adminHistoryResult" style="margin-top:14px;"></div>
+            </div>
 
             <div
                 style="
@@ -6393,6 +6508,21 @@ async function showQuizResult(
 
         </div>
 
+        ${
+            isCurrentUserAdmin
+                ? `
+                    <div style="margin-top:14px;display:flex;justify-content:flex-end;">
+                        <button
+                            class="secondary-btn"
+                            type="button"
+                            onclick="openAdminHistoryForQuiz('${escapeHTML(quiz.quiz_id || "")}')">
+                            📜 View History
+                        </button>
+                    </div>
+                `
+                : ""
+        }
+
     `;
 
 
@@ -6584,6 +6714,335 @@ async function showQuizResult(
         `
         ).join("");
 
+}
+
+
+
+/* =========================
+   QUIZ HISTORY
+========================= */
+
+async function openMyQuizHistory() {
+
+    if (!requireLogin()) return;
+
+    const list = document.getElementById("myHistoryList");
+
+    if (!list) return;
+
+    list.innerHTML =
+        '<div class="empty">Loading history...</div>';
+
+    openModal("myHistoryModal");
+
+    const { data, error } =
+        await supabaseClient
+            .from("quiz_attempts")
+            .select("*")
+            .eq("user_id", currentProfile.id)
+            .order("completed_at", { ascending: false });
+
+    if (error) {
+
+        console.error("History load error:", error);
+
+        list.innerHTML =
+            '<div class="empty">Unable to load your quiz history.</div>';
+
+        return;
+    }
+
+    const entries = data || [];
+
+    if (!entries.length) {
+
+        list.innerHTML =
+            '<div class="empty">You have not completed any quizzes yet.</div>';
+
+        return;
+    }
+
+    list.innerHTML = entries.map(entry => `
+
+        <div class="result-item">
+
+            <div class="result-main">
+
+                <div class="result-name">
+                    ${escapeHTML(entry.quiz_code || "Quiz")}
+                </div>
+
+                <div class="result-meta">
+                    ${
+                        entry.completed_at
+                            ? new Date(entry.completed_at).toLocaleString()
+                            : "Date unavailable"
+                    }
+                </div>
+
+            </div>
+
+            <div class="result-score">
+                ${Number(entry.score || 0)}/${Number(entry.total_questions || 0)}
+            </div>
+
+        </div>
+
+    `).join("");
+}
+
+
+async function adminSearchQuizHistory(suppliedQuizId = "") {
+
+    if (!currentProfile) return;
+
+    const admin =
+        await isUserAdmin(currentProfile.id);
+
+    if (!admin) {
+
+        alert(
+            "You do not have permission to view quiz history."
+        );
+
+        return;
+    }
+
+    const input =
+        document.getElementById("adminHistoryQuizId");
+
+    const result =
+        document.getElementById("adminHistoryResult");
+
+    const quizId =
+        String(
+            suppliedQuizId ||
+            input?.value ||
+            ""
+        ).trim();
+
+    if (!quizId) {
+
+        if (result) {
+            result.innerHTML =
+                '<div class="empty">Enter a Quiz ID first.</div>';
+        }
+
+        return;
+    }
+
+    if (input) {
+        input.value = quizId;
+    }
+
+    if (result) {
+        result.innerHTML =
+            '<div class="empty">Loading quiz history...</div>';
+    }
+
+    let attempts = null;
+    let quiz = null;
+
+    const { data: byCode, error: codeError } =
+        await supabaseClient
+            .from("quiz_attempts")
+            .select("*")
+            .eq("quiz_code", quizId)
+            .order("score", { ascending: false })
+            .order("completed_at", { ascending: true });
+
+    if (!codeError && byCode?.length) {
+
+        attempts = byCode;
+
+    } else {
+
+        const {
+            data: quizRows,
+            error: quizLookupError
+        } =
+            await supabaseClient
+                .from("quizzes")
+                .select("id,quiz_id,title")
+                .eq("quiz_id", quizId)
+                .limit(1);
+
+        if (!quizLookupError && quizRows?.length) {
+
+            quiz = quizRows[0];
+
+            const {
+                data: byUuid,
+                error: uuidError
+            } =
+                await supabaseClient
+                    .from("quiz_attempts")
+                    .select("*")
+                    .eq("quiz_id", quiz.id)
+                    .order("score", { ascending: false })
+                    .order("completed_at", { ascending: true });
+
+            if (!uuidError) {
+                attempts = byUuid || [];
+            }
+        }
+    }
+
+    if (attempts === null) {
+
+        if (result) {
+            result.innerHTML =
+                '<div class="empty">Unable to find a quiz with that ID.</div>';
+        }
+
+        return;
+    }
+
+    const bestByUser = new Map();
+
+    attempts.forEach(entry => {
+
+        const key =
+            entry.user_id ||
+            entry.participant_user_id ||
+            entry.participant_name ||
+            String(Math.random());
+
+        const existing = bestByUser.get(key);
+
+        if (
+            !existing ||
+            Number(entry.score || 0) >
+                Number(existing.score || 0) ||
+            (
+                Number(entry.score || 0) ===
+                    Number(existing.score || 0) &&
+                new Date(entry.completed_at || 0) <
+                    new Date(existing.completed_at || 0)
+            )
+        ) {
+            bestByUser.set(key, entry);
+        }
+    });
+
+    const entries =
+        [...bestByUser.values()].sort(
+            (a, b) =>
+                Number(b.score || 0) -
+                Number(a.score || 0)
+        );
+
+    const title =
+        quiz?.title ||
+        entries[0]?.quiz_code ||
+        quizId;
+
+    if (!result) return;
+
+    if (!entries.length) {
+
+        result.innerHTML = `
+            <div class="empty">
+                No completed attempts found for
+                <strong>${escapeHTML(title)}</strong>.
+            </div>
+        `;
+
+        return;
+    }
+
+    result.innerHTML = `
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+            <strong>${escapeHTML(title)}</strong>
+            <span style="color:#8f95a2;font-size:12px;">
+                ${entries.length} player(s)
+            </span>
+        </div>
+
+        <div
+            class="global-board-header"
+            style="display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;padding:10px 14px;margin-bottom:6px;color:#777d8a;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">
+
+            <div>Rank</div>
+            <div>Player</div>
+            <div style="text-align:right;">Score</div>
+
+        </div>
+
+        <div class="results-list">
+
+            ${entries.map((entry, index) => `
+
+                <div class="result-item">
+
+                    <div class="result-row">
+
+                        <div class="rank-badge">
+                            ${index + 1}
+                        </div>
+
+                        <div class="result-main">
+
+                            <div class="result-name">
+                                ${escapeHTML(entry.participant_name || "User")}
+                            </div>
+
+                            <div class="result-meta">
+                                ${escapeHTML(entry.participant_user_id || "USER")}
+                                ${
+                                    entry.completed_at
+                                        ? " • " + new Date(entry.completed_at).toLocaleString()
+                                        : ""
+                                }
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="result-score">
+                        ${Number(entry.score || 0)}/${Number(entry.total_questions || 0)}
+                    </div>
+
+                </div>
+
+            `).join("")}
+
+        </div>
+
+    `;
+}
+
+
+async function openAdminHistoryForQuiz(quizId) {
+
+    if (!currentProfile) return;
+
+    const admin =
+        await isUserAdmin(currentProfile.id);
+
+    if (!admin) {
+
+        alert(
+            "You do not have permission to view quiz history."
+        );
+
+        return;
+    }
+
+    closeModal("resultModal");
+
+    await openAdmin();
+
+    const input =
+        document.getElementById("adminHistoryQuizId");
+
+    if (input) {
+        input.value = quizId || "";
+    }
+
+    await adminSearchQuizHistory(quizId);
 }
 
 
