@@ -1382,146 +1382,113 @@ textarea {
 
 
 /* =========================
-   MOBILE HEADER / NAV
+   MOBILE POLISH + SOCIAL CHAT
 ========================= */
-.mobile-menu-btn {
-    display: none;
-    background: rgba(255,255,255,.08);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,.12);
-    padding: 9px 11px;
-    font-size: 18px;
-    line-height: 1;
+.profile-more-wrap { position:relative; margin-left:auto; }
+.profile-more-btn { width:36px; height:36px; padding:0; border-radius:10px; background:rgba(255,255,255,.06); color:#fff; border:1px solid rgba(255,255,255,.10); }
+.profile-more-menu { position:absolute; right:0; top:42px; min-width:150px; padding:6px; border-radius:12px; background:#171a22; border:1px solid rgba(255,255,255,.10); box-shadow:0 16px 35px rgba(0,0,0,.35); z-index:1200; display:none; }
+.profile-more-menu.show { display:block; }
+.profile-more-menu button { width:100%; background:transparent; color:#fff; text-align:left; padding:9px 10px; border-radius:8px; }
+.profile-more-menu button:hover { background:rgba(255,255,255,.07); }
+.profile-more-menu .danger { color:#ff8a8a; }
+.chat-composer { display:flex; gap:8px; align-items:center; margin-top:10px; }
+.chat-composer input { flex:1; }
+.chat-image-btn { width:44px; min-width:44px; padding:12px 0; background:rgba(255,255,255,.08); color:#fff; }
+.chat-image-preview { max-width:220px; max-height:220px; border-radius:12px; margin-top:5px; display:block; }
+.chat-image-message { max-width:240px; width:auto; border-radius:12px; display:block; margin-top:5px; cursor:pointer; }
+.social-list-actions { display:flex; align-items:center; gap:6px; margin-left:auto; flex:0 0 auto; }
+.social-more-btn { width:34px; height:34px; padding:0; background:rgba(255,255,255,.06); color:#fff; border:1px solid rgba(255,255,255,.08); }
+@media (max-width:650px) {
+    header { padding:12px 14px; gap:8px; }
+    header nav { display:none; }
+    .account-area { flex:1; flex-wrap:nowrap; gap:7px; justify-content:flex-end; }
+    .header-action-btn { min-width:36px; height:36px; padding:0 8px; border-radius:9px; font-size:0; }
+    .header-action-btn[onclick*="openJoinRoomModal"] { min-width:88px; font-size:11px; }
+    .header-action-btn[onclick*="openGlobalLeaderboard"]::first-letter,
+    .header-action-btn[onclick*="openPlayerSearch"]::first-letter { font-size:16px; }
+    .profile-btn { width:36px; height:36px; padding:2px; justify-content:center; }
+    .profile-btn .profile-name, .profile-btn .profile-arrow { display:none; }
+    .hero { width:calc(100% - 24px); margin:22px auto; min-height:360px; padding:28px 22px; border-radius:20px; }
+    .hero h1 { font-size:42px; letter-spacing:-2px; }
+    .hero p { font-size:14px; }
+    .hero-buttons { flex-direction:column; }
+    .hero-buttons button { width:100%; }
+    .container { width:calc(100% - 24px); margin:35px auto; }
+    .cards { grid-template-columns:1fr; }
+    .modal { padding:18px 10px; }
+    .modal-content { padding:20px; border-radius:16px; }
+    .quiz-settings-grid, .question-settings-grid, .options-grid { grid-template-columns:1fr; }
+    .social-actions { gap:7px; }
+    .social-actions button { flex:1; min-width:0; }
+    .chat-messages-box { height:52vh; min-height:260px; }
 }
-.mobile-nav-panel {
-    display: none;
+
+
+.mobile-menu-btn { display:none; width:36px; height:36px; padding:0; border-radius:9px; background:rgba(255,255,255,.06); color:#fff; border:1px solid rgba(255,255,255,.10); font-size:20px; }
+.mobile-menu { display:none; position:fixed; top:58px; left:10px; width:190px; padding:8px; background:#171a22; border:1px solid rgba(255,255,255,.10); border-radius:14px; box-shadow:0 18px 40px rgba(0,0,0,.4); z-index:1500; }
+.mobile-menu.show { display:block; }
+.mobile-menu button { width:100%; background:transparent; color:#fff; text-align:left; padding:11px 12px; border-radius:9px; }
+.mobile-menu button:hover { background:rgba(255,255,255,.07); }
+@media (max-width:650px) {
+    header { justify-content:flex-start; }
+    .mobile-menu-btn { display:block; flex:0 0 36px; }
+    header .logo { flex:0 0 auto; margin-right:auto; }
 }
-@media (max-width: 760px) {
-    header {
-        padding: 12px 16px;
-        gap: 10px;
+
+</style>
+
+<style id="mobile-social-fix">
+@media (max-width: 768px) {
+    #socialButton {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        visibility: visible !important;
+        opacity: 1 !important;
+        gap: 4px;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 8px;
+        font-size: 14px;
+        line-height: 1;
         position: relative;
     }
-    .logo { font-size: 20px; }
-    header nav { display: none; }
-    .account-area {
-        margin-left: auto;
-        gap: 7px;
-        flex-wrap: nowrap;
+
+    #socialButton::before {
+        content: "👥";
+        display: inline-block;
+        font-size: 19px;
+        line-height: 1;
     }
-    .account-area > .header-action-btn { display: none !important; }
-    .account-area > .login-btn { display: none !important; }
-    .account-area > .profile-btn {
-        display: flex !important;
-        padding: 5px;
-        width: 40px;
-        height: 40px;
-        justify-content: center;
+
+    #socialButton {
+        font-size: 0;
     }
-    .account-area > .profile-btn #profileName,
-    .account-area > .profile-btn .profile-arrow { display: none; }
-    .mobile-menu-btn { display: block; }
-    .mobile-nav-panel {
-        position: absolute;
-        top: calc(100% + 8px);
-        left: 12px;
-        right: 12px;
-        z-index: 1200;
-        background: #171a22;
-        border: 1px solid rgba(255,255,255,.1);
-        border-radius: 14px;
-        padding: 8px;
-        box-shadow: 0 18px 40px rgba(0,0,0,.4);
-    }
-    .mobile-nav-panel.open { display: block; }
-    .mobile-nav-panel a,
-    .mobile-nav-panel button {
-        display: flex;
-        width: 100%;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 10px;
-        padding: 12px 13px;
-        margin: 2px 0;
-        border-radius: 9px;
-        background: transparent;
-        color: #fff;
-        text-decoration: none;
-        font-size: 14px;
-        border: 0;
-        text-align: left;
-    }
-    .mobile-nav-panel a:hover,
-    .mobile-nav-panel button:hover { background: rgba(255,255,255,.07); }
-    .mobile-nav-divider {
-        height: 1px;
-        background: rgba(255,255,255,.08);
-        margin: 6px 4px;
-    }
-    .mobile-social-row { position: relative; }
-    .mobile-social-badge {
-        margin-left: auto;
-        min-width: 19px;
-        height: 19px;
-        padding: 0 5px;
-        border-radius: 999px;
-        background: #ef4444;
-        color: #fff;
+
+    #socialButton #socialNotificationBadge {
         font-size: 10px;
-        line-height: 19px;
-        text-align: center;
-        font-weight: 800;
-        display: none;
     }
-    .mobile-social-badge.show { display: inline-block; }
-    .hero {
-        width: calc(100% - 24px);
-        margin: 24px auto;
-        min-height: 360px;
-        padding: 30px 22px;
-        border-radius: 18px;
-    }
-    .hero-buttons { flex-wrap: wrap; }
-    .hero-buttons button { flex: 1 1 140px; }
 }
-
-
-/* MOBILE HEADER V2 - compact primary actions */
-@media (max-width:650px){
-  header{padding:10px 12px !important; gap:8px !important;}
-  header .logo{font-size:18px !important; margin-right:auto !important;}
-  header nav{display:none !important;}
-  .account-area{display:flex !important; align-items:center !important; flex-wrap:nowrap !important; gap:7px !important; margin-left:auto !important;}
-  .account-area .header-action-btn{display:inline-flex !important; align-items:center !important; justify-content:center !important; min-width:38px !important; height:36px !important; padding:0 9px !important; border-radius:10px !important; font-size:0 !important; white-space:nowrap !important;}
-  .account-area .header-action-btn[onclick*="openJoinRoomModal"]{font-size:11px !important; padding:0 11px !important; min-width:auto !important; font-weight:700 !important;}
-  .account-area .header-action-btn[onclick*="openPlayerSearch"]::before{content:"🔎"; font-size:17px !important;}
-  .account-area .header-action-btn[onclick*="openGlobalLeaderboard"]::before{content:"🏆"; font-size:17px !important;}
-  .account-area .social-header-btn{font-size:0 !important; position:relative !important;}
-  .account-area .social-header-btn::before{content:"👥"; font-size:17px !important;}
-  .account-area .profile-header-btn{font-size:0 !important;}
-  .account-area .profile-header-btn::before{content:"👤"; font-size:17px !important;}
-  .account-area .mobile-menu-btn{display:inline-flex !important;}
-}
-@media (min-width:651px){.mobile-menu-btn{display:none !important;}}
 </style>
+
 </head>
 
 <body>
 
 <header>
 
+    <button class="mobile-menu-btn" type="button" onclick="toggleMobileMenu(event)" aria-label="Menu">⋮</button>
+
     <div class="logo">
         Quiz
     </div>
 
-    <button
-        class="mobile-menu-btn"
-        id="mobileMenuButton"
-        type="button"
-        aria-label="Open menu"
-        onclick="toggleMobileMenu()">
-        ☰
-    </button>
+    <div id="mobileMenu" class="mobile-menu">
+        <button type="button" onclick="toggleMobileMenu(); goHome();">🏠 Home</button>
+        <button type="button" onclick="toggleMobileMenu(); openQuizLibrary();">📚 My Quizzes</button>
+        <button type="button" onclick="toggleMobileMenu(); openCreateQuiz();">➕ Create</button>
+        <button type="button" onclick="toggleMobileMenu(); goAbout();">ℹ️ About</button>
+    </div>
 
     <nav>
 
@@ -1537,26 +1504,11 @@ textarea {
             Create
         </a>
 
-        <a href="#about" onclick="goAbout(); closeMobileMenu(); return false;">
+        <a href="#about" onclick="goAbout(); return false;">
             About
         </a>
 
     </nav>
-
-    <div class="mobile-nav-panel" id="mobileNavPanel">
-        <a href="#" onclick="goHome(); closeMobileMenu(); return false;">🏠 Home</a>
-        <a href="#" onclick="openQuizLibrary(); closeMobileMenu(); return false;">📚 My Quizzes</a>
-        <a href="#" onclick="openCreateQuiz(); closeMobileMenu(); return false;">➕ Create</a>
-        <a href="#about" onclick="goAbout(); closeMobileMenu(); return false;">ℹ️ About</a>
-        <div class="mobile-nav-divider"></div>
-        <button type="button" onclick="openGlobalLeaderboard(); closeMobileMenu();">🏆 Leaderboard</button>
-        <button type="button" onclick="openJoinRoomModal(); closeMobileMenu();">🚪 Join Room</button>
-        <button type="button" onclick="openPlayerSearch(); closeMobileMenu();">🔎 Search Players</button>
-        <button type="button" class="mobile-social-row" onclick="openSocialCenter(); closeMobileMenu();">
-            👥 Social
-            <span id="mobileSocialNotificationBadge" class="mobile-social-badge">0</span>
-        </button>
-    </div>
 
     <div class="account-area">
 
@@ -1586,7 +1538,8 @@ textarea {
             type="button"
             id="socialButton"
             onclick="openSocialCenter()"
-            style="display:none;">
+            aria-label="Social"
+            title="Social">
             👥 Social
             <span id="socialNotificationBadge" class="social-notification-badge">0</span>
         </button>
@@ -2194,10 +2147,13 @@ textarea {
             <button class="close" onclick="closeModal('directChatModal')">×</button>
         </div>
         <div id="directChatMessages" class="chat-messages-box"></div>
-        <form onsubmit="sendDirectMessage(event)" style="display:flex;gap:8px;">
-            <input id="directChatInput" maxlength="1000" placeholder="Write a message..." style="flex:1;">
+        <form onsubmit="sendDirectMessage(event)" class="chat-composer">
+            <input id="directChatInput" maxlength="1000" placeholder="Write a message...">
+            <input id="directChatImage" type="file" accept="image/*" hidden onchange="previewChatImage(event)">
+            <button class="chat-image-btn" type="button" onclick="document.getElementById('directChatImage').click()" title="Send image">🖼️</button>
             <button class="save-btn" type="submit">Send</button>
         </form>
+        <div id="chatImagePreviewWrap"></div>
         <p style="color:#8f95a2;font-size:11px;margin-top:8px;">Direct chat is available only between mutual followers.</p>
     </div>
 </div>
@@ -7581,17 +7537,6 @@ function closeProfileMenu() {
 }
 
 
-function toggleMobileMenu() {
-    const panel = document.getElementById("mobileNavPanel");
-    if (!panel) return;
-    panel.classList.toggle("open");
-}
-
-function closeMobileMenu() {
-    const panel = document.getElementById("mobileNavPanel");
-    if (panel) panel.classList.remove("open");
-}
-
 function toggleProfileMenu() {
 
     const menu =
@@ -8446,8 +8391,11 @@ async function renderSocialUsers(box, ids, showFollowBack, showMessage) {
                 <strong>${escapeHTML(person.display_name || "User")}</strong>
                 <small>${escapeHTML(person.user_id || "")}</small>
             </div>
-            ${showFollowBack ? `<button class="secondary-btn" type="button" onclick="event.stopPropagation(); followFromSocial('${escapeHTML(person.id)}')">Follow back</button>` : ""}
-            ${showMessage ? `<button class="primary-btn" type="button" onclick="event.stopPropagation(); openDirectChat('${escapeHTML(person.id)}')">Message</button>` : ""}
+            <div class="social-list-actions">
+                ${showFollowBack ? `<button class="secondary-btn" type="button" onclick="event.stopPropagation(); followFromSocial('${escapeHTML(person.id)}')">Follow back</button>` : ""}
+                ${showMessage ? `<button class="primary-btn" type="button" onclick="event.stopPropagation(); openDirectChat('${escapeHTML(person.id)}')">Message</button>` : ""}
+                <button class="social-more-btn" type="button" title="More" onclick="event.stopPropagation(); toggleSocialMore('${escapeHTML(person.id)}', this)">⋮</button>
+            </div>
         </div>
     `).join("");
 }
@@ -8583,8 +8531,14 @@ async function openPublicProfile(userId) {
     const actions = document.getElementById("publicProfileActions");
     actions.innerHTML = userId !== currentProfile.id ? `
         <button class="secondary-btn" onclick="toggleProfileLike('${escapeHTML(userId)}', ${!!liked})">Like</button>
-        <button class="secondary-btn" onclick="toggleProfileFollow('${escapeHTML(userId)}', ${!!following})">${isMutual ? "Mutual" : (following ? "Following" : "Follow")}</button>
+        <button class="secondary-btn" onclick="toggleProfileFollow('${escapeHTML(userId)}', ${!!following})">${isMutual ? "Friends" : (following ? "Following" : "Follow")}</button>
         ${isMutual ? `<button class="primary-btn" onclick="openDirectChat('${escapeHTML(userId)}')">💬 Message</button>` : ""}
+        <div class="profile-more-wrap">
+            <button class="profile-more-btn" type="button" onclick="toggleProfileMoreMenu(event)">⋮</button>
+            <div id="publicProfileMoreMenu" class="profile-more-menu">
+                ${following ? `<button class="danger" type="button" onclick="closeProfileMoreMenu(); toggleProfileFollow('${escapeHTML(userId)}', true)">Unfollow</button>` : `<button type="button" onclick="closeProfileMoreMenu(); openPlayerSearch()">Search player</button>`}
+            </div>
+        </div>
     ` : "";
 
     const mutualBox = document.getElementById("publicProfileMutuals");
@@ -8769,6 +8723,12 @@ async function loadDirectChat() {
     }
     box.innerHTML = (data || []).map(m => m.message_type === "system" ? `
         <div class="social-system-message">${escapeHTML(m.message)}</div>
+    ` : m.message_type === "image" ? `
+        <div class="chat-message-row">
+            <strong>${escapeHTML(m.sender_id === currentProfile.id ? "You" : (directChatUser.display_name || "User"))}</strong>
+            <img class="chat-image-message" src="${escapeHTML(m.message)}" alt="Shared image" onclick="window.open('${escapeHTML(m.message)}','_blank')">
+            <small>${new Date(m.created_at).toLocaleString()}</small>
+        </div>
     ` : `
         <div class="chat-message-row">
             <strong>${escapeHTML(m.sender_id === currentProfile.id ? "You" : (directChatUser.display_name || "User"))}</strong>
@@ -8779,24 +8739,95 @@ async function loadDirectChat() {
     box.scrollTop = box.scrollHeight;
 }
 
+
+function toggleMobileMenu(event) {
+    if (event) event.stopPropagation();
+    const menu = document.getElementById("mobileMenu");
+    if (menu) menu.classList.toggle("show");
+}
+
 async function sendDirectMessage(event) {
     event.preventDefault();
     if (!directChatUser || !currentProfile) return;
+
     const input = document.getElementById("directChatInput");
+    const imageInput = document.getElementById("directChatImage");
     const message = input.value.trim();
-    if (!message) return;
-    const { error } = await supabaseClient.from("direct_messages").insert({
-        sender_id: currentProfile.id,
-        recipient_id: directChatUser.id,
-        message: message.slice(0, 1000)
-    });
-    if (error) {
-        alert("Message could not be sent: " + error.message);
-        return;
+
+    if (!message && !(imageInput && imageInput.files && imageInput.files[0])) return;
+
+    if (message) {
+        const { error } = await supabaseClient.from("direct_messages").insert({
+            sender_id: currentProfile.id,
+            recipient_id: directChatUser.id,
+            message: message.slice(0, 1000),
+            message_type: "text"
+        });
+        if (error) { alert("Message could not be sent: " + error.message); return; }
     }
+
+    if (imageInput && imageInput.files && imageInput.files[0]) {
+        const file = imageInput.files[0];
+        if (!file.type.startsWith("image/")) { alert("Please select an image file."); return; }
+        if (file.size > 8 * 1024 * 1024) { alert("Image must be 8 MB or smaller."); return; }
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+        const path = `${currentProfile.id}/${crypto.randomUUID()}.${ext}`;
+        const { error: uploadError } = await supabaseClient.storage.from("quiz-chat-images").upload(path, file, { contentType: file.type, upsert: false });
+        if (uploadError) { alert("Image could not be uploaded: " + uploadError.message); return; }
+        const { data: publicData } = supabaseClient.storage.from("quiz-chat-images").getPublicUrl(path);
+        const imageUrl = publicData?.publicUrl;
+        if (!imageUrl) { alert("Image URL could not be created."); return; }
+        const { error: imageError } = await supabaseClient.from("direct_messages").insert({
+            sender_id: currentProfile.id,
+            recipient_id: directChatUser.id,
+            message: imageUrl,
+            message_type: "image"
+        });
+        if (imageError) { alert("Image message could not be sent: " + imageError.message); return; }
+        imageInput.value = "";
+        const preview = document.getElementById("chatImagePreviewWrap");
+        if (preview) preview.innerHTML = "";
+    }
+
     input.value = "";
     await loadDirectChat();
 }
+
+function previewChatImage(event) {
+    const wrap = document.getElementById("chatImagePreviewWrap");
+    if (!wrap) return;
+    const file = event.target.files?.[0];
+    if (!file) { wrap.innerHTML = ""; return; }
+    if (!file.type.startsWith("image/")) { event.target.value = ""; wrap.innerHTML = ""; alert("Please select an image file."); return; }
+    const url = URL.createObjectURL(file);
+    wrap.innerHTML = `<img class="chat-image-preview" src="${url}" alt="Preview">`;
+}
+
+function toggleProfileMoreMenu(event) {
+    event.stopPropagation();
+    const menu = document.getElementById("publicProfileMoreMenu");
+    if (menu) menu.classList.toggle("show");
+}
+
+function closeProfileMoreMenu() {
+    const menu = document.getElementById("publicProfileMoreMenu");
+    if (menu) menu.classList.remove("show");
+}
+
+function toggleSocialMore(userId, button) {
+    const existing = document.getElementById("socialMoreMenu");
+    if (existing) existing.remove();
+    const menu = document.createElement("div");
+    menu.id = "socialMoreMenu";
+    menu.className = "profile-more-menu show";
+    menu.style.position = "fixed";
+    const rect = button.getBoundingClientRect();
+    menu.style.top = `${rect.bottom + 5}px`;
+    menu.style.right = `${Math.max(8, window.innerWidth - rect.right)}px`;
+    menu.innerHTML = `<button class="danger" type="button" onclick="this.parentElement.remove(); toggleProfileFollow('${escapeHTML(userId)}', true)">Unfollow</button>`;
+    document.body.appendChild(menu);
+}
+
 
 
 
