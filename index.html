@@ -3659,6 +3659,8 @@ function renderCurrentIdentityName(name) {
                 <div class="social-stat"><strong id="profileStatScore">0</strong><small>Total Score</small></div>
                 <div class="social-stat"><strong id="profileStatRank">—</strong><small>All-Time Rank</small></div>
                 <div class="social-stat"><strong id="profileStatLikes">0</strong><small>Likes</small></div>
+                <div class="social-stat"><strong id="profileStatFollowers">0</strong><small>Followers</small></div>
+                <div class="social-stat"><strong id="profileStatFollowing">0</strong><small>Following</small></div>
             </div>
             <div class="social-actions" id="profileSocialActions"></div>
             <div style="margin-top:12px;display:flex;justify-content:flex-end;">
@@ -4449,11 +4451,14 @@ function renderCurrentIdentityName(name) {
 
         <div class="form-group">
             <label>Password <span style="color:#8f95a2;">(optional)</span></label>
-            <input
-                type="password"
-                id="createRoomPassword"
-                maxlength="40"
-                placeholder="Leave blank for no password">
+            <div class="room-password-wrap">
+                <input
+                    type="password"
+                    id="createRoomPassword"
+                    maxlength="40"
+                    placeholder="Leave blank for no password">
+                <button type="button" class="room-password-toggle" id="createRoomPasswordToggle" aria-label="Show password" title="Show password">👁️</button>
+            </div>
         </div>
 
         <button
@@ -10302,6 +10307,83 @@ function toggleProfileMenu() {
 
 
 /* =========================
+   OWN PROFILE SOCIAL STATS
+========================= */
+
+async function loadOwnProfileSocialStats() {
+    if (!currentProfile) return;
+
+    const {
+        data: stats,
+        error
+    } = await supabaseClient.rpc(
+        "get_profile_stats",
+        {
+            target_user: currentProfile.id
+        }
+    );
+
+    if (error) {
+        console.error(
+            "Own profile stats error:",
+            error
+        );
+        return;
+    }
+
+    const s = stats?.[0] || {};
+
+    const played =
+        document.getElementById("profileStatPlayed");
+
+    const score =
+        document.getElementById("profileStatScore");
+
+    const rank =
+        document.getElementById("profileStatRank");
+
+    const likes =
+        document.getElementById("profileStatLikes");
+
+    const followers =
+        document.getElementById("profileStatFollowers");
+
+    const following =
+        document.getElementById("profileStatFollowing");
+
+    if (played) {
+        played.textContent =
+            Number(s.quizzes_played || 0);
+    }
+
+    if (score) {
+        score.textContent =
+            Number(s.total_score || 0);
+    }
+
+    if (rank) {
+        rank.textContent =
+            Number(s.all_time_rank || 0) || "—";
+    }
+
+    if (likes) {
+        likes.textContent =
+            Number(s.likes || 0);
+    }
+
+    if (followers) {
+        followers.textContent =
+            Number(s.followers || 0);
+    }
+
+    if (following) {
+        following.textContent =
+            Number(s.following || 0);
+    }
+}
+
+
+/* =========================
    PROFILE DATABASE
 ========================= */
 
@@ -10429,6 +10511,8 @@ async function handleUserProfile() {
             fallbackProfile
         );
 
+        await loadOwnProfileSocialStats();
+
 
         await checkAdminStatus();
 
@@ -10452,6 +10536,8 @@ async function handleUserProfile() {
     updateLoginUI(
         profile
     );
+
+    await loadOwnProfileSocialStats();
 
 
     await migrateLocalQuizzesToSupabase();
@@ -10769,6 +10855,7 @@ async function openProfile() {
 
 
     await handleUserProfile();
+    await loadOwnProfileSocialStats();
 
     const ownGallery =
         await loadProfileGallery(
@@ -14650,5 +14737,15 @@ document.addEventListener(
 );
 </script>
 
+
+<style id="v44-room-password-eye-style">
+.room-password-wrap{position:relative;width:100%;}
+.room-password-wrap input{padding-right:48px!important;}
+.room-password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:34px;height:34px;padding:0;border:0;border-radius:8px;background:transparent;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;line-height:1;opacity:.75;}
+.room-password-toggle:hover,.room-password-toggle:focus-visible{opacity:1;background:rgba(255,255,255,.08);outline:none;}
+</style>
+<script id="v44-room-password-eye-script">
+document.addEventListener("DOMContentLoaded",function(){const i=document.getElementById("createRoomPassword"),b=document.getElementById("createRoomPasswordToggle");if(!i||!b)return;b.addEventListener("click",function(){const show=i.type==="password";i.type=show?"text":"password";b.textContent=show?"🙈":"👁️";b.setAttribute("aria-label",show?"Hide password":"Show password");b.title=show?"Hide password":"Show password";});});
+</script>
 </body>
 </html>
