@@ -1364,6 +1364,22 @@ textarea {
     .chat-messages-box { height:300px; }
 }
 
+
+.social-header-btn { position:relative; }
+.social-notification-badge { position:absolute; top:-5px; right:-5px; min-width:18px; height:18px; padding:0 5px; border-radius:999px; background:#ef4444; color:#fff; font-size:10px; line-height:18px; text-align:center; font-weight:800; display:none; }
+.social-notification-badge.show { display:block; }
+.social-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.social-tabs button { padding:8px 12px; border-radius:9px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.04); color:#fff; cursor:pointer; }
+.social-tabs button.active { background:rgba(255,255,255,.12); }
+.social-list { display:flex; flex-direction:column; gap:8px; }
+.social-list-item { display:flex; align-items:center; gap:10px; padding:10px; border:1px solid rgba(255,255,255,.07); border-radius:10px; cursor:pointer; }
+.social-list-item:hover { background:rgba(255,255,255,.04); }
+.social-list-item img { width:40px; height:40px; border-radius:50%; object-fit:cover; }
+.social-list-main { flex:1; min-width:0; }
+.social-list-main strong, .social-list-main small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.social-list-main small { color:#8f95a2; margin-top:3px; }
+.social-system-message { margin:10px auto; max-width:90%; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); color:#b7bbc5; text-align:center; font-size:12px; }
+
 </style>
 </head>
 
@@ -1416,6 +1432,16 @@ textarea {
             type="button"
             onclick="openPlayerSearch()">
             🔎 Search
+        </button>
+
+        <button
+            class="header-action-btn social-header-btn"
+            type="button"
+            id="socialButton"
+            onclick="openSocialCenter()"
+            style="display:none;">
+            👥 Social
+            <span id="socialNotificationBadge" class="social-notification-badge">0</span>
         </button>
 
         <button
@@ -1969,11 +1995,27 @@ textarea {
             <button class="close" onclick="closeModal('playerSearchModal')">×</button>
         </div>
         <div class="player-search-box">
-            <input id="playerSearchInput" type="search" maxlength="60" placeholder="Search username or User ID..." oninput="searchPlayers()">
+            <input id="playerSearchInput" type="search" maxlength="60" placeholder="Search username, display name or User ID..." oninput="searchPlayers()">
             <button class="secondary-btn" type="button" onclick="searchPlayers()">Search</button>
         </div>
         <div id="playerSearchSuggestions" style="margin-bottom:14px;"></div>
         <div id="playerSearchResults" class="player-search-results"></div>
+    </div>
+</div>
+
+<!-- SOCIAL CENTER MODAL -->
+<div class="modal" id="socialCenterModal">
+    <div class="modal-content" style="max-width:620px;">
+        <div class="modal-header">
+            <h2>Social</h2>
+            <button class="close" onclick="closeModal('socialCenterModal')">×</button>
+        </div>
+        <div class="social-tabs">
+            <button id="socialFollowersTab" onclick="loadSocialTab('followers')">Followers</button>
+            <button id="socialFollowingTab" onclick="loadSocialTab('following')">Following</button>
+            <button id="socialFriendsTab" onclick="loadSocialTab('friends')">Friends</button>
+        </div>
+        <div id="socialCenterContent" class="social-list"></div>
     </div>
 </div>
 
@@ -2188,6 +2230,7 @@ textarea {
             <button id="globalBoardMonthlyBtn" onclick="setGlobalLeaderboardPeriod('monthly')">Monthly</button>
             <button id="globalBoardWeeklyBtn" onclick="setGlobalLeaderboardPeriod('weekly')">Weekly</button>
             <button id="globalBoardDailyBtn" onclick="setGlobalLeaderboardPeriod('daily')">Daily</button>
+            <button id="globalBoardLikesBtn" onclick="openLikeLeaderboard()">❤️ Like Ranking</button>
         </div>
 
         <div
@@ -2210,7 +2253,7 @@ textarea {
 
             <div>Player</div>
 
-            <div style="text-align:right;">Total Points</div>
+            <div id="globalBoardValueHeader" style="text-align:right;">Total Points</div>
 
         </div>
 
@@ -7213,6 +7256,12 @@ function updateLoginUI(
         );
 
 
+    const socialButton =
+        document.getElementById(
+            "socialButton"
+        );
+
+
     const adminHomeCard =
         document.getElementById(
             "adminHomeCard"
@@ -7232,6 +7281,14 @@ function updateLoginUI(
         if (profileButton) {
 
             profileButton.style.display =
+                "none";
+
+        }
+
+
+        if (socialButton) {
+
+            socialButton.style.display =
                 "none";
 
         }
@@ -7289,6 +7346,16 @@ function updateLoginUI(
             "flex";
 
     }
+
+
+    if (socialButton) {
+
+        socialButton.style.display =
+            "inline-flex";
+
+    }
+
+    loadSocialNotificationCount();
 
 
     if (profileName) {
@@ -8062,6 +8129,10 @@ let directChatChannel = null;
 
 async function openGlobalLeaderboard() {
     if (!requireLogin()) return;
+    const header = document.getElementById("globalBoardValueHeader");
+    if (header) header.textContent = "Total Points";
+    const likeBtn = document.getElementById("globalBoardLikesBtn");
+    if (likeBtn) likeBtn.classList.remove("active");
     await loadGlobalLeaderboard();
     openModal("leaderboardModal");
 }
@@ -8120,6 +8191,194 @@ async function loadGlobalLeaderboard() {
     }
 }
 
+
+/* =========================
+   SOCIAL CENTER / FRIENDS
+========================= */
+
+async function loadSocialNotificationCount() {
+    if (!currentProfile) return;
+    const badge = document.getElementById("socialNotificationBadge");
+    const button = document.getElementById("socialButton");
+    if (button) button.style.display = "inline-flex";
+
+    const { count, error } = await supabaseClient
+        .from("social_notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("recipient_id", currentProfile.id)
+        .eq("is_read", false);
+
+    if (error) {
+        console.error("Social notification count error:", error);
+        return;
+    }
+
+    const n = Number(count || 0);
+    if (badge) {
+        badge.textContent = n > 99 ? "99+" : String(n);
+        badge.classList.toggle("show", n > 0);
+    }
+}
+
+async function openSocialCenter() {
+    if (!requireLogin()) return;
+    openModal("socialCenterModal");
+    await loadSocialTab("followers");
+    await markSocialNotificationsRead();
+}
+
+async function loadSocialTab(tab) {
+    if (!currentProfile) return;
+
+    ["followers", "following", "friends"].forEach(name => {
+        const el = document.getElementById("social" + name.charAt(0).toUpperCase() + name.slice(1) + "Tab");
+        if (el) el.classList.toggle("active", name === tab);
+    });
+
+    const box = document.getElementById("socialCenterContent");
+    if (!box) return;
+    box.innerHTML = '<div class="empty">Loading...</div>';
+
+    if (tab === "followers") {
+        const { data: rows, error } = await supabaseClient
+            .from("profile_follows")
+            .select("follower_id")
+            .eq("following_id", currentProfile.id);
+        if (error) { box.innerHTML = '<div class="empty">Unable to load followers.</div>'; return; }
+        await renderSocialUsers(box, (rows || []).map(r => r.follower_id), true);
+    } else if (tab === "following") {
+        const { data: rows, error } = await supabaseClient
+            .from("profile_follows")
+            .select("following_id")
+            .eq("follower_id", currentProfile.id);
+        if (error) { box.innerHTML = '<div class="empty">Unable to load following.</div>'; return; }
+        await renderSocialUsers(box, (rows || []).map(r => r.following_id), false);
+    } else {
+        const { data: mine, error: e1 } = await supabaseClient
+            .from("profile_follows")
+            .select("following_id")
+            .eq("follower_id", currentProfile.id);
+        const { data: theirs, error: e2 } = await supabaseClient
+            .from("profile_follows")
+            .select("follower_id")
+            .eq("following_id", currentProfile.id);
+        if (e1 || e2) { box.innerHTML = '<div class="empty">Unable to load friends.</div>'; return; }
+        const followers = new Set((theirs || []).map(r => r.follower_id));
+        const ids = (mine || []).map(r => r.following_id).filter(id => followers.has(id));
+        await renderSocialUsers(box, ids, false, true);
+    }
+}
+
+async function renderSocialUsers(box, ids, showFollowBack, showMessage) {
+    if (!ids.length) {
+        box.innerHTML = '<div class="empty">No players here yet.</div>';
+        return;
+    }
+
+    const { data: profiles, error } = await supabaseClient
+        .from("profiles")
+        .select("id,display_name,user_id,avatar_url")
+        .in("id", ids.slice(0, 100));
+    if (error) { box.innerHTML = '<div class="empty">Unable to load players.</div>'; return; }
+
+    box.innerHTML = (profiles || []).map(person => `
+        <div class="social-list-item" onclick="openPublicProfile('${escapeHTML(person.id)}')">
+            <img src="${escapeHTML(person.avatar_url || getDefaultAvatar())}" alt="Avatar">
+            <div class="social-list-main">
+                <strong>${escapeHTML(person.display_name || "User")}</strong>
+                <small>${escapeHTML(person.user_id || "")}</small>
+            </div>
+            ${showFollowBack ? `<button class="secondary-btn" type="button" onclick="event.stopPropagation(); followFromSocial('${escapeHTML(person.id)}')">Follow back</button>` : ""}
+            ${showMessage ? `<button class="primary-btn" type="button" onclick="event.stopPropagation(); openDirectChat('${escapeHTML(person.id)}')">Message</button>` : ""}
+        </div>
+    `).join("");
+}
+
+async function followFromSocial(userId) {
+    if (!currentProfile || !userId || userId === currentProfile.id) return;
+    const { error } = await supabaseClient
+        .from("profile_follows")
+        .insert({ following_id: userId, follower_id: currentProfile.id });
+    if (error && !String(error.message || "").toLowerCase().includes("duplicate")) {
+        alert("Unable to follow: " + error.message);
+        return;
+    }
+    await loadSocialTab("friends");
+    await loadSocialNotificationCount();
+}
+
+async function markSocialNotificationsRead() {
+    if (!currentProfile) return;
+    await supabaseClient
+        .from("social_notifications")
+        .update({ is_read: true })
+        .eq("recipient_id", currentProfile.id)
+        .eq("is_read", false);
+    await loadSocialNotificationCount();
+}
+
+/* =========================
+   LIKE LEADERBOARD
+========================= */
+
+async function openLikeLeaderboard() {
+    if (!requireLogin()) return;
+
+    const list = document.getElementById("globalLeaderboardList");
+    const meBox = document.getElementById("globalLeaderboardMe");
+    const header = document.getElementById("globalBoardValueHeader");
+
+    if (header) header.textContent = "Likes";
+    ["all","monthly","weekly","daily"].forEach(p => {
+        const btn = document.getElementById("globalBoard" + p.charAt(0).toUpperCase() + p.slice(1) + "Btn");
+        if (btn) btn.classList.remove("active");
+    });
+    const likeBtn = document.getElementById("globalBoardLikesBtn");
+    if (likeBtn) likeBtn.classList.add("active");
+
+    if (list) list.innerHTML = '<div class="empty">Loading like ranking...</div>';
+
+    const { data, error } = await supabaseClient.rpc("get_like_leaderboard", {
+        requested_user: currentProfile?.id || null
+    });
+
+    if (error) {
+        console.error("Like leaderboard error:", error);
+        if (list) {
+            list.innerHTML = '<div class="empty">Like ranking is not configured yet. Run the latest social_like_follow_fix_v4.sql migration in Supabase.</div>';
+        }
+        if (meBox) meBox.style.display = "none";
+        return;
+    }
+
+    const rows = data || [];
+    const top = rows.slice(0, 100);
+
+    if (!top.length) {
+        if (list) list.innerHTML = '<div class="empty">No likes yet.</div>';
+    } else if (list) {
+        list.innerHTML = top.map(row => `
+            <div class="global-board-row ${row.is_current_user ? "current" : ""}" onclick="openPublicProfile('${escapeHTML(row.user_id)}')" style="cursor:pointer;">
+                <div class="global-board-rank">#${Number(row.rank || 0)}</div>
+                <img class="global-board-avatar" src="${escapeHTML(row.avatar_url || getDefaultAvatar())}" alt="Avatar">
+                <div class="global-board-main">
+                    <strong>${escapeHTML(row.display_name || "User")}</strong>
+                    <small>${Number(row.total_likes || 0)} like${Number(row.total_likes || 0) === 1 ? "" : "s"}</small>
+                </div>
+                <div class="global-board-score">${Number(row.total_likes || 0)}</div>
+            </div>
+        `).join("");
+    }
+
+    const me = rows.find(row => row.is_current_user);
+    if (meBox && me) {
+        meBox.style.display = "block";
+        meBox.innerHTML = `<strong>Your like rank: #${Number(me.rank)}</strong> · ${Number(me.total_likes || 0)} likes · Top ${Number(me.percentile || 0).toFixed(2)}%`;
+    } else if (meBox) {
+        meBox.style.display = "none";
+    }
+}
+
 /* =========================
    PUBLIC PROFILE / SOCIAL
 ========================= */
@@ -8165,8 +8424,8 @@ async function openPublicProfile(userId) {
 
     const actions = document.getElementById("publicProfileActions");
     actions.innerHTML = userId !== currentProfile.id ? `
-        <button class="secondary-btn" onclick="toggleProfileLike('${escapeHTML(userId)}', ${!!liked})">${liked ? "♥ Liked Today" : "♡ Like Today"}</button>
-        <button class="secondary-btn" onclick="toggleProfileFollow('${escapeHTML(userId)}', ${!!following})">${following ? "Following" : "Follow"}</button>
+        <button class="secondary-btn" onclick="toggleProfileLike('${escapeHTML(userId)}', ${!!liked})">Like</button>
+        <button class="secondary-btn" onclick="toggleProfileFollow('${escapeHTML(userId)}', ${!!following})">${isMutual ? "Mutual" : (following ? "Following" : "Follow")}</button>
         ${isMutual ? `<button class="primary-btn" onclick="openDirectChat('${escapeHTML(userId)}')">💬 Message</button>` : ""}
     ` : "";
 
@@ -8207,7 +8466,7 @@ async function toggleProfileLike(userId, currentlyLiked) {
     if (!currentProfile || userId === currentProfile.id) return;
 
     if (currentlyLiked) {
-        alert("You already liked this player today. You can like them again tomorrow.");
+        alert("You can give like only one like in one day.");
         return;
     }
 
@@ -8216,12 +8475,23 @@ async function toggleProfileLike(userId, currentlyLiked) {
         .insert({
             user_id: userId,
             liked_by: currentProfile.id,
-            like_day: new Date().toISOString().slice(0,10)
+            like_day: new Date().toISOString().slice(0, 10)
         });
 
     if (error) {
-        if (String(error.message || "").toLowerCase().includes("duplicate")) {
-            alert("You already liked this player today.");
+        const message = String(error.message || "").toLowerCase();
+
+        if (
+            message.includes("duplicate") ||
+            message.includes("unique") ||
+            message.includes("profile_likes_daily_unique")
+        ) {
+            alert("You can give like only one like in one day.");
+        } else if (
+            message.includes("row-level security") ||
+            message.includes("permission denied")
+        ) {
+            alert("Like could not be saved because the database permission needs to be updated. Run the latest social_like_follow_fix_v4.sql migration in Supabase.");
         } else {
             alert("Like could not be saved: " + error.message);
         }
@@ -8233,11 +8503,43 @@ async function toggleProfileLike(userId, currentlyLiked) {
 
 
 async function toggleProfileFollow(userId, currentlyFollowing) {
+    if (!currentProfile || userId === currentProfile.id) return;
+
     if (currentlyFollowing) {
-        await supabaseClient.from("profile_follows").delete().eq("following_id", userId).eq("follower_id", currentProfile.id);
+        const { error } = await supabaseClient
+            .from("profile_follows")
+            .delete()
+            .eq("following_id", userId)
+            .eq("follower_id", currentProfile.id);
+
+        if (error) {
+            alert("Unable to unfollow: " + error.message);
+            return;
+        }
     } else {
-        await supabaseClient.from("profile_follows").insert({ following_id: userId, follower_id: currentProfile.id });
+        const { error } = await supabaseClient
+            .from("profile_follows")
+            .insert({
+                following_id: userId,
+                follower_id: currentProfile.id
+            });
+
+        if (error) {
+            alert("Unable to follow: " + error.message);
+            return;
+        }
+
+        const { error: socialError } = await supabaseClient.rpc("process_follow_social_event", {
+            follower_user: currentProfile.id,
+            following_user: userId
+        });
+
+        if (socialError) {
+            console.error("Social follow event error:", socialError);
+        }
     }
+
+    await loadSocialNotificationCount();
     await openPublicProfile(userId);
 }
 
@@ -8300,14 +8602,16 @@ async function loadDirectChat() {
     const box = document.getElementById("directChatMessages");
     const { data, error } = await supabaseClient
         .from("direct_messages")
-        .select("id,sender_id,recipient_id,message,created_at")
+        .select("id,sender_id,recipient_id,message,message_type,created_at")
         .or(`and(sender_id.eq.${currentProfile.id},recipient_id.eq.${directChatUser.id}),and(sender_id.eq.${directChatUser.id},recipient_id.eq.${currentProfile.id})`)
         .order("created_at", { ascending: true });
     if (error) {
         box.innerHTML = '<div class="empty">Unable to load chat.</div>';
         return;
     }
-    box.innerHTML = (data || []).map(m => `
+    box.innerHTML = (data || []).map(m => m.message_type === "system" ? `
+        <div class="social-system-message">${escapeHTML(m.message)}</div>
+    ` : `
         <div class="chat-message-row">
             <strong>${escapeHTML(m.sender_id === currentProfile.id ? "You" : (directChatUser.display_name || "User"))}</strong>
             <p>${escapeHTML(m.message)}</p>
@@ -8389,8 +8693,14 @@ async function searchPlayers() {
     }
 
     const [{ data: mine }, { data: theirs }] = await Promise.all([
-        supabaseClient.from("profile_follows").select("following_id").eq("follower_id", currentProfile.id),
-        supabaseClient.from("profile_follows").select("following_id").eq("follower_id", currentProfile.id)
+        supabaseClient
+            .from("profile_follows")
+            .select("following_id")
+            .eq("follower_id", currentProfile.id),
+        supabaseClient
+            .from("profile_follows")
+            .select("following_id")
+            .eq("follower_id", currentProfile.id)
     ]);
 
     const myFollowing = new Set((mine || []).map(r => r.following_id));
@@ -8411,8 +8721,8 @@ async function searchPlayers() {
     const mutuals = ranked.filter(p => myFollowing.has(p.id) && followsMe.has(p.id));
     if (suggestions) {
         suggestions.innerHTML = mutuals.length
-            ? `<div style="font-weight:700;margin-bottom:6px;">Mutual suggestions</div><div style="display:flex;gap:7px;flex-wrap:wrap;">${mutuals.slice(0,8).map(p => `<button class="secondary-btn" type="button" onclick="openPublicProfile('${escapeHTML(p.id)}')">${escapeHTML(p.display_name || "User")}</button>`).join("")}</div>`
-            : '<small style="color:#8f95a2;">No mutual matches for this search.</small>';
+            ? `<div style="font-weight:700;margin-bottom:6px;">Mutual Following</div><div style="display:flex;gap:7px;flex-wrap:wrap;">${mutuals.slice(0,8).map(p => `<button class="secondary-btn" type="button" onclick="openPublicProfile('${escapeHTML(p.id)}')">${escapeHTML(p.display_name || "User")}</button>`).join("")}</div>`
+            : '<small style="color:#8f95a2;">No mutual following matches for this search.</small>';
     }
 
     results.innerHTML = ranked.map(person => {
@@ -8424,7 +8734,7 @@ async function searchPlayers() {
                     <strong>${escapeHTML(person.display_name || "User")}</strong>
                     <small>${escapeHTML(person.user_id || "")}</small>
                 </div>
-                ${isMutual ? '<span class="search-badge">Mutual</span>' : ''}
+                ${isMutual ? '<span class="search-badge">Mutual Following</span>' : ''}
             </div>
         `;
     }).join("");
