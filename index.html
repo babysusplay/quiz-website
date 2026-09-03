@@ -1796,6 +1796,218 @@ header .home-logo {
 }
 </style>
 
+
+<style id="friends-followers-chat-ui">
+.social-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 10px;
+    border-radius: 9px;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.10);
+    color: #d8dbe2;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.social-list-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 7px;
+    flex: 0 0 auto;
+}
+
+.social-list-actions .primary-btn,
+.social-list-actions .secondary-btn {
+    padding: 8px 11px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.chat-composer {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.chat-composer #directChatInput {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 58px;
+    max-height: 150px;
+    padding: 12px 13px;
+    resize: vertical;
+    line-height: 1.45;
+    overflow-y: auto;
+}
+
+.chat-image-btn {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 10px;
+    background: rgba(255,255,255,.08);
+    color: white;
+    border: 1px solid rgba(255,255,255,.12);
+    font-size: 24px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-send-btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 42px;
+    margin-top: 0 !important;
+    padding: 11px 18px !important;
+}
+
+#chatImagePreviewWrap {
+    margin-top: 8px;
+}
+
+@media (max-width: 650px) {
+    .social-list-actions {
+        gap: 5px;
+    }
+
+    .social-list-actions .primary-btn,
+    .social-list-actions .secondary-btn {
+        padding: 7px 8px;
+        font-size: 11px;
+    }
+
+    .social-status-pill {
+        padding: 0 7px;
+        font-size: 11px;
+    }
+
+    .chat-composer {
+        gap: 6px;
+    }
+
+    .chat-composer #directChatInput {
+        min-height: 64px;
+    }
+
+    .chat-image-btn {
+        flex-basis: 40px;
+        width: 40px;
+    }
+
+    .chat-send-btn {
+        padding-left: 13px !important;
+        padding-right: 13px !important;
+    }
+}
+</style>
+
+
+<style id="v21-chat-avatar-time-ui">
+.chat-message-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin: 9px 0;
+}
+
+.chat-message-row.mine {
+    flex-direction: row-reverse;
+}
+
+.chat-avatar-btn {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background: transparent;
+    cursor: pointer;
+}
+
+.chat-message-avatar {
+    display: block;
+    width: 34px;
+    height: 34px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.chat-message-content {
+    max-width: min(75%, 520px);
+}
+
+.chat-message-name {
+    display: block;
+    margin: 0 0 3px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+.chat-message-row.mine .chat-message-name {
+    text-align: right;
+}
+
+.chat-message-text {
+    margin: 0;
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+}
+
+.chat-time-separator {
+    display: flex;
+    justify-content: center;
+    margin: 17px 0 9px;
+}
+
+.chat-time-separator span {
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.07);
+    color: #8f95a2;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.chat-image-message {
+    display: block;
+    max-width: 240px;
+    max-height: 300px;
+    border-radius: 10px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+@media (max-width: 650px) {
+    .chat-message-content {
+        max-width: 80%;
+    }
+
+    .chat-avatar-btn,
+    .chat-message-avatar {
+        width: 31px;
+        height: 31px;
+        flex-basis: 31px;
+    }
+}
+</style>
+
 </head>
 
 <body>
@@ -2434,9 +2646,9 @@ header .home-logo {
             <button class="close" onclick="closeModal('socialCenterModal')">×</button>
         </div>
         <div class="social-tabs">
-            <button id="socialFollowersTab" onclick="loadSocialTab('followers')">Followers</button>
-            <button id="socialFollowingTab" onclick="loadSocialTab('following')">Following</button>
             <button id="socialFriendsTab" onclick="loadSocialTab('friends')">Friends</button>
+            <button id="socialFollowingTab" onclick="loadSocialTab('following')">Following</button>
+            <button id="socialFollowersTab" onclick="loadSocialTab('followers')">Followers</button>
         </div>
         <div id="socialCenterContent" class="social-list"></div>
     </div>
@@ -2471,10 +2683,37 @@ header .home-logo {
         </div>
         <div id="directChatMessages" class="chat-messages-box"></div>
         <form onsubmit="sendDirectMessage(event)" class="chat-composer">
-            <input id="directChatInput" maxlength="1000" placeholder="Write a message...">
-            <input id="directChatImage" type="file" accept="image/*" hidden onchange="previewChatImage(event)">
-            <button class="chat-image-btn" type="button" onclick="document.getElementById('directChatImage').click()" title="Send image">🖼️</button>
-            <button class="save-btn" type="submit">Send</button>
+            <textarea
+                id="directChatInput"
+                maxlength="1000"
+                rows="2"
+                placeholder="Write a message..."
+                autocomplete="off"></textarea>
+
+            <input
+                id="directChatImage"
+                type="file"
+                accept="image/*"
+                hidden
+                onchange="previewChatImage(event)">
+
+            <button
+                class="chat-image-btn"
+                type="button"
+                onclick="document.getElementById('directChatImage').click()"
+                title="Add image">
+
+                +
+
+            </button>
+
+            <button
+                class="save-btn chat-send-btn"
+                type="submit">
+
+                Send
+
+            </button>
         </form>
         <div id="chatImagePreviewWrap"></div>
         <p style="color:#8f95a2;font-size:11px;margin-top:8px;">Direct chat is available only between mutual followers.</p>
@@ -8853,79 +9092,274 @@ async function loadSocialNotificationCount() {
 async function openSocialCenter() {
     if (!requireLogin()) return;
     openModal("socialCenterModal");
-    await loadSocialTab("followers");
+    await loadSocialTab("friends");
     await markSocialNotificationsRead();
 }
 
 async function loadSocialTab(tab) {
     if (!currentProfile) return;
 
-    ["followers", "following", "friends"].forEach(name => {
-        const el = document.getElementById("social" + name.charAt(0).toUpperCase() + name.slice(1) + "Tab");
+    ["friends", "following", "followers"].forEach(name => {
+        const el = document.getElementById(
+            "social" +
+            name.charAt(0).toUpperCase() +
+            name.slice(1) +
+            "Tab"
+        );
         if (el) el.classList.toggle("active", name === tab);
     });
 
-    const box = document.getElementById("socialCenterContent");
+    const box =
+        document.getElementById("socialCenterContent");
+
     if (!box) return;
-    box.innerHTML = '<div class="empty">Loading...</div>';
 
-    if (tab === "followers") {
-        const { data: rows, error } = await supabaseClient
-            .from("profile_follows")
-            .select("follower_id")
-            .eq("following_id", currentProfile.id);
-        if (error) { box.innerHTML = '<div class="empty">Unable to load followers.</div>'; return; }
-        await renderSocialUsers(box, (rows || []).map(r => r.follower_id), true);
-    } else if (tab === "following") {
-        const { data: rows, error } = await supabaseClient
-            .from("profile_follows")
-            .select("following_id")
-            .eq("follower_id", currentProfile.id);
-        if (error) { box.innerHTML = '<div class="empty">Unable to load following.</div>'; return; }
-        await renderSocialUsers(box, (rows || []).map(r => r.following_id), false);
-    } else {
-        const { data: mine, error: e1 } = await supabaseClient
-            .from("profile_follows")
-            .select("following_id")
-            .eq("follower_id", currentProfile.id);
-        const { data: theirs, error: e2 } = await supabaseClient
-            .from("profile_follows")
-            .select("follower_id")
-            .eq("following_id", currentProfile.id);
-        if (e1 || e2) { box.innerHTML = '<div class="empty">Unable to load friends.</div>'; return; }
-        const followers = new Set((theirs || []).map(r => r.follower_id));
-        const ids = (mine || []).map(r => r.following_id).filter(id => followers.has(id));
-        await renderSocialUsers(box, ids, false, true);
-    }
-}
+    box.innerHTML =
+        '<div class="empty">Loading...</div>';
 
-async function renderSocialUsers(box, ids, showFollowBack, showMessage) {
-    if (!ids.length) {
-        box.innerHTML = '<div class="empty">No players here yet.</div>';
+    /*
+       A friend is a true mutual follow:
+       me -> them AND them -> me.
+
+       Followers only shows people who follow me
+       but whom I have NOT followed back yet.
+       Therefore once Follow Back succeeds, the person
+       disappears from Followers and appears in Friends.
+    */
+
+    const {
+        data: myFollowingRows,
+        error: myFollowingError
+    } = await supabaseClient
+        .from("profile_follows")
+        .select("following_id")
+        .eq("follower_id", currentProfile.id);
+
+    const {
+        data: myFollowerRows,
+        error: myFollowerError
+    } = await supabaseClient
+        .from("profile_follows")
+        .select("follower_id")
+        .eq("following_id", currentProfile.id);
+
+    if (myFollowingError || myFollowerError) {
+        box.innerHTML =
+            '<div class="empty">Unable to load social connections.</div>';
         return;
     }
 
-    const { data: profiles, error } = await supabaseClient
-        .from("profiles")
-        .select("id,display_name,user_id,avatar_url")
-        .in("id", ids.slice(0, 100));
-    if (error) { box.innerHTML = '<div class="empty">Unable to load players.</div>'; return; }
+    const followingIds =
+        new Set(
+            (myFollowingRows || [])
+                .map(row => row.following_id)
+        );
 
-    box.innerHTML = (profiles || []).map(person => `
-        <div class="social-list-item" onclick="openPublicProfile('${escapeHTML(person.id)}')">
-            <img src="${escapeHTML(person.avatar_url || getDefaultAvatar())}" alt="Avatar">
-            <div class="social-list-main">
-                <strong>${escapeHTML(person.display_name || "User")}</strong>
-                <small>${escapeHTML(person.user_id || "")}</small>
-            </div>
-            <div class="social-list-actions">
-                ${showFollowBack ? `<button class="secondary-btn" type="button" onclick="event.stopPropagation(); followFromSocial('${escapeHTML(person.id)}')">Follow back</button>` : ""}
-                ${showMessage ? `<button class="primary-btn" type="button" onclick="event.stopPropagation(); openDirectChat('${escapeHTML(person.id)}')">Message</button>` : ""}
-                <button class="social-more-btn" type="button" title="More" onclick="event.stopPropagation(); toggleSocialMore('${escapeHTML(person.id)}', this)">⋮</button>
-            </div>
-        </div>
-    `).join("");
+    const followerIds =
+        new Set(
+            (myFollowerRows || [])
+                .map(row => row.follower_id)
+        );
+
+    let ids = [];
+
+    if (tab === "friends") {
+
+        ids = [
+            ...followingIds
+        ].filter(
+            id => followerIds.has(id)
+        );
+
+        await renderSocialUsers(
+            box,
+            ids,
+            {
+                mode: "friends"
+            }
+        );
+
+    } else if (tab === "following") {
+
+        ids = [
+            ...followingIds
+        ].filter(
+            id => !followerIds.has(id)
+        );
+
+        await renderSocialUsers(
+            box,
+            ids,
+            {
+                mode: "following"
+            }
+        );
+
+    } else {
+
+        /*
+           IMPORTANT:
+           Mutual followers are intentionally excluded here.
+           They already belong in Friends.
+        */
+
+        ids = [
+            ...followerIds
+        ].filter(
+            id => !followingIds.has(id)
+        );
+
+        await renderSocialUsers(
+            box,
+            ids,
+            {
+                mode: "followers"
+            }
+        );
+    }
 }
+
+
+async function renderSocialUsers(
+    box,
+    ids,
+    options = {}
+) {
+    const mode =
+        options.mode || "followers";
+
+    if (!ids.length) {
+
+        const message =
+            mode === "friends"
+                ? "No friends yet."
+                : mode === "following"
+                    ? "You are not following anyone who hasn't followed you back yet."
+                    : "No new followers yet.";
+
+        box.innerHTML =
+            `<div class="empty">${message}</div>`;
+
+        return;
+    }
+
+    const {
+        data: profiles,
+        error
+    } = await supabaseClient
+        .from("profiles")
+        .select(
+            "id,display_name,user_id,avatar_url"
+        )
+        .in(
+            "id",
+            ids.slice(0, 100)
+        );
+
+    if (error) {
+        box.innerHTML =
+            '<div class="empty">Unable to load players.</div>';
+        return;
+    }
+
+    box.innerHTML =
+        (profiles || []).map(person => {
+
+            const id =
+                escapeHTML(person.id);
+
+            let actionButtons = "";
+
+            if (mode === "friends") {
+
+                actionButtons = `
+                    <span class="social-status-pill">
+                        Friends
+                    </span>
+
+                    <button
+                        class="primary-btn"
+                        type="button"
+                        onclick="event.stopPropagation(); openDirectChat('${id}')">
+
+                        💬 Message
+
+                    </button>
+                `;
+
+            } else if (mode === "followers") {
+
+                actionButtons = `
+                    <button
+                        class="secondary-btn"
+                        type="button"
+                        onclick="event.stopPropagation(); followFromSocial('${id}')">
+
+                        Follow back
+
+                    </button>
+                `;
+
+            } else {
+
+                actionButtons = `
+                    <span class="social-status-pill">
+                        Following
+                    </span>
+                `;
+            }
+
+            return `
+                <div
+                    class="social-list-item"
+                    onclick="openPublicProfile('${id}')">
+
+                    <img
+                        src="${escapeHTML(
+                            person.avatar_url ||
+                            getDefaultAvatar()
+                        )}"
+                        alt="Avatar">
+
+                    <div class="social-list-main">
+
+                        <strong>
+                            ${escapeHTML(
+                                person.display_name ||
+                                "User"
+                            )}
+                        </strong>
+
+                        <small>
+                            ${escapeHTML(
+                                person.user_id ||
+                                ""
+                            )}
+                        </small>
+
+                    </div>
+
+                    <div class="social-list-actions">
+
+                        ${actionButtons}
+
+                        <button
+                            class="social-more-btn"
+                            type="button"
+                            title="More"
+                            onclick="event.stopPropagation(); toggleSocialMore('${id}', this)">
+
+                            ⋮
+
+                        </button>
+
+                    </div>
+
+                </div>
+            `;
+        }).join("");
+}
+
 
 async function followFromSocial(userId) {
     if (!currentProfile || !userId || userId === currentProfile.id) return;
@@ -9238,34 +9672,186 @@ async function openDirectChat(userId) {
 
 async function loadDirectChat() {
     if (!directChatUser || !currentProfile) return;
-    const box = document.getElementById("directChatMessages");
-    const { data, error } = await supabaseClient
-        .from("direct_messages")
-        .select("id,sender_id,recipient_id,message,message_type,created_at")
-        .or(`and(sender_id.eq.${currentProfile.id},recipient_id.eq.${directChatUser.id}),and(sender_id.eq.${directChatUser.id},recipient_id.eq.${currentProfile.id})`)
-        .order("created_at", { ascending: true });
+
+    const box =
+        document.getElementById("directChatMessages");
+
+    const { data, error } =
+        await supabaseClient
+            .from("direct_messages")
+            .select(
+                "id,sender_id,recipient_id,message,message_type,created_at"
+            )
+            .or(
+                `and(sender_id.eq.${currentProfile.id},recipient_id.eq.${directChatUser.id}),and(sender_id.eq.${directChatUser.id},recipient_id.eq.${currentProfile.id})`
+            )
+            .order(
+                "created_at",
+                { ascending: true }
+            );
+
     if (error) {
-        box.innerHTML = '<div class="empty">Unable to load chat.</div>';
+        box.innerHTML =
+            '<div class="empty">Unable to load chat.</div>';
         return;
     }
-    box.innerHTML = (data || []).map(m => m.message_type === "system" ? `
-        <div class="social-system-message">${escapeHTML(m.message)}</div>
-    ` : m.message_type === "image" ? `
-        <div class="chat-message-row">
-            <strong>${escapeHTML(m.sender_id === currentProfile.id ? "You" : (directChatUser.display_name || "User"))}</strong>
-            <img class="chat-image-message" src="${escapeHTML(m.message)}" alt="Shared image" onclick="window.open('${escapeHTML(m.message)}','_blank')">
-            <small>${new Date(m.created_at).toLocaleString()}</small>
-        </div>
-    ` : `
-        <div class="chat-message-row">
-            <strong>${escapeHTML(m.sender_id === currentProfile.id ? "You" : (directChatUser.display_name || "User"))}</strong>
-            <p>${escapeHTML(m.message)}</p>
-            <small>${new Date(m.created_at).toLocaleString()}</small>
-        </div>
-    `).join("") || '<div class="empty">No messages yet.</div>';
-    box.scrollTop = box.scrollHeight;
-}
 
+    const messages = data || [];
+
+    if (!messages.length) {
+        box.innerHTML =
+            '<div class="empty">No messages yet.</div>';
+        return;
+    }
+
+    /*
+       We already know both profiles in this one-to-one chat:
+       currentProfile and directChatUser.
+
+       A profile photo + name is shown beside every message,
+       and clicking either opens that user's profile.
+    */
+
+    const GAP_MS =
+        30 * 60 * 1000;
+
+    let previousTime = null;
+
+    box.innerHTML =
+        messages.map(m => {
+
+            const mine =
+                m.sender_id === currentProfile.id;
+
+            const profile =
+                mine
+                    ? currentProfile
+                    : directChatUser;
+
+            const senderName =
+                mine
+                    ? (
+                        currentProfile.display_name ||
+                        currentProfile.username ||
+                        "You"
+                    )
+                    : (
+                        directChatUser.display_name ||
+                        directChatUser.username ||
+                        "User"
+                    );
+
+            const avatar =
+                profile?.avatar_url ||
+                getDefaultAvatar();
+
+            const messageTime =
+                m.created_at
+                    ? new Date(m.created_at)
+                    : null;
+
+            const showTime =
+                !previousTime ||
+                (
+                    messageTime &&
+                    previousTime &&
+                    (
+                        messageTime.getTime() -
+                        previousTime.getTime()
+                    ) >= GAP_MS
+                );
+
+            if (messageTime) {
+                previousTime = messageTime;
+            }
+
+            const timestamp =
+                messageTime
+                    ? messageTime.toLocaleString(
+                        [],
+                        {
+                            dateStyle: "medium",
+                            timeStyle: "short"
+                        }
+                    )
+                    : "";
+
+            const profileId =
+                String(
+                    profile?.id ||
+                    m.sender_id ||
+                    ""
+                );
+
+            const messageHtml =
+                m.message_type === "image"
+                    ? `
+                        <img
+                            class="chat-image-message"
+                            src="${escapeHTML(m.message)}"
+                            alt="Shared image"
+                            onclick="window.open('${escapeHTML(m.message)}','_blank')">
+                      `
+                    : `
+                        <p class="chat-message-text">
+                            ${escapeHTML(m.message)}
+                        </p>
+                      `;
+
+            return `
+                ${
+                    showTime && timestamp
+                        ? `
+                            <div class="chat-time-separator">
+                                <span>
+                                    ${escapeHTML(timestamp)}
+                                </span>
+                            </div>
+                          `
+                        : ""
+                }
+
+                <div
+                    class="
+                        chat-message-row
+                        ${mine ? "mine" : "theirs"}
+                    ">
+
+                    <button
+                        type="button"
+                        class="chat-avatar-btn"
+                        title="View profile"
+                        onclick="event.stopPropagation(); openPublicProfile('${escapeHTML(profileId)}')">
+
+                        <img
+                            class="chat-message-avatar"
+                            src="${escapeHTML(avatar)}"
+                            alt="${escapeHTML(senderName)}">
+
+                    </button>
+
+                    <div class="chat-message-content">
+
+                        <button
+                            type="button"
+                            class="chat-message-name"
+                            onclick="event.stopPropagation(); openPublicProfile('${escapeHTML(profileId)}')">
+
+                            ${escapeHTML(senderName)}
+
+                        </button>
+
+                        ${messageHtml}
+
+                    </div>
+
+                </div>
+            `;
+        }).join("");
+
+    box.scrollTop =
+        box.scrollHeight;
+}
 
 function toggleMobileMenu(event) {
     if (event) event.stopPropagation();
@@ -10904,6 +11490,35 @@ window.onclick =
     closeMoreMenusExcept(event.target);
   }, true);
 })();
+</script>
+
+
+<script id="chat-input-enhancement">
+document.addEventListener("keydown", function(event) {
+
+    const input =
+        event.target &&
+        event.target.id === "directChatInput"
+            ? event.target
+            : null;
+
+    if (!input) return;
+
+    if (
+        event.key === "Enter" &&
+        !event.shiftKey
+    ) {
+        event.preventDefault();
+
+        const form =
+            input.closest("form");
+
+        if (form) {
+            form.requestSubmit();
+        }
+    }
+
+});
 </script>
 
 </body>
