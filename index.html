@@ -6,6 +6,21 @@
 
 <title>Quiz Platform</title>
 
+
+<script id="global-admin-badge-fix">
+function renderAdminBadge(profile) {
+    if (!profile) return "";
+    const admin =
+        profile.is_admin === true ||
+        profile.isAdmin === true ||
+        profile.role === "admin" ||
+        profile.role === "ADMIN";
+    return admin
+        ? '<span class="profile-admin-badge" aria-label="Administrator">ADMIN</span>'
+        : '';
+}
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -2885,41 +2900,38 @@ function renderCurrentIdentityName(name) {
 }
 </style>
 
-<style id="v37-create-room-pause-style">
-.quiz-paused-overlay {
-    position:fixed;
-    inset:0;
-    z-index:100000;
+<style id="v50-inline-pause-style">
+.quiz-inline-paused{
     display:none;
     align-items:center;
     justify-content:center;
-    padding:20px;
-    background:rgba(0,0,0,.68);
-    backdrop-filter:blur(5px);
-}
-.quiz-paused-overlay.show {
-    display:flex;
-}
-.quiz-paused-card {
-    width:min(430px,100%);
-    padding:28px 24px;
+    gap:8px;
+    width:100%;
+    margin:0 0 12px;
+    padding:9px 12px;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:12px;
+    background:rgba(255,255,255,.035);
+    color:#c7cbd4;
+    font-size:12px;
+    font-weight:600;
     text-align:center;
-    border:1px solid rgba(255,255,255,.1);
-    border-radius:18px;
-    background:#11141b;
-    box-shadow:0 24px 70px rgba(0,0,0,.45);
 }
-.quiz-paused-card h3 {
-    margin:0 0 7px;
-    font-size:21px;
-}
-.quiz-paused-card p {
-    margin:0;
-    color:#8f95a2;
-    font-size:13px;
+.quiz-inline-paused.show{display:flex;}
+.quiz-inline-paused .paused-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#f0a35a;
+    box-shadow:0 0 10px rgba(240,163,90,.35);
+    flex:0 0 auto;
 }
 @media(max-width:650px){
-    #hostPauseQuizButton{font-size:11px;padding:8px 10px;}
+    .quiz-inline-paused{
+        margin-bottom:8px;
+        padding:8px 10px;
+        font-size:11px;
+    }
 }
 </style>
 
@@ -3079,6 +3091,193 @@ function renderCurrentIdentityName(name) {
         white-space: nowrap;
     }
 }
+</style>
+
+
+<style id="v47-live-quiz-polish">
+.quiz-live-control-strip{
+    display:flex;align-items:center;gap:8px;
+    min-height:34px;padding:7px 12px;margin:0 0 10px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;background:rgba(255,255,255,.025);
+    color:#c7cbd4;font-size:12px;font-weight:600;
+}
+.quiz-live-status-dot{width:7px;height:7px;border-radius:50%;background:#65d68b;box-shadow:0 0 10px rgba(101,214,139,.55);flex:0 0 auto;}
+.quiz-live-host-status{margin-left:auto;color:#8f95a2;font-weight:500;}
+#hostPauseQuizButton{align-items:center;justify-content:center;gap:6px;white-space:nowrap;}
+@media(max-width:650px){
+    .quiz-live-control-strip{margin-bottom:7px;padding:6px 9px;min-height:30px;font-size:11px;}
+    .quiz-live-header-actions{display:flex;align-items:center;gap:6px;}
+    #hostPauseQuizButton{font-size:11px;padding:7px 9px;min-height:32px;}
+}
+</style>
+
+
+<style id="v51-admin-quiz-view-style">
+#adminQuizList .admin-user-item{
+    transition:transform .15s ease,border-color .15s ease;
+}
+#adminQuizList .admin-user-item:hover{
+    transform:translateY(-1px);
+    border-color:rgba(255,255,255,.14);
+}
+#adminQuizViewContent{
+    scrollbar-width:thin;
+}
+@media(max-width:650px){
+    #adminQuizList .admin-user-item{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+    #adminQuizList .admin-view-btn{
+        width:100%;
+    }
+}
+</style>
+
+<style id="global-admin-badge-style">
+.profile-admin-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: 7px !important;
+    padding: 2px 7px !important;
+    min-height: 18px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 72, 92, .55) !important;
+    background: rgba(255, 72, 92, .10) !important;
+    color: #ff485c !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+    letter-spacing: .07em !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+}
+</style>
+
+
+<style id="v53-live-chat-composer-fix">
+.quiz-live-layout {
+    min-height: 0 !important;
+}
+.quiz-live-side.quiz-live-chat-panel {
+    position: relative !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+.quiz-live-chat-panel .quiz-live-chat-messages {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    padding-bottom: 6px !important;
+}
+.quiz-live-chat-panel .quiz-live-chat-form {
+    display: flex !important;
+    position: relative !important;
+    z-index: 5 !important;
+    width: 100% !important;
+    min-height: 42px !important;
+    margin-top: 8px !important;
+    flex: 0 0 auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+.quiz-live-chat-panel .quiz-live-chat-form input {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-width: 0 !important;
+    width: 0 !important;
+    flex: 1 1 auto !important;
+    box-sizing: border-box !important;
+}
+.quiz-live-chat-panel .quiz-live-chat-form button {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 58px !important;
+    cursor: pointer !important;
+}
+
+/* Never replace the chat composer with an empty-state message. */
+.quiz-live-chat-panel .empty {
+    text-align: center;
+    padding: 18px 8px;
+}
+
+/* Keep the live chat usable on phones too. */
+@media (max-width:760px) {
+    .quiz-live-chat-panel .quiz-live-chat-form {
+        min-height: 38px !important;
+    }
+    .quiz-live-chat-panel .quiz-live-chat-form input {
+        font-size: 12px !important;
+    }
+    .quiz-live-chat-panel .quiz-live-chat-form button {
+        min-width: 52px !important;
+        font-size: 11px !important;
+    }
+}
+</style>
+
+
+<style id="v55-quiz-creator-ui">
+.quiz-creator-step{width:100%}
+.quiz-basic-details{margin-top:2px}
+.quiz-type-picker{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 18px}
+.quiz-type-option{position:relative;display:block;cursor:pointer}
+.quiz-type-option input{position:absolute;opacity:0;pointer-events:none}
+.quiz-type-card{display:block;padding:15px;border:1px solid rgba(255,255,255,.10);border-radius:14px;background:#10131a;transition:.16s ease}
+.quiz-type-card:hover{border-color:rgba(255,255,255,.22);transform:translateY(-1px)}
+.quiz-type-option input:checked + .quiz-type-card{border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.07);box-shadow:0 0 0 1px rgba(255,255,255,.08) inset}
+.quiz-type-card-title{font-weight:800;font-size:15px;margin-bottom:5px}
+.quiz-type-card-sub{font-size:11px;color:#8f95a2;line-height:1.45}
+.quiz-type-badge{display:inline-flex;align-items:center;gap:5px;margin-bottom:8px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#b9bec9}
+.discord-quiz-note{display:none;margin:-6px 0 14px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025);color:#9da3b0;font-size:11px;line-height:1.45}
+.discord-quiz-note.is-visible{display:block}
+.quiz-step-actions{display:flex;justify-content:flex-end;margin-top:18px}
+.quiz-next-step-btn,.quiz-back-step-btn{min-height:40px;padding:9px 15px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#191c24;color:#fff;font-weight:800;cursor:pointer}
+.quiz-next-step-btn{background:#fff;color:#111;border-color:#fff}
+.quiz-question-step-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.quiz-question-step-head>div{min-width:0}
+.quiz-question-step-title{font-size:15px;font-weight:850}
+.quiz-question-step-sub{font-size:11px;color:#8f95a2;margin-top:2px}
+.quiz-editor-nav{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:8px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.025)}
+.quiz-editor-nav button{flex:0 0 auto;min-height:34px;padding:7px 12px;border:1px solid rgba(255,255,255,.10);border-radius:9px;background:#171a21;color:#fff;font-weight:700;cursor:pointer}
+.quiz-editor-nav button:disabled{opacity:.35;cursor:not-allowed}
+.quiz-editor-position{flex:1;text-align:center;font-size:12px;font-weight:800;color:#c9cdd6}
+.question-box.editor-question{display:none;margin-bottom:12px}
+.question-box.editor-question.is-active{display:block}
+.question-box.editor-question .question-header{margin-bottom:14px}
+.question-image-inline{display:inline-flex;align-items:center;gap:7px;margin-left:auto}
+.question-image-upload{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:34px;padding:7px 11px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:#191c24;color:#fff;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
+.question-image-upload:hover{border-color:rgba(255,255,255,.25);background:#20242d}
+.question-image-upload.has-image{border-color:rgba(100,220,150,.35);color:#d9ffe7}
+.question-image-file{display:none!important}
+.question-image-preview-wrap{display:none!important}
+.question-image-editor{display:none!important}
+.quiz-question-actions{display:flex;gap:10px;margin-top:12px}
+.quiz-question-actions .add-question,.quiz-question-actions .save-btn{margin-top:0;flex:1}
+@media(max-width:650px){
+ .quiz-type-picker{grid-template-columns:1fr}
+ .quiz-editor-nav{position:sticky;top:0;z-index:5}
+ .quiz-question-step-head{align-items:flex-start}
+ .quiz-question-actions{flex-direction:column}
+}
+</style>
+
+<style id="v54-question-image-play">
+.quiz-play-question-image{margin:0 0 16px;display:flex;justify-content:center}
+.quiz-play-question-image img{display:block;width:100%;max-height:330px;object-fit:contain;border-radius:12px;border:1px solid rgba(255,255,255,.10);background:#0b0d12}
 </style>
 
 </head>
@@ -3924,6 +4123,25 @@ function renderCurrentIdentityName(name) {
 </div>
 
 
+
+<!-- PUBLIC QUIZ HISTORY MODAL -->
+<div class="modal" id="publicQuizHistoryModal">
+    <div class="modal-content" style="max-width:900px;">
+        <div class="modal-header">
+            <div>
+                <h2 id="publicQuizHistoryTitle">Quiz History</h2>
+                <p style="margin:4px 0 0;color:#8f95a2;font-size:12px;">
+                    Completed attempts and scores for this quiz.
+                </p>
+            </div>
+            <button class="close" type="button" onclick="closeModal('publicQuizHistoryModal')">×</button>
+        </div>
+        <div id="publicQuizHistoryResult" style="margin-top:14px;">
+            <div class="empty">Loading quiz history...</div>
+        </div>
+    </div>
+</div>
+
 <!-- MY QUIZ HISTORY MODAL -->
 <div class="modal" id="myHistoryModal">
     <div class="modal-content" style="max-width:620px;">
@@ -4060,174 +4278,111 @@ function renderCurrentIdentityName(name) {
 
 
 <!-- CREATE QUIZ MODAL -->
-
-<div
-    class="modal"
-    id="createModal">
-
+<div class="modal" id="createModal">
     <div class="modal-content">
-
         <div class="modal-header">
-
-            <h2 id="createTitle">
-                Create Quiz
-            </h2>
-
-            <button
-                class="close"
-                onclick="closeModal('createModal')">
-
-                ×
-
-            </button>
-
+            <h2 id="createTitle">Create Quiz</h2>
+            <button class="close" onclick="closeModal('createModal')">×</button>
         </div>
 
+        <!-- STEP 1: QUIZ DETAILS -->
+        <div id="quizDetailsStep" class="quiz-creator-step">
+            <div class="quiz-type-picker" role="radiogroup" aria-label="Quiz type">
+                <label class="quiz-type-option">
+                    <input type="radio" name="quizType" id="quizTypeNormal" value="normal" checked onchange="updateQuizTypeUI()">
+                    <span class="quiz-type-card">
+                        <span class="quiz-type-badge">🌐 Website</span>
+                        <span class="quiz-type-card-title">Normal Quiz</span>
+                        <span class="quiz-type-card-sub">For quizzes played directly on this website.</span>
+                    </span>
+                </label>
 
-        <div class="form-group">
-
-            <label>
-                Quiz Name
-            </label>
-
-            <input
-                type="text"
-                id="quizName"
-                placeholder="Enter quiz name">
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Quiz Description
-            </label>
-
-            <textarea
-                id="quizDescription"
-                placeholder="Enter quiz description">
-            </textarea>
-
-        </div>
-
-
-        <div class="quiz-settings">
-
-            <h3 style="margin-bottom:12px;">
-                Quiz Settings
-            </h3>
-
-            <p style="color:#8f95a2; font-size:12px; margin-bottom:14px;">
-                These are the default settings. You can override them for individual questions below.
-            </p>
-
-            <div class="quiz-settings-grid">
-
-                <div class="form-group" style="margin-bottom:0;">
-
-                    <label>
-                        Default Question Time (seconds)
-                    </label>
-
-                    <input
-                        type="number"
-                        id="quizDefaultTime"
-                        min="1"
-                        max="600"
-                        placeholder="e.g. 15">
-
-                </div>
-
-
-                <div class="form-group" style="margin-bottom:0;">
-
-                    <label>
-                        Default Minimum Points
-                    </label>
-
-                    <input
-                        type="number"
-                        id="quizDefaultMinPoints"
-                        min="0"
-                        max="1000000"
-                        value="100">
-
-                </div>
-
-
-                <div class="form-group" style="margin-bottom:0;">
-
-                    <label>
-                        Default Maximum Points
-                    </label>
-
-                    <input
-                        type="number"
-                        id="quizDefaultMaxPoints"
-                        min="1"
-                        max="1000000"
-                        value="1000">
-
-                </div>
-
-                <div class="form-group" style="margin-bottom:0;">
-
-                    <label>
-                        Room ID
-                    </label>
-
-                    <input
-                        type="text"
-                        id="quizRoomId"
-                        maxlength="40"
-                        placeholder="Leave blank to generate automatically">
-
-                </div>
-
-                <div class="form-group" style="margin-bottom:0;">
-
-                    <label>
-                        Room Password (optional)
-                    </label>
-
-                    <input
-                        type="text"
-                        id="quizRoomPassword"
-                        maxlength="40"
-                        placeholder="Leave empty for no password">
-
-                </div>
-
+                <label class="quiz-type-option">
+                    <input type="radio" name="quizType" id="quizTypeDiscord" value="discord" onchange="updateQuizTypeUI()">
+                    <span class="quiz-type-card">
+                        <span class="quiz-type-badge">🎮 Discord</span>
+                        <span class="quiz-type-card-title">Discord Quiz</span>
+                        <span class="quiz-type-card-sub">For Discord events, with optional images on each question.</span>
+                    </span>
+                </label>
             </div>
 
+            <div id="discordQuizNote" class="discord-quiz-note">
+                Discord Quiz keeps the same question editor, with optional image support for every question.
+            </div>
+
+            <div class="quiz-basic-details">
+                <div class="form-group">
+                    <label>Quiz Name</label>
+                    <input type="text" id="quizName" placeholder="Enter quiz name">
+                </div>
+
+                <div class="form-group">
+                    <label>Quiz Description</label>
+                    <textarea id="quizDescription" placeholder="Enter quiz description"></textarea>
+                </div>
+            </div>
+
+            <div class="quiz-settings">
+                <h3 style="margin-bottom:12px;">Quiz Settings</h3>
+                <div class="quiz-settings-grid">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Default Question Time (seconds)</label>
+                        <input type="number" id="quizDefaultTime" min="1" max="600" placeholder="e.g. 15">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Default Minimum Points</label>
+                        <input type="number" id="quizDefaultMinPoints" min="0" max="1000000" value="100">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Default Maximum Points</label>
+                        <input type="number" id="quizDefaultMaxPoints" min="1" max="1000000" value="1000">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Room ID</label>
+                        <input type="text" id="quizRoomId" maxlength="40" placeholder="Leave blank to generate automatically">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Room Password (optional)</label>
+                        <input type="text" id="quizRoomPassword" maxlength="40" placeholder="Leave empty for no password">
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-step-actions">
+                <button type="button" class="quiz-next-step-btn" onclick="goToQuizQuestions()">Next → Questions</button>
+            </div>
         </div>
 
+        <!-- STEP 2: QUESTIONS -->
+        <div id="quizQuestionsStep" class="quiz-creator-step" style="display:none;">
+            <div class="quiz-question-step-head">
+                <button type="button" class="quiz-back-step-btn" onclick="goToQuizDetails()">← Details</button>
+                <div>
+                    <div class="quiz-question-step-title">Add Questions</div>
+                    <div class="quiz-question-step-sub" id="quizQuestionTypeLabel">Normal Quiz</div>
+                </div>
+            </div>
 
-        <div id="questionsContainer"></div>
+            <div class="quiz-editor-nav">
+                <button type="button" id="quizEditorPrev" onclick="goToQuestion(-1)">← Previous</button>
+                <div class="quiz-editor-position" id="quizEditorPosition">Question 1 of 1</div>
+                <button type="button" id="quizEditorNext" onclick="goToQuestion(1)">Next →</button>
+            </div>
 
+            <div id="questionsContainer"></div>
 
-        <button
-            class="add-question"
-            onclick="addQuestion()">
-
-            + Add Question
-
-        </button>
-
-
-        <button
-            class="save-btn"
-            onclick="saveQuiz()">
-
-            Save Quiz
-
-        </button>
-
+            <div class="quiz-question-actions">
+                <button type="button" class="add-question" onclick="addQuestion()">+ Add Question</button>
+                <button type="button" class="save-btn" onclick="saveQuiz()">Save Quiz</button>
+            </div>
+        </div>
     </div>
-
 </div>
-
 
 <!-- QUIZ LIBRARY -->
 
@@ -4266,49 +4421,55 @@ function renderCurrentIdentityName(name) {
 
 <!-- PLAY QUIZ -->
 
-<div
-    class="modal"
-    id="playModal">
-
-    <div class="modal-content">
-
-        <div class="modal-header">
-
+<div class="modal" id="playModal">
+    <div class="modal-content quiz-live-modal-content">
+        <div class="modal-header quiz-live-header">
             <h2 id="playTitle"></h2>
-
-            <div style="display:flex;align-items:center;gap:8px;">
-                <button
-                    id="hostPauseQuizButton"
-                    class="secondary-btn"
-                    type="button"
-                    onclick="toggleHostQuizPause()"
-                    style="display:none;">
+            <div class="quiz-live-header-actions">
+                <button id="hostPauseQuizButton" class="secondary-btn" type="button" onclick="toggleHostQuizPause()" style="display:none;">
                     ⏸ Pause
                 </button>
-
-                <button
-                    class="close"
-                    onclick="closeModal('playModal')">
-                    ×
-                </button>
+                <button class="close" onclick="closeModal('playModal')">×</button>
             </div>
-
         </div>
 
+        <div id="quizLiveControlStrip" class="quiz-live-control-strip">
+            <span class="quiz-live-status-dot" aria-hidden="true"></span>
+            <span>Live Quiz</span>
+            <span id="quizLiveHostStatus" class="quiz-live-host-status"></span>
+        </div>
 
-        <div id="playContent"></div>
+        <div class="quiz-live-layout">
+            <aside class="quiz-live-side quiz-live-ranking-panel">
+                <div class="quiz-live-side-title">🏆 Live Ranking</div>
+                <div id="liveQuizRanking" class="quiz-live-ranking-list"></div>
+            </aside>
 
+            <main class="quiz-live-center">
+                <div id="quizPausedInline" class="quiz-inline-paused" aria-live="polite">
+                    <span class="paused-dot" aria-hidden="true"></span>
+                    <span>Quiz is currently paused</span>
+                </div>
+                <div id="playContent"></div>
+                <div id="quizQuestionTransition" class="quiz-question-transition" aria-live="polite">
+                    <div class="quiz-question-transition-card">
+                        <div class="quiz-question-transition-label">Next Question in</div>
+                        <div id="quizQuestionTransitionNumber">3</div>
+                    </div>
+                </div>
+            </main>
+
+            <aside class="quiz-live-side quiz-live-chat-panel">
+                <div class="quiz-live-side-title">💬 Chat</div>
+                <div id="liveQuizChatMessages" class="quiz-live-chat-messages"></div>
+                <form class="quiz-live-chat-form" onsubmit="sendLiveQuizChat(event)">
+                    <input id="liveQuizChatInput" type="text" maxlength="300" placeholder="Type a message..." autocomplete="off">
+                    <button type="submit">Send</button>
+                </form>
+            </aside>
+        </div>
     </div>
-
 </div>
-
-<div id="quizPausedOverlay" class="quiz-paused-overlay">
-    <div class="quiz-paused-card">
-        <h3>⏸ Quiz Paused</h3>
-        <p id="quizPausedMessage">The host has paused the quiz. Please wait.</p>
-    </div>
-</div>
-
 
 <!-- QUIZ RESULT -->
 
@@ -4727,6 +4888,30 @@ function renderCurrentIdentityName(name) {
 <!-- ADMIN PANEL -->
 
 <div
+    id="adminQuizViewModal"
+    class="modal-overlay"
+    style="display:none;"
+    onclick="if(event.target===this) closeModal('adminQuizViewModal')">
+    <div class="modal-card" style="max-width:900px;width:94%;">
+        <div class="modal-header">
+            <h2 id="adminQuizViewTitle">Quiz</h2>
+            <button
+                class="close"
+                type="button"
+                onclick="closeModal('adminQuizViewModal')">×</button>
+        </div>
+        <div
+            id="adminQuizViewMeta"
+            style="color:#8f95a2;font-size:12px;margin-bottom:14px;">
+        </div>
+        <div
+            id="adminQuizViewContent"
+            style="max-height:65vh;overflow:auto;">
+        </div>
+    </div>
+</div>
+
+<div
     class="modal"
     id="adminModal">
 
@@ -4888,6 +5073,25 @@ function renderCurrentIdentityName(name) {
             </div>
 
 
+            <div id="adminQuizLibrarySection" style="margin-top:20px;margin-bottom:20px;">
+                <div class="admin-section-title-row">
+                    <div>
+                        <h3 class="admin-section-title">📝 All Quizzes</h3>
+                        <p class="admin-chat-monitor-subtitle">
+                            View quizzes created by every player.
+                        </p>
+                    </div>
+                    <button
+                        class="admin-chat-refresh-btn"
+                        type="button"
+                        onclick="loadAdminQuizzes()">↻</button>
+                </div>
+
+                <div id="adminQuizList" class="admin-user-list">
+                    <div class="empty">Loading quizzes...</div>
+                </div>
+            </div>
+
             <div style="margin-top:20px;margin-bottom:20px;">
                 <h3 class="admin-section-title">Quiz History</h3>
                 <p style="color:#777d8a;font-size:12px;margin-bottom:10px;">
@@ -4995,6 +5199,7 @@ let questionStartedAt = 0;
 let questionTimeRemaining = 0;
 
 let answerSubmitted = false;
+let questionSubmittedWaiting = false;
 
 let participants = JSON.parse(
     localStorage.getItem("quizParticipants") || "[]"
@@ -5019,9 +5224,13 @@ let lobbyPlayers = new Map();
 let lobbyChatMessages = [];
 
 let quizControlChannel = null;
+let quizControlChannelReady = false;
 let quizPaused = false;
 let questionPausedAt = 0;
 let quizHostMode = false;
+let liveQuizScores = new Map();
+let liveQuizChatMessages = [];
+let quizQuestionTransitionTimer = null;
 
 
 /* =========================
@@ -5056,6 +5265,7 @@ function closeModal(id) {
         questionPausedAt = 0;
         showQuizPausedOverlay(false);
         closeQuizControlChannel();
+        stopLiveQuizChatGuard();
         quizHostMode = false;
     }
 
@@ -5179,6 +5389,8 @@ function quizFromDatabase(row) {
     return {
 
         id: row.id,
+
+        quiz_number: row.quiz_number ?? null,
 
         quiz_id: row.quiz_id,
 
@@ -5401,438 +5613,286 @@ function requireLogin() {
 }
 
 
-function openCreateQuiz() {
+function getSelectedQuizType() {
+    const selected = document.querySelector('input[name="quizType"]:checked');
+    return selected ? selected.value : "normal";
+}
 
+function updateQuizTypeUI() {
+    const note = document.getElementById("discordQuizNote");
+    if (note) note.classList.toggle("is-visible", getSelectedQuizType() === "discord");
+}
+
+function showQuizCreatorStep(step) {
+    const details = document.getElementById("quizDetailsStep");
+    const questions = document.getElementById("quizQuestionsStep");
+
+    if (details) details.style.display = step === "details" ? "" : "none";
+    if (questions) questions.style.display = step === "questions" ? "" : "none";
+}
+
+function updateQuizQuestionTypeLabel() {
+    const label = document.getElementById("quizQuestionTypeLabel");
+    if (!label) return;
+    label.textContent =
+        getSelectedQuizType() === "discord"
+            ? "Discord Quiz • Images can be added to each question"
+            : "Normal Quiz • Website gameplay";
+}
+
+function goToQuizQuestions() {
+    const name = document.getElementById("quizName")?.value.trim();
+    const defaultTime = document.getElementById("quizDefaultTime")?.value.trim();
+
+    if (!name) {
+        alert("Please enter a quiz name.");
+        return;
+    }
+
+    if (!defaultTime || !Number.isFinite(Number(defaultTime)) || Number(defaultTime) < 1) {
+        alert("Please set a valid default question time.");
+        return;
+    }
+
+    updateQuizQuestionTypeLabel();
+    showQuizCreatorStep("questions");
+
+    if (!document.querySelector("#questionsContainer .question-box")) {
+        addQuestion();
+    } else {
+        setEditorQuestion(currentEditorQuestionIndex);
+    }
+}
+
+function goToQuizDetails() {
+    showQuizCreatorStep("details");
+}
+
+function openCreateQuiz() {
     if (!requireLogin()) return;
 
     editingQuizId = null;
+    document.getElementById("createTitle").textContent = "Create Quiz";
+    document.getElementById("quizName").value = "";
+    document.getElementById("quizDescription").value = "";
 
-    document.getElementById(
-        "createTitle"
-    ).textContent =
-        "Create Quiz";
+    const typeNormal = document.getElementById("quizTypeNormal");
+    if (typeNormal) typeNormal.checked = true;
+    updateQuizTypeUI();
 
-    document.getElementById(
-        "quizName"
-    ).value = "";
-
-    document.getElementById(
-        "quizDescription"
-    ).value = "";
-
-    const defaultTimeInput =
-        document.getElementById(
-            "quizDefaultTime"
-        );
-
-    if (defaultTimeInput) {
-        defaultTimeInput.value = "";
-    }
-
-    const defaultMinPointsInput =
-        document.getElementById(
-            "quizDefaultMinPoints"
-        );
-
-    if (defaultMinPointsInput) {
-        defaultMinPointsInput.value = "100";
-    }
-
-    const defaultMaxPointsInput =
-        document.getElementById(
-            "quizDefaultMaxPoints"
-        );
-
-    if (defaultMaxPointsInput) {
-        defaultMaxPointsInput.value = "1000";
-    }
-
+    const defaultTime = document.getElementById("quizDefaultTime");
+    const defaultMinPoints = document.getElementById("quizDefaultMinPoints");
+    const defaultMaxPoints = document.getElementById("quizDefaultMaxPoints");
     const roomIdInput = document.getElementById("quizRoomId");
+    const roomPassword = document.getElementById("quizRoomPassword");
+
+    if (defaultTime) defaultTime.value = "";
+    if (defaultMinPoints) defaultMinPoints.value = "100";
+    if (defaultMaxPoints) defaultMaxPoints.value = "1000";
     if (roomIdInput) roomIdInput.value = "";
+    if (roomPassword) roomPassword.value = "";
 
-    const defaultTime =
-        document.getElementById(
-            "quizDefaultTime"
-        );
-
-    const defaultMinPoints =
-        document.getElementById(
-            "quizDefaultMinPoints"
-        );
-
-    const defaultMaxPoints =
-        document.getElementById(
-            "quizDefaultMaxPoints"
-        );
-
-    if (defaultTime) {
-
-        defaultTime.value =
-            "";
-
-    }
-
-    if (defaultMinPoints) {
-
-        defaultMinPoints.value =
-            "100";
-
-    }
-
-    if (defaultMaxPoints) {
-
-        defaultMaxPoints.value =
-            "1000";
-
-    }
-
-    document.getElementById(
-        "questionsContainer"
-    ).innerHTML = "";
-
+    document.getElementById("questionsContainer").innerHTML = "";
     questionCounter = 0;
+    currentEditorQuestionIndex = 0;
 
-    addQuestion();
-
-    openModal(
-        "createModal"
-    );
-
+    showQuizCreatorStep("details");
+    openModal("createModal");
 }
 
-
-/* =========================
-   ADD QUESTION
-========================= *//* =========================
-   ADD QUESTION
-========================= */
-
 function addQuestion(data = null) {
-
     questionCounter++;
 
-    const id =
-        Date.now() +
-        Math.random();
-
-    const box =
-        document.createElement(
-            "div"
-        );
-
-    box.className =
-        "question-box";
-
-    box.dataset.id =
-        id;
+    const id = Date.now() + Math.random();
+    const box = document.createElement("div");
+    box.className = "question-box editor-question";
+    box.dataset.id = id;
 
     box.innerHTML = `
-
         <div class="question-header">
-
-            <div class="question-number">
-                Question
+            <div class="question-number">Question ${questionCounter}</div>
+            <div class="question-image-inline">
+                <label class="question-image-upload" title="Add an optional image to this question">
+                    🖼️ <span class="question-image-label">Add Image</span>
+                    <input type="file" class="question-image-file" accept="image/jpeg,image/png,image/webp,image/gif">
+                </label>
+                <button type="button" class="delete-btn" onclick="deleteQuestion(this)">Delete Question</button>
             </div>
-
-            <button
-                type="button"
-                class="delete-btn"
-                onclick="deleteQuestion(this)">
-
-                Delete Question
-
-            </button>
-
         </div>
-
 
         <div class="form-group">
-
-            <label>
-                Question
-            </label>
-
-            <input
-                type="text"
-                class="question-text"
-                placeholder="Enter your question">
-
+            <label>Question</label>
+            <input type="text" class="question-text" placeholder="Enter your question">
         </div>
-
 
         <div class="options-grid">
-
-            <div class="form-group">
-
-                <label>
-                    Option 1
-                </label>
-
-                <input
-                    type="text"
-                    class="option"
-                    placeholder="Option 1">
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Option 2
-                </label>
-
-                <input
-                    type="text"
-                    class="option"
-                    placeholder="Option 2">
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Option 3
-                </label>
-
-                <input
-                    type="text"
-                    class="option"
-                    placeholder="Option 3">
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Option 4
-                </label>
-
-                <input
-                    type="text"
-                    class="option"
-                    placeholder="Option 4">
-
-            </div>
-
+            <div class="form-group"><label>Option 1</label><input type="text" class="option" placeholder="Option 1"></div>
+            <div class="form-group"><label>Option 2</label><input type="text" class="option" placeholder="Option 2"></div>
+            <div class="form-group"><label>Option 3</label><input type="text" class="option" placeholder="Option 3"></div>
+            <div class="form-group"><label>Option 4</label><input type="text" class="option" placeholder="Option 4"></div>
         </div>
 
-
         <div class="form-group">
-
-            <label>
-                Correct Answer
-            </label>
-
+            <label>Correct Answer</label>
             <select class="correct-answer">
-
-                <option value="">
-                    Select correct answer
-                </option>
-
-                <option value="0">
-                    Option 1
-                </option>
-
-                <option value="1">
-                    Option 2
-                </option>
-
-                <option value="2">
-                    Option 3
-                </option>
-
-                <option value="3">
-                    Option 4
-                </option>
-
+                <option value="">Select correct answer</option>
+                <option value="0">Option 1</option>
+                <option value="1">Option 2</option>
+                <option value="2">Option 3</option>
+                <option value="3">Option 4</option>
             </select>
-
         </div>
     `;
 
+    document.getElementById("questionsContainer").appendChild(box);
 
-    document
-        .getElementById(
-            "questionsContainer"
-        )
-        .appendChild(box);
+    const imageFile = box.querySelector(".question-image-file");
+    const imageButton = box.querySelector(".question-image-upload");
+    const imageLabel = box.querySelector(".question-image-label");
 
+    const setImage = (src) => {
+        box.dataset.image = src || "";
+        if (src) {
+            imageButton.classList.add("has-image");
+            imageLabel.textContent = "Image Added";
+        } else {
+            imageButton.classList.remove("has-image");
+            imageLabel.textContent = "Add Image";
+        }
+    };
+
+    imageFile.addEventListener("change", async function() {
+        const file = this.files && this.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            alert("Please select an image file.");
+            this.value = "";
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            alert("Image size must be 10 MB or less.");
+            this.value = "";
+            return;
+        }
+
+        try {
+            const dataUrl = await compressQuizImage(file);
+            if (dataUrl.length > 900000) {
+                alert("This image is still too large after compression. Please choose a smaller image.");
+                this.value = "";
+                return;
+            }
+            setImage(dataUrl);
+        } catch (error) {
+            console.error("Question image error:", error);
+            alert("Unable to process that image. Please try another one.");
+            this.value = "";
+        }
+    });
 
     if (data) {
+        box.querySelector(".question-text").value = data.question || "";
 
-        box.querySelector(
-            ".question-text"
-        ).value =
-            data.question || "";
-
-        const optionInputs =
-            box.querySelectorAll(
-                ".option"
-            );
-
-        if (
-            Array.isArray(
-                data.options
-            )
-        ) {
-
-            data.options.forEach(
-                (
-                    option,
-                    index
-                ) => {
-
-                    if (
-                        optionInputs[index]
-                    ) {
-
-                        optionInputs[index]
-                            .value =
-                            option || "";
-
-                    }
-
-                }
-            );
-
+        const optionInputs = box.querySelectorAll(".option");
+        if (Array.isArray(data.options)) {
+            data.options.forEach((option, index) => {
+                if (optionInputs[index]) optionInputs[index].value = option || "";
+            });
         }
 
-        box.querySelector(
-            ".correct-answer"
-        ).value =
-            String(
-                data.correct
-            );
-
+        box.querySelector(".correct-answer").value = String(data.correct ?? "");
+        setImage(data.image || data.imageUrl || "");
     }
 
     updateQuestionNumbers();
 
+    if (!data) {
+        currentEditorQuestionIndex =
+            document.querySelectorAll("#questionsContainer .question-box").length - 1;
+    }
+
+    setEditorQuestion(currentEditorQuestionIndex);
 }
 
+function compressQuizImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                const maxSide = 1280;
+                const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.max(1, Math.round(img.width * scale));
+                canvas.height = Math.max(1, Math.round(img.height * scale));
+                const ctx = canvas.getContext("2d");
+                if (!ctx) return reject(new Error("Canvas unavailable"));
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL("image/jpeg", 0.78));
+            };
+            img.onerror = () => reject(new Error("Invalid image"));
+            img.src = reader.result;
+        };
+        reader.onerror = () => reject(reader.error || new Error("File read failed"));
+        reader.readAsDataURL(file);
+    });
+}
 
-/* =========================
-   DELETE QUESTION
-========================= *//* =========================
-   DELETE QUESTION
-========================= */
+function setEditorQuestion(index) {
+    const boxes = [...document.querySelectorAll("#questionsContainer .question-box")];
+    if (!boxes.length) return;
+    currentEditorQuestionIndex = Math.max(0, Math.min(index, boxes.length - 1));
+    boxes.forEach((box, i) => box.classList.toggle("is-active", i === currentEditorQuestionIndex));
+    const position = document.getElementById("quizEditorPosition");
+    const prev = document.getElementById("quizEditorPrev");
+    const next = document.getElementById("quizEditorNext");
+    if (position) position.textContent = `Question ${currentEditorQuestionIndex + 1} of ${boxes.length}`;
+    if (prev) prev.disabled = currentEditorQuestionIndex <= 0;
+    if (next) next.disabled = currentEditorQuestionIndex >= boxes.length - 1;
+}
+
+function goToQuestion(direction) {
+    setEditorQuestion(currentEditorQuestionIndex + Number(direction || 0));
+}
 
 function deleteQuestion(button) {
-
-    const questions =
-        document.querySelectorAll(
-            ".question-box"
-        );
-
-
-    if (
-        questions.length <= 1
-    ) {
-
-        alert(
-            "A quiz must contain at least one question."
-        );
-
+    const questions = [...document.querySelectorAll("#questionsContainer .question-box")];
+    if (questions.length <= 1) {
+        alert("A quiz must contain at least one question.");
         return;
-
     }
-
-
-    button
-        .closest(
-            ".question-box"
-        )
-        .remove();
-
-
+    const targetIndex = questions.indexOf(button.closest(".question-box"));
+    button.closest(".question-box").remove();
+    currentEditorQuestionIndex = Math.max(0, Math.min(targetIndex, document.querySelectorAll("#questionsContainer .question-box").length - 1));
     updateQuestionNumbers();
-
+    setEditorQuestion(currentEditorQuestionIndex);
 }
-
-
-/* =========================
-   QUESTION NUMBERS
-========================= */
 
 function updateQuestionNumbers() {
-
-    const questions =
-        document.querySelectorAll(
-            ".question-box"
-        );
-
-
-    questions.forEach(
-        (
-            box,
-            index
-        ) => {
-
-            box.querySelector(
-                ".question-number"
-            ).textContent =
-                `Question ${index + 1}`;
-
-        }
-    );
-
+    const questions = document.querySelectorAll("#questionsContainer .question-box");
+    questions.forEach((box, index) => {
+        const label = box.querySelector(".question-number");
+        if (label) label.textContent = `Question ${index + 1}`;
+    });
+    const position = document.getElementById("quizEditorPosition");
+    const prev = document.getElementById("quizEditorPrev");
+    const next = document.getElementById("quizEditorNext");
+    if (position) position.textContent = `Question ${Math.min(currentEditorQuestionIndex + 1, Math.max(questions.length, 1))} of ${questions.length}`;
+    if (prev) prev.disabled = currentEditorQuestionIndex <= 0;
+    if (next) next.disabled = currentEditorQuestionIndex >= questions.length - 1;
 }
-
-
-/* =========================
-   CHECK BLANK QUESTION
-========================= */
 
 function isQuestionCompletelyBlank(box) {
-
-    const question =
-        box.querySelector(
-            ".question-text"
-        )
-        .value
-        .trim();
-
-
-    const options =
-        [
-            ...box.querySelectorAll(
-                ".option"
-            )
-        ]
-        .map(
-            input =>
-                input.value.trim()
-        );
-
-
-    const correct =
-        box.querySelector(
-            ".correct-answer"
-        ).value;
-
-
-    return (
-
-        !question &&
-
-        options.every(
-            option =>
-                !option
-        ) &&
-
-        correct === ""
-
-    );
-
+    const question = box.querySelector(".question-text").value.trim();
+    const options = [...box.querySelectorAll(".option")].map(input => input.value.trim());
+    const correct = box.querySelector(".correct-answer").value;
+    const image = box.dataset.image || "";
+    return !question && options.every(option => !option) && correct === "" && !image;
 }
-
-
-/* =========================
-   SAVE QUIZ
-========================= */
 
 async function saveQuiz() {
 
@@ -5861,6 +5921,8 @@ async function saveQuiz() {
         )
         .value
         .trim();
+
+    const quizType = getSelectedQuizType();
 
     const roomPasswordInput =
         document.getElementById(
@@ -6016,7 +6078,9 @@ async function saveQuiz() {
 
             options: options,
 
-            correct: Number(correct)
+            correct: Number(correct),
+
+            image: box.dataset.image || ""
 
         };
 
@@ -6061,6 +6125,8 @@ async function saveQuiz() {
             defaultMinPoints: defaultMinPoints,
 
             defaultMaxPoints: defaultMaxPoints,
+
+            quizType: quizType,
 
             roomPassword: roomPassword,
 
@@ -6128,13 +6194,23 @@ async function saveQuiz() {
 
     }
 
+    const savedQuizId = editingQuizId;
     editingQuizId = null;
 
     await loadQuizzesFromSupabase();
 
+    const savedQuiz = savedQuizId
+        ? quizzes.find(q => String(q.id) === String(savedQuizId))
+        : quizzes[0];
+    const savedQuizNumber = savedQuiz?.quiz_number ?? null;
+
     closeModal("createModal");
 
     renderQuizList();
+
+    if (savedQuizNumber !== null) {
+        alert(`Quiz saved successfully!\n\nQuiz ID: #${savedQuizNumber}`);
+    }
 
 }
 
@@ -6278,12 +6354,8 @@ function renderQuizList() {
                         color:#9da3b0;
                         font-size:12px;
                     ">
-
-                    ${escapeHTML(
-                        quiz.quiz_id ||
-                        ""
-                    )}
-
+                    Quiz ID: <strong style="color:#fff;">#${escapeHTML(quiz.quiz_number ?? "—")}</strong>
+                    ${quiz.quiz_id ? ` • Room ID: ${escapeHTML(quiz.quiz_id)}` : ""}
                 </p>
 
 
@@ -6453,7 +6525,9 @@ async function editQuiz(id) {
     document.getElementById(
         "createTitle"
     ).textContent =
-        "Edit Quiz";
+        quiz.quiz_number != null
+            ? `Edit Quiz #${quiz.quiz_number}`
+            : "Edit Quiz";
 
 
     document.getElementById(
@@ -6512,6 +6586,12 @@ async function editQuiz(id) {
 
     }
 
+    const quizTypeNormal = document.getElementById("quizTypeNormal");
+    const quizTypeDiscord = document.getElementById("quizTypeDiscord");
+    if (quizTypeNormal) quizTypeNormal.checked = (quiz.settings?.quizType || "normal") !== "discord";
+    if (quizTypeDiscord) quizTypeDiscord.checked = (quiz.settings?.quizType || "normal") === "discord";
+    updateQuizTypeUI();
+
     const roomIdInput = document.getElementById("quizRoomId");
     if (roomIdInput) {
         roomIdInput.value = quiz.quiz_id || "";
@@ -6540,6 +6620,8 @@ async function editQuiz(id) {
 
     questionCounter =
         0;
+
+    currentEditorQuestionIndex = 0;
 
 
     if (
@@ -6572,6 +6654,9 @@ async function editQuiz(id) {
         "libraryModal"
     );
 
+
+    updateQuizQuestionTypeLabel();
+    showQuizCreatorStep("details");
 
     openModal(
         "createModal"
@@ -7154,12 +7239,26 @@ async function openSharedQuizFromUrl() {
 
     try {
 
-        const { data, error } =
-            await supabaseClient
+        let data = null;
+        let error = null;
+
+        // New Discord links use the short numeric Quiz ID.
+        if (/^\d+$/.test(String(sharedQuizId))) {
+            ({ data, error } = await supabaseClient
+                .from("quizzes")
+                .select("*")
+                .eq("quiz_number", Number(sharedQuizId))
+                .maybeSingle());
+        }
+
+        // Backward compatibility for older UUID-based links.
+        if (!data && !error) {
+            ({ data, error } = await supabaseClient
                 .from("quizzes")
                 .select("*")
                 .eq("id", sharedQuizId)
-                .maybeSingle();
+                .maybeSingle());
+        }
 
         if (error) {
             console.error("Shared quiz load error:", error);
@@ -7187,7 +7286,16 @@ async function openSharedQuizFromUrl() {
             window.location.pathname
         );
 
-        openQuizLobby(sharedQuiz);
+        const sharedParams = new URLSearchParams(window.location.search);
+        if (sharedParams.get("edit") === "1") {
+            if (String(sharedQuiz.creator_id) !== String(currentProfile.id)) {
+                alert("You can only edit your own quiz.");
+                return;
+            }
+            await editQuiz(sharedQuiz.id);
+        } else {
+            openQuizLobby(sharedQuiz);
+        }
 
     } catch (error) {
 
@@ -7476,6 +7584,21 @@ async function joinQuizLobby(hostMode = false) {
             alert("The host closed this room.");
             await leaveQuizLobby(true);
         })
+        .on("broadcast", { event: "quiz_score_update" }, ({ payload }) => {
+            if (!payload || String(payload.quizId) !== String(activeLobbyQuiz?.id)) return;
+            if (payload.userId) {
+                liveQuizScores.set(String(payload.userId), {
+                    userId: String(payload.userId),
+                    displayName: payload.displayName || "Player",
+                    score: Number(payload.score) || 0
+                });
+                renderLiveQuizRanking();
+            }
+        })
+        .on("broadcast", { event: "quiz_chat" }, ({ payload }) => {
+            if (!payload || String(payload.quizId) !== String(activeLobbyQuiz?.id)) return;
+            pushLiveQuizChatMessage(payload);
+        })
         .on("broadcast", { event: "quiz_start" }, ({ payload }) => {
             if (!payload || !payload.startsAt) return;
             if (lobbyStarting) return;
@@ -7518,7 +7641,8 @@ async function sendLobbyChat(event) {
         userId: currentProfile.id,
         displayName: currentProfile.display_name || "User",
         text: text.slice(0, 300),
-        sentAt: new Date().toISOString()
+        sentAt: new Date().toISOString(),
+        messageId: `${currentProfile.id}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
     };
 
     lobbyChatMessages.push(payload);
@@ -7607,13 +7731,23 @@ function runLobbyCountdown(startsAt) {
     const overlay = document.getElementById("lobbyCountdown");
     const number = document.getElementById("lobbyCountdownNumber");
 
+    // Hide the waiting lobby as soon as the host starts the countdown.
+    closeModal("quizLobbyModal");
+
     if (overlay) overlay.classList.add("show");
+
+    let lastLobbySecond = null;
 
     const tick = () => {
         const remaining = Math.max(0, startsAt - Date.now());
         const seconds = Math.ceil(remaining / 1000);
 
         if (number) number.textContent = String(Math.max(1, seconds));
+
+        if (seconds !== lastLobbySecond && seconds > 0 && seconds <= 6) {
+            playQuizUISound(seconds === 1 ? "timerFinal" : "timer");
+            lastLobbySecond = seconds;
+        }
 
         if (remaining <= 0) {
             if (lobbyCountdownTimer) {
@@ -7622,12 +7756,32 @@ function runLobbyCountdown(startsAt) {
             }
 
             if (number) number.textContent = "GO";
+            playQuizUISound("go");
 
             setTimeout(async () => {
                 if (overlay) overlay.classList.remove("show");
 
                 const quizToPlay = activeLobbyQuiz;
-                await leaveQuizLobby(false);
+
+                // Carry the lobby conversation into the live-quiz chat so
+                // chat never disappears when the quiz starts.
+                liveQuizChatMessages = Array.isArray(lobbyChatMessages)
+                    ? lobbyChatMessages.slice(-100)
+                    : [];
+
+                liveQuizScores = new Map();
+                for (const player of lobbyPlayers.values()) {
+                    if (player && player.userId) {
+                        liveQuizScores.set(String(player.userId), {
+                            userId: String(player.userId),
+                            displayName: player.displayName || "Player",
+                            score: 0
+                        });
+                    }
+                }
+                // Keep the room channel alive while the quiz is running so
+                // the room's chat/realtime connection does not disappear.
+                // The live quiz has its own control channel for scores/pause.
                 await playQuizObject(quizToPlay);
             }, 250);
         }
@@ -7773,6 +7927,9 @@ async function playQuiz(id) {
 
 
     showCurrentQuestion();
+    updateHostPauseButton();
+    const hostStatus = document.getElementById("quizLiveHostStatus");
+    if (hostStatus) hostStatus.textContent = quizHostMode ? "Host controls enabled" : "";
 
 
     openModal(
@@ -7807,6 +7964,21 @@ async function setupQuizControlChannel(quiz) {
     );
 
     quizControlChannel
+        .on("broadcast", { event: "quiz_score_update" }, ({ payload }) => {
+            if (!payload || String(payload.quizId) !== String(quiz.id)) return;
+            if (payload.userId) {
+                liveQuizScores.set(String(payload.userId), {
+                    userId: String(payload.userId),
+                    displayName: payload.displayName || "Player",
+                    score: Number(payload.score) || 0
+                });
+                renderLiveQuizRanking();
+            }
+        })
+        .on("broadcast", { event: "quiz_chat" }, ({ payload }) => {
+            if (!payload || String(payload.quizId) !== String(quiz.id)) return;
+            pushLiveQuizChatMessage(payload);
+        })
         .on("broadcast", { event: "quiz_pause" }, ({ payload }) => {
             if (!payload) return;
             if (
@@ -7825,14 +7997,23 @@ async function setupQuizControlChannel(quiz) {
 
             resumeQuizLocally(false);
         })
-        .subscribe();
+        .subscribe(status => {
+            quizControlChannelReady = status === "SUBSCRIBED";
+        });
 }
 
 function updateHostPauseButton() {
-    const button =
-        document.getElementById("hostPauseQuizButton");
-
+    const button = document.getElementById("hostPauseQuizButton");
     if (!button) return;
+
+    // Re-check ownership every time so the host control cannot remain hidden
+    // because the modal opened before the host state was refreshed.
+    const isHost =
+        !!currentQuiz &&
+        !!currentProfile &&
+        String(currentQuiz.creator_id) === String(currentProfile.id);
+
+    quizHostMode = quizHostMode || isHost;
 
     if (!quizHostMode || !currentQuiz) {
         button.style.display = "none";
@@ -7840,26 +8021,24 @@ function updateHostPauseButton() {
     }
 
     button.style.display = "inline-flex";
-    button.textContent =
-        quizPaused ? "▶ Resume" : "⏸ Pause";
+    button.hidden = false;
+    button.disabled = false;
+    button.textContent = quizPaused ? "▶ Resume" : "⏸ Pause";
 }
 
 function showQuizPausedOverlay(show) {
-    const overlay =
-        document.getElementById("quizPausedOverlay");
-
-    if (overlay) {
-        overlay.classList.toggle("show", !!show);
+    // Non-blocking pause state: only the quiz/question area gets a small
+    // status banner. Ranking and chat remain fully usable.
+    const inline = document.getElementById("quizPausedInline");
+    if (inline) {
+        inline.classList.toggle("show", !!show);
     }
 
-    const message =
-        document.getElementById("quizPausedMessage");
-
-    if (message) {
-        message.textContent =
-            quizHostMode && quizPaused
-                ? "The quiz is paused. Resume it when you are ready."
-                : "The host has paused the quiz. Please wait.";
+    const status = document.getElementById("quizLiveHostStatus");
+    if (status) {
+        status.textContent = show
+            ? (quizHostMode ? "Paused" : "Paused by host")
+            : (quizHostMode ? "Host controls enabled" : "");
     }
 }
 
@@ -7892,6 +8071,8 @@ function pauseQuizLocally(fromHost = true) {
     quizPaused = true;
     showQuizPausedOverlay(true);
     updateHostPauseButton();
+    const hostStatus = document.getElementById("quizLiveHostStatus");
+    if (hostStatus) hostStatus.textContent = quizHostMode ? "Paused" : "Paused by host";
 
     if (
         fromHost &&
@@ -7920,6 +8101,8 @@ function resumeQuizLocally(fromHost = true) {
     questionPausedAt = 0;
     showQuizPausedOverlay(false);
     updateHostPauseButton();
+    const hostStatus = document.getElementById("quizLiveHostStatus");
+    if (hostStatus) hostStatus.textContent = quizHostMode ? "Host controls enabled" : "";
 
     if (remaining <= 0) {
         submitCurrentAnswer(true);
@@ -7965,6 +8148,7 @@ function toggleHostQuizPause() {
 }
 
 async function closeQuizControlChannel() {
+    quizControlChannelReady = false;
     if (!quizControlChannel) return;
 
     try {
@@ -7978,6 +8162,197 @@ async function closeQuizControlChannel() {
     quizControlChannel = null;
 }
 
+
+function pushLiveQuizChatMessage(payload) {
+    if (!payload || !payload.text) return;
+    const key = payload.messageId || [payload.userId, payload.sentAt, payload.text].join("|");
+    const exists = liveQuizChatMessages.some(m => {
+        const mk = m.messageId || [m.userId, m.sentAt, m.text].join("|");
+        return mk === key;
+    });
+    if (exists) return;
+    liveQuizChatMessages.push(payload);
+    renderLiveQuizChat();
+}
+
+function renderLiveQuizRanking() {
+    const el = document.getElementById("liveQuizRanking");
+    if (!el) return;
+    const rows = [...liveQuizScores.values()].sort((a,b) => b.score - a.score || a.displayName.localeCompare(b.displayName));
+    if (!rows.length) { el.innerHTML = '<div class="empty">Waiting for scores...</div>'; return; }
+    el.innerHTML = rows.map((p,i) => `
+        <div class="quiz-live-rank-row">
+            <span class="quiz-live-rank-number">#${i+1}</span>
+            <span class="quiz-live-rank-name">${escapeHTML(p.displayName)}</span>
+            <span class="quiz-live-rank-score">${p.score}</span>
+        </div>
+    `).join("");
+}
+
+function ensureLiveQuizChatComposer() {
+    const panel = document.querySelector("#playModal .quiz-live-chat-panel");
+    if (!panel) return null;
+
+    panel.style.position = "relative";
+    panel.style.display = "flex";
+    panel.style.flexDirection = "column";
+    panel.style.visibility = "visible";
+    panel.style.opacity = "1";
+    panel.style.overflow = "hidden";
+    panel.style.minHeight = "0";
+
+    let form = panel.querySelector(".quiz-live-chat-form");
+    if (!form) {
+        form = document.createElement("form");
+        form.className = "quiz-live-chat-form";
+        form.setAttribute("onsubmit", "sendLiveQuizChat(event)");
+        form.innerHTML = `
+            <input id="liveQuizChatInput" type="text" maxlength="300"
+                   placeholder="Type a message..." autocomplete="off" aria-label="Chat message">
+            <button type="submit" aria-label="Send chat message">Send</button>`;
+        panel.appendChild(form);
+    }
+
+    form.style.display = "flex";
+    form.style.visibility = "visible";
+    form.style.opacity = "1";
+    form.style.position = "relative";
+    form.style.zIndex = "100";
+    form.style.pointerEvents = "auto";
+
+    const input = form.querySelector("input");
+    const button = form.querySelector("button");
+    if (input) {
+        input.style.display = "block";
+        input.style.visibility = "visible";
+        input.style.opacity = "1";
+        input.style.pointerEvents = "auto";
+    }
+    if (button) {
+        button.style.display = "inline-flex";
+        button.style.visibility = "visible";
+        button.style.opacity = "1";
+        button.style.pointerEvents = "auto";
+    }
+    return form;
+}
+
+function renderLiveQuizChat() {
+    const panel = document.querySelector("#playModal .quiz-live-chat-panel");
+    if (!panel) return;
+
+    let el = document.getElementById("liveQuizChatMessages");
+    if (!el) {
+        el = document.createElement("div");
+        el.id = "liveQuizChatMessages";
+        el.className = "quiz-live-chat-messages";
+        panel.insertBefore(el, panel.firstChild?.nextSibling || null);
+    }
+
+    el.innerHTML = liveQuizChatMessages.slice(-100).map(m => `
+        <div class="quiz-live-chat-message">
+            <strong>${escapeHTML(m.displayName || "Player")}</strong>
+            <p>${escapeHTML(m.text || "")}</p>
+        </div>
+    `).join("") || '<div class="empty">No messages yet.<br><span style="font-size:11px;">Chat is open — send a message below.</span></div>';
+
+    ensureLiveQuizChatComposer();
+    el.scrollTop = el.scrollHeight;
+}
+
+// The quiz question renderer only owns #playContent. Keep the chat composer
+// outside that area and restore it if any other UI update accidentally removes it.
+let liveQuizChatGuard = null;
+function startLiveQuizChatGuard() {
+    if (liveQuizChatGuard) return;
+    liveQuizChatGuard = setInterval(() => {
+        if (!currentQuiz) return;
+        const modal = document.getElementById("playModal");
+        if (!modal || modal.style.display === "none") return;
+        ensureLiveQuizChatComposer();
+    }, 250);
+}
+
+function stopLiveQuizChatGuard() {
+    if (!liveQuizChatGuard) return;
+    clearInterval(liveQuizChatGuard);
+    liveQuizChatGuard = null;
+}
+
+async function sendLiveQuizChat(event) {
+    if (event) event.preventDefault();
+
+    const input = document.getElementById("liveQuizChatInput");
+    const text = input ? input.value.trim() : "";
+    if (!text || !currentProfile || !currentQuiz) return;
+
+    const payload = {
+        quizId: currentQuiz.id,
+        userId: currentProfile.id,
+        displayName: currentProfile.display_name || "Player",
+        text: text.slice(0, 300),
+        sentAt: new Date().toISOString(),
+        messageId: `${currentProfile.id}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    };
+
+    pushLiveQuizChatMessage(payload);
+    const currentInput = document.getElementById("liveQuizChatInput");
+    if (currentInput) currentInput.value = "";
+
+    // Use the live quiz channel while the quiz is running. If the channel is
+    // still connecting, keep the local message and retry once it is ready.
+    if (quizControlChannel) {
+        try {
+            await quizControlChannel.send({
+                type: "broadcast",
+                event: "quiz_chat",
+                payload
+            });
+        } catch (error) {
+            console.warn("Live quiz chat send error:", error);
+        }
+    }
+
+    // Keep the lobby channel as a fallback while the quiz is live. This also
+    // makes chat continue working during the short control-channel reconnect.
+    if (lobbyChannel && lobbyJoined) {
+        try {
+            await lobbyChannel.send({
+                type: "broadcast",
+                event: "quiz_chat",
+                payload
+            });
+        } catch (error) {
+            console.warn("Lobby fallback chat send error:", error);
+        }
+    }
+}
+
+function showQuizQuestionTransition() {
+    return new Promise(resolve => {
+        const overlay = document.getElementById("quizQuestionTransition");
+        const number = document.getElementById("quizQuestionTransitionNumber");
+        if (!overlay || !number) { resolve(); return; }
+        if (quizQuestionTransitionTimer) clearInterval(quizQuestionTransitionTimer);
+        overlay.classList.add("show");
+        let seconds = 3;
+        number.textContent = String(seconds);
+        playQuizUISound("next");
+
+        quizQuestionTransitionTimer = setInterval(() => {
+            seconds -= 1;
+            if (seconds > 0) {
+                number.textContent = String(seconds);
+                playQuizUISound(seconds === 1 ? "timerFinal" : "timer");
+                return;
+            }
+            clearInterval(quizQuestionTransitionTimer);
+            quizQuestionTransitionTimer = null;
+            overlay.classList.remove("show");
+            resolve();
+        }, 1000);
+    });
+}
 
 async function playQuizObject(quiz) {
 
@@ -8016,10 +8391,28 @@ async function playQuizObject(quiz) {
     questionStartedAt = 0;
     questionTimeRemaining = 0;
     answerSubmitted = false;
+    questionSubmittedWaiting = false;
     quizPaused = false;
     questionPausedAt = 0;
     quizHostMode =
         String(quiz.creator_id) === String(currentProfile?.id);
+
+    if (!(liveQuizScores instanceof Map)) liveQuizScores = new Map();
+    // Do not clear the live chat here. The lobby -> live-quiz transition
+    // carries the conversation into this panel.
+    if (!Array.isArray(liveQuizChatMessages)) {
+        liveQuizChatMessages = [];
+    }
+    if (currentProfile) {
+        liveQuizScores.set(String(currentProfile.id), {
+            userId: String(currentProfile.id),
+            displayName: currentProfile.display_name || "Player",
+            score: 0
+        });
+    }
+    renderLiveQuizRanking();
+    renderLiveQuizChat();
+    startLiveQuizChatGuard();
 
     await setupQuizControlChannel(quiz);
 
@@ -8032,10 +8425,12 @@ async function playQuizObject(quiz) {
 
     showCurrentQuestion();
 
-
     openModal(
         "playModal"
     );
+
+    // Refresh after opening the modal so the host control appears immediately.
+    requestAnimationFrame(() => updateHostPauseButton());
 
 }
 
@@ -8098,6 +8493,7 @@ function stopQuestionTimer() {
 function startQuestionTimer(preserveRemaining = false) {
 
     stopQuestionTimer();
+    lastTimerSoundSecond = null;
 
 
     const question =
@@ -8162,6 +8558,18 @@ function startQuestionTimer(preserveRemaining = false) {
                 timeLimit - elapsed
             );
 
+        const timerSecond = Math.ceil(questionTimeRemaining);
+        if (
+            timerSecond > 0 &&
+            timerSecond <= 3 &&
+            timerSecond !== lastTimerSoundSecond
+        ) {
+            playQuizUISound(
+                timerSecond === 1 ? "timerFinal" : "timer"
+            );
+            lastTimerSoundSecond = timerSecond;
+        }
+
         if (timerText) {
 
             timerText.textContent =
@@ -8190,9 +8598,12 @@ function startQuestionTimer(preserveRemaining = false) {
 
             stopQuestionTimer();
 
-            submitCurrentAnswer(
-                true
-            );
+            if (questionSubmittedWaiting) {
+                questionSubmittedWaiting = false;
+                advanceAfterQuestionEnd();
+            } else {
+                submitCurrentAnswer(true);
+            }
 
         }
 
@@ -8208,6 +8619,67 @@ function startQuestionTimer(preserveRemaining = false) {
         );
 
 }
+
+
+/* =========================
+   QUIZ UI SOUNDS
+========================= */
+let quizAudioContext = null;
+let lastTimerSoundSecond = null;
+
+function playQuizUISound(kind = "tap") {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!quizAudioContext) quizAudioContext = new AudioCtx();
+        if (quizAudioContext.state === "suspended") quizAudioContext.resume();
+
+        const ctx = quizAudioContext;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const now = ctx.currentTime;
+
+        const settings = {
+            tap:   { freq: 520, duration: .055, volume: .045, type: "sine" },
+            select: { freq: 690, duration: .07,  volume: .055, type: "sine" },
+            submit: { freq: 820, duration: .09,  volume: .06,  type: "triangle" },
+            pause: { freq: 340, duration: .10,  volume: .06,  type: "sine" },
+            resume: { freq: 620, duration: .10,  volume: .06,  type: "sine" },
+            timer: { freq: 720, duration: .065, volume: .05, type: "square" },
+            timerFinal: { freq: 980, duration: .11, volume: .07, type: "square" },
+            next: { freq: 560, duration: .075, volume: .055, type: "triangle" },
+            go: { freq: 1100, duration: .15, volume: .075, type: "triangle" }
+        }[kind] || { freq: 520, duration: .055, volume: .045, type: "sine" };
+
+        osc.type = settings.type;
+        osc.frequency.setValueAtTime(settings.freq, now);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(settings.volume, now + .008);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + settings.duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + settings.duration + .01);
+    } catch (_) {
+        // Sound is optional; never let it interfere with quiz functionality.
+    }
+}
+
+document.addEventListener("click", (event) => {
+    if (!currentQuiz) return;
+    const target = event.target.closest?.("#playModal .answer-option, #playModal .next-btn, #playModal #hostPauseQuizButton, #playModal .quiz-live-chat-form button");
+    if (!target) return;
+
+    if (target.matches(".answer-option")) {
+        playQuizUISound("select");
+    } else if (target.matches("#hostPauseQuizButton")) {
+        playQuizUISound(quizPaused ? "resume" : "pause");
+    } else if (target.matches(".next-btn")) {
+        playQuizUISound("submit");
+    } else {
+        playQuizUISound("tap");
+    }
+});
 
 
 /* =========================
@@ -8352,6 +8824,13 @@ function showCurrentQuestion() {
         </h3>
 
 
+        ${question.image ? `
+            <div class="quiz-play-question-image">
+                <img src="${escapeHTML(question.image)}" alt="Question image">
+            </div>
+        ` : ""}
+
+
         ${question.options.map(
             (
                 option,
@@ -8422,8 +8901,14 @@ function showCurrentQuestion() {
         submit
     );
 
+    if (quizPaused) {
+        showQuizPausedOverlay(true);
+    } else {
+        showQuizPausedOverlay(false);
+        startQuestionTimer();
+    }
 
-    startQuestionTimer();
+    updateHostPauseButton();
 
 }
 
@@ -8440,56 +8925,36 @@ async function submitCurrentAnswer(
 
     if (
         answerSubmitted ||
-        !currentQuiz
+        !currentQuiz ||
+        quizPaused
     ) {
-
         return;
-
     }
-
-
-    answerSubmitted =
-        true;
-
-    stopQuestionTimer();
-
 
     const selected =
         document.querySelector(
             'input[name="current-answer"]:checked'
         );
 
-
     if (
         !selected &&
         !timedOut
     ) {
-
-        answerSubmitted =
-            false;
-
-        startQuestionTimer();
-
         alert(
             "Please select an answer."
         );
-
         return;
-
     }
-
 
     const question =
         currentQuiz.questions[
             currentQuestionIndex
         ];
 
-
     const timeLimit =
         getQuestionTime(
             question
         );
-
 
     const elapsed =
         questionStartedAt
@@ -8501,16 +8966,13 @@ async function submitCurrentAnswer(
             )
             : timeLimit;
 
-
     const remaining =
         Math.max(
             0,
             timeLimit - elapsed
         );
 
-
     let earnedPoints = 0;
-
 
     if (
         selected &&
@@ -8530,16 +8992,105 @@ async function submitCurrentAnswer(
                 (pointsRange.max - pointsRange.min) *
                 (remaining / timeLimit)
             );
-
     }
 
+    answerSubmitted = true;
 
-    currentScore +=
-        earnedPoints;
+    if (!timedOut && remaining > 0) {
 
+        questionSubmittedWaiting = true;
+
+        document
+            .querySelectorAll(
+                'input[name="current-answer"]'
+            )
+            .forEach(input => {
+                input.disabled = true;
+            });
+
+        const submitButton =
+            document.querySelector(
+                "#playContent .next-btn"
+            );
+
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent =
+                "✓ You are submitted";
+        }
+
+        const questionBox =
+            document.querySelector(
+                "#playContent .play-question"
+            );
+
+        if (questionBox) {
+            questionBox.classList.add("answer-submitted-state");
+
+            let submittedState =
+                document.getElementById(
+                    "answerSubmittedNotice"
+                );
+
+            if (!submittedState) {
+                submittedState =
+                    document.createElement("div");
+                submittedState.id =
+                    "answerSubmittedNotice";
+                submittedState.className =
+                    "quiz-answer-submitted-card";
+                questionBox.appendChild(submittedState);
+            }
+
+            submittedState.innerHTML = `
+                <div class="quiz-answer-submitted-icon">✓</div>
+                <div class="quiz-answer-submitted-title">Answer Submitted</div>
+                <div class="quiz-answer-submitted-main">You are submitted</div>
+                <div class="quiz-answer-submitted-sub">Wait for the next question</div>
+                <div class="quiz-answer-submitted-hint">Other players are still answering.</div>
+            `;
+        }
+
+        // Keep the question timer running. The timer reaching zero
+        // is the only thing that permits the next question.
+        return;
+    }
+
+    currentScore += earnedPoints;
+
+    if (currentProfile) {
+
+        liveQuizScores.set(String(currentProfile.id), {
+            userId: String(currentProfile.id),
+            displayName: currentProfile.display_name || "Player",
+            score: currentScore
+        });
+
+        renderLiveQuizRanking();
+
+        if (quizControlChannel && currentQuiz) {
+            quizControlChannel.send({
+                type: "broadcast",
+                event: "quiz_score_update",
+                payload: {
+                    quizId: currentQuiz.id,
+                    userId: currentProfile.id,
+                    displayName: currentProfile.display_name || "Player",
+                    score: currentScore
+                }
+            });
+        }
+    }
+
+    await advanceAfterQuestionEnd();
+}
+
+
+async function advanceAfterQuestionEnd() {
+
+    if (!currentQuiz) return;
 
     currentQuestionIndex++;
-
 
     if (
         currentQuestionIndex >=
@@ -8555,17 +9106,14 @@ async function submitCurrentAnswer(
         const totalQuestions =
             finishedQuiz.questions.length;
 
-
         await saveParticipantResult(
             finishedQuiz,
             finalScore
         );
 
-
         closeModal(
             "playModal"
         );
-
 
         currentQuiz =
             null;
@@ -8579,6 +9127,8 @@ async function submitCurrentAnswer(
         answerSubmitted =
             false;
 
+        questionSubmittedWaiting =
+            false;
 
         await showQuizResult(
             finishedQuiz,
@@ -8598,12 +9148,10 @@ async function submitCurrentAnswer(
         }
 
         return;
-
     }
 
-
+    await showQuizQuestionTransition();
     showCurrentQuestion();
-
 }
 
 
@@ -8745,20 +9293,14 @@ async function showQuizResult(
 
         </div>
 
-        ${
-            isCurrentUserAdmin
-                ? `
-                    <div style="margin-top:14px;display:flex;justify-content:flex-end;">
-                        <button
-                            class="secondary-btn"
-                            type="button"
-                            onclick="openAdminHistoryForQuiz('${escapeHTML(quiz.quiz_id || "")}')">
-                            📜 View History
-                        </button>
-                    </div>
-                `
-                : ""
-        }
+        <div style="margin-top:14px;display:flex;justify-content:flex-end;">
+            <button
+                class="secondary-btn"
+                type="button"
+                onclick="openPublicQuizHistory('${escapeHTML(quiz.quiz_id || "")}')">
+                📜 View History
+            </button>
+        </div>
 
     `;
 
@@ -9252,34 +9794,184 @@ async function adminSearchQuizHistory(suppliedQuizId = "") {
 }
 
 
-async function openAdminHistoryForQuiz(quizId) {
+async function openPublicQuizHistory(quizId) {
 
-    if (!currentProfile) return;
+    if (!requireLogin()) return;
 
-    const admin =
-        await isUserAdmin(currentProfile.id);
+    const id = String(quizId || "").trim();
 
-    if (!admin) {
-
-        alert(
-            "You do not have permission to view quiz history."
-        );
-
+    if (!id) {
+        alert("Quiz ID is missing.");
         return;
     }
 
-    closeModal("resultModal");
+    const titleEl =
+        document.getElementById("publicQuizHistoryTitle");
 
-    await openAdmin();
+    const result =
+        document.getElementById("publicQuizHistoryResult");
 
-    const input =
-        document.getElementById("adminHistoryQuizId");
-
-    if (input) {
-        input.value = quizId || "";
+    if (titleEl) {
+        titleEl.textContent = "Quiz History";
     }
 
-    await adminSearchQuizHistory(quizId);
+    if (result) {
+        result.innerHTML =
+            '<div class="empty">Loading quiz history...</div>';
+    }
+
+    closeModal("resultModal");
+    openModal("publicQuizHistoryModal");
+
+    let attempts = [];
+    let quizTitle = id;
+
+    // First try the public quiz code stored on attempts.
+    const {
+        data: byCode,
+        error: codeError
+    } = await supabaseClient
+        .from("quiz_attempts")
+        .select("*")
+        .eq("quiz_code", id)
+        .order("score", { ascending: false })
+        .order("completed_at", { ascending: true });
+
+    if (!codeError && Array.isArray(byCode) && byCode.length) {
+        attempts = byCode;
+    } else {
+        // Fallback: resolve the quiz UUID from quizzes.quiz_id.
+        const {
+            data: quizRows,
+            error: quizLookupError
+        } = await supabaseClient
+            .from("quizzes")
+            .select("id,quiz_id,title")
+            .eq("quiz_id", id)
+            .limit(1);
+
+        if (!quizLookupError && quizRows?.length) {
+            const quiz = quizRows[0];
+            quizTitle = quiz.title || id;
+
+            const {
+                data: byUuid,
+                error: uuidError
+            } = await supabaseClient
+                .from("quiz_attempts")
+                .select("*")
+                .eq("quiz_id", quiz.id)
+                .order("score", { ascending: false })
+                .order("completed_at", { ascending: true });
+
+            if (!uuidError) {
+                attempts = byUuid || [];
+            }
+        } else if (codeError) {
+            if (result) {
+                result.innerHTML = `
+                    <div class="empty">
+                        Unable to load quiz history right now.
+                    </div>
+                `;
+            }
+            console.error("Public quiz history error:", codeError);
+            return;
+        }
+    }
+
+    if (titleEl) {
+        titleEl.textContent = `${quizTitle} • Quiz History`;
+    }
+
+    if (!attempts.length) {
+        if (result) {
+            result.innerHTML = `
+                <div class="empty">
+                    No completed attempts found for
+                    <strong>${escapeHTML(quizTitle)}</strong>.
+                </div>
+            `;
+        }
+        return;
+    }
+
+    // Show each player's best completed attempt.
+    const bestByUser = new Map();
+
+    attempts.forEach(entry => {
+        const key =
+            entry.user_id ||
+            entry.participant_user_id ||
+            entry.participant_name ||
+            String(Math.random());
+
+        const existing = bestByUser.get(key);
+
+        if (
+            !existing ||
+            Number(entry.score || 0) > Number(existing.score || 0) ||
+            (
+                Number(entry.score || 0) === Number(existing.score || 0) &&
+                new Date(entry.completed_at || 0) <
+                    new Date(existing.completed_at || 0)
+            )
+        ) {
+            bestByUser.set(key, entry);
+        }
+    });
+
+    const entries = [...bestByUser.values()].sort(
+        (a, b) => Number(b.score || 0) - Number(a.score || 0)
+    );
+
+    if (!result) return;
+
+    result.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+            <strong>${escapeHTML(quizTitle)}</strong>
+            <span style="color:#8f95a2;font-size:12px;">
+                ${entries.length} player(s)
+            </span>
+        </div>
+
+        <div
+            class="global-board-header"
+            style="display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;padding:10px 14px;margin-bottom:6px;color:#777d8a;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">
+            <div>Rank</div>
+            <div>Player</div>
+            <div style="text-align:right;">Score</div>
+        </div>
+
+        <div class="results-list">
+            ${entries.map((entry, index) => `
+                <div class="result-item">
+                    <div class="result-row">
+                        <div class="rank-badge">${index + 1}</div>
+
+                        <div class="result-main">
+                            <div class="result-name">
+                                ${escapeHTML(entry.participant_name || "User")}
+                            </div>
+
+                            <div class="result-meta">
+                                ${escapeHTML(entry.participant_user_id || "USER")}
+                                ${
+                                    entry.completed_at
+                                        ? " • " + new Date(entry.completed_at).toLocaleString()
+                                        : ""
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-score">
+                        ${Number(entry.score || 0)}/${Number(entry.total_questions || 0)}
+                    </div>
+                </div>
+            `).join("")}
+        </div>
+    `;
 }
 
 
@@ -9895,6 +10587,9 @@ function getAuthRedirectUrl() {
     const quizId =
         getPendingSharedQuizId();
 
+    const params = new URLSearchParams(window.location.search);
+    const editMode = params.get("edit") === "1";
+
     if (!quizId) {
         return (
             window.location.origin +
@@ -9911,7 +10606,8 @@ function getAuthRedirectUrl() {
         window.location.origin +
         window.location.pathname +
         "?quiz=" +
-        encodeURIComponent(quizId)
+        encodeURIComponent(quizId) +
+        (editMode ? "&edit=1" : "")
     );
 
 }
@@ -10384,6 +11080,31 @@ async function loadOwnProfileSocialStats() {
 
 
 /* =========================
+   DISCORD IDENTITY LINK
+========================= */
+
+async function syncDiscordIdentity(user) {
+    try {
+        const identities = user?.identities || [];
+        const discordIdentity = identities.find(identity => identity.provider === "discord");
+        const discordUserId =
+            discordIdentity?.identity_data?.sub ||
+            discordIdentity?.identity_data?.user_id ||
+            discordIdentity?.identity_data?.id ||
+            "";
+
+        if (!discordUserId) return;
+
+        await supabaseClient
+            .from("profiles")
+            .update({ discord_user_id: String(discordUserId) })
+            .eq("id", user.id);
+    } catch (error) {
+        console.warn("Discord identity sync skipped:", error);
+    }
+}
+
+/* =========================
    PROFILE DATABASE
 ========================= */
 
@@ -10414,6 +11135,8 @@ async function handleUserProfile() {
 
     }
 
+
+    await syncDiscordIdentity(user);
 
     /*
        IMPORTANT:
@@ -10693,16 +11416,10 @@ function renderProfileQuizList() {
                         font-size:12px;
                     ">
 
-                    ${escapeHTML(
-                        quiz.quiz_id ||
-                        ""
-                    )}
-
+                    Quiz ID: <strong style="color:#fff;">#${escapeHTML(quiz.quiz_number ?? "—")}</strong>
+                    ${quiz.quiz_id ? ` • Room ID: ${escapeHTML(quiz.quiz_id)}` : ""}
                     •
-
-                    ${
-                        quiz.questions.length
-                    }
+                    ${quiz.questions.length}
                     question(s)
 
                 </p>
@@ -13026,6 +13743,336 @@ async function checkAdminStatus() {
    ADMIN PANEL
 ========================= */
 
+async function loadAdminQuizzes() {
+
+    const list =
+        document.getElementById("adminQuizList");
+
+    if (!list || !isCurrentUserAdmin) return;
+
+    list.innerHTML =
+        '<div class="empty">Loading quizzes...</div>';
+
+    const {
+        data: quizRows,
+        error
+    } =
+        await supabaseClient
+            .from("quizzes")
+            .select(
+                "id,quiz_id,title,description,questions,creator_id,created_at,updated_at"
+            )
+            .order(
+                "created_at",
+                { ascending: false }
+            );
+
+    if (error) {
+        console.error(
+            "Admin quizzes error:",
+            error
+        );
+        list.innerHTML =
+            '<div class="empty">Unable to load quizzes.</div>';
+        return;
+    }
+
+    const rows =
+        quizRows || [];
+
+    if (!rows.length) {
+        list.innerHTML =
+            '<div class="empty">No quizzes have been created yet.</div>';
+        return;
+    }
+
+    const creatorIds = [
+        ...new Set(
+            rows
+                .map(row => row.creator_id)
+                .filter(Boolean)
+                .map(String)
+        )
+    ];
+
+    let profileMap =
+        new Map();
+
+    if (creatorIds.length) {
+
+        const {
+            data: creators
+        } =
+            await supabaseClient
+                .from("profiles")
+                .select(
+                    "id,display_name,user_id"
+                )
+                .in(
+                    "id",
+                    creatorIds
+                );
+
+        profileMap =
+            new Map(
+                (creators || []).map(
+                    profile => [
+                        String(profile.id),
+                        profile
+                    ]
+                )
+            );
+    }
+
+    list.innerHTML =
+        rows.map(row => {
+
+            const creator =
+                profileMap.get(
+                    String(row.creator_id)
+                );
+
+            const questions =
+                Array.isArray(row.questions)
+                    ? row.questions
+                    : (
+                        Array.isArray(row.questions?.items)
+                            ? row.questions.items
+                            : []
+                    );
+
+            return `
+                <div
+                    class="admin-user-item"
+                    style="align-items:center;">
+
+                    <div class="admin-user-main">
+                        <div class="admin-user-text">
+                            <div class="admin-user-name">
+                                ${escapeHTML(
+                                    row.title ||
+                                    "Untitled Quiz"
+                                )}
+                            </div>
+
+                            <div
+                                style="
+                                    color:#777d8a;
+                                    font-size:11px;
+                                    margin-top:3px;">
+
+                                Quiz ID:
+                                ${escapeHTML(
+                                    String(
+                                        row.quiz_id ||
+                                        row.id
+                                    )
+                                )}
+                                • ${questions.length} question(s)
+                                • Created by
+                                ${escapeHTML(
+                                    creator?.display_name ||
+                                    creator?.user_id ||
+                                    "Unknown player"
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        class="admin-view-btn"
+                        type="button"
+                        onclick='viewAdminQuiz(${JSON.stringify(row.id)})'>
+                        View Quiz
+                    </button>
+                </div>
+            `;
+        }).join("");
+}
+
+
+async function viewAdminQuiz(
+    quizId
+) {
+
+    if (!isCurrentUserAdmin) {
+        alert(
+            "Admin access required."
+        );
+        return;
+    }
+
+    const {
+        data: quiz,
+        error
+    } =
+        await supabaseClient
+            .from("quizzes")
+            .select(
+                "id,quiz_id,title,description,questions,creator_id,created_at,updated_at"
+            )
+            .eq(
+                "id",
+                quizId
+            )
+            .maybeSingle();
+
+    if (error || !quiz) {
+        alert(
+            "Unable to load this quiz."
+        );
+        return;
+    }
+
+    const title =
+        document.getElementById(
+            "adminQuizViewTitle"
+        );
+
+    const meta =
+        document.getElementById(
+            "adminQuizViewMeta"
+        );
+
+    const content =
+        document.getElementById(
+            "adminQuizViewContent"
+        );
+
+    const questions =
+        Array.isArray(quiz.questions)
+            ? quiz.questions
+            : (
+                Array.isArray(quiz.questions?.items)
+                    ? quiz.questions.items
+                    : []
+            );
+
+    if (title) {
+        title.textContent =
+            quiz.title ||
+            "Untitled Quiz";
+    }
+
+    if (meta) {
+        meta.textContent =
+            `Quiz ID: ${quiz.quiz_id || quiz.id} • ${questions.length} question(s)`;
+    }
+
+    if (content) {
+
+        if (!questions.length) {
+            content.innerHTML =
+                '<div class="empty">This quiz has no questions.</div>';
+        } else {
+
+            content.innerHTML =
+                questions.map(
+                    (question, index) => {
+
+                        const options =
+                            Array.isArray(
+                                question.options
+                            )
+                                ? question.options
+                                : [];
+
+                        const correctIndex =
+                            Number(
+                                question.correct
+                            );
+
+                        const questionTime =
+                            Number(
+                                question.time ||
+                                question.timeLimit ||
+                                15
+                            );
+
+                        return `
+                            <div
+                                style="
+                                    padding:16px;
+                                    margin-bottom:10px;
+                                    border:1px solid rgba(255,255,255,.08);
+                                    border-radius:14px;
+                                    background:#10131a;">
+
+                                <div
+                                    style="
+                                        font-weight:700;
+                                        margin-bottom:10px;">
+
+                                    ${index + 1}.
+                                    ${escapeHTML(
+                                        question.question ||
+                                        "Untitled question"
+                                    )}
+                                </div>
+
+                                <div
+                                    style="
+                                        display:flex;
+                                        flex-direction:column;
+                                        gap:6px;">
+
+                                    ${options.map(
+                                        (
+                                            option,
+                                            optionIndex
+                                        ) => `
+                                            <div
+                                                style="
+                                                    padding:8px 10px;
+                                                    border-radius:9px;
+                                                    background:rgba(255,255,255,.03);
+                                                    color:${optionIndex === correctIndex
+                                                        ? "#d7dbe3"
+                                                        : "#8f95a2"};">
+
+                                                ${optionIndex === correctIndex ? "✓ " : ""}
+                                                ${escapeHTML(option)}
+                                            </div>
+                                        `
+                                    ).join("")}
+                                </div>
+
+                                <div
+                                    style="
+                                        margin-top:9px;
+                                        color:#777d8a;
+                                        font-size:11px;">
+
+                                    Time: ${questionTime}s
+                                    • Correct option:
+                                    ${
+                                        Number.isInteger(
+                                            correctIndex
+                                        ) &&
+                                        options[
+                                            correctIndex
+                                        ]
+                                            ? escapeHTML(
+                                                options[
+                                                    correctIndex
+                                                ]
+                                            )
+                                            : "Not set"
+                                    }
+                                </div>
+                            </div>
+                        `;
+                    }
+                ).join("");
+        }
+    }
+
+    openModal(
+        "adminQuizViewModal"
+    );
+}
+
+
 async function loadAdminLiveRooms() {
     const list = document.getElementById("adminLiveRoomList");
     if (!list || !isCurrentUserAdmin) return;
@@ -13140,6 +14187,7 @@ async function openAdminPanel() {
 
     showAdminUsers();
     await loadAdminLiveRooms();
+    await loadAdminQuizzes();
 
 
     openModal(
@@ -14747,5 +15795,321 @@ document.addEventListener(
 <script id="v44-room-password-eye-script">
 document.addEventListener("DOMContentLoaded",function(){const i=document.getElementById("createRoomPassword"),b=document.getElementById("createRoomPasswordToggle");if(!i||!b)return;b.addEventListener("click",function(){const show=i.type==="password";i.type=show?"text":"password";b.textContent=show?"🙈":"👁️";b.setAttribute("aria-label",show?"Hide password":"Show password");b.title=show?"Hide password":"Show password";});});
 </script>
+
+<style id="v46-live-quiz-layout">
+.quiz-live-modal-content { max-width: 1280px !important; width: min(96vw, 1280px); height: min(92vh, 820px); padding: 0 !important; overflow: hidden; }
+.quiz-live-header { padding: 16px 20px !important; flex: 0 0 auto; }
+.quiz-live-header-actions { display:flex; align-items:center; gap:8px; }
+.quiz-live-layout { display:grid; grid-template-columns: 220px minmax(0, 1fr) 280px; gap:12px; height:calc(100% - 70px); padding:0 12px 12px; min-height:0; }
+.quiz-live-side, .quiz-live-center { min-width:0; min-height:0; border:1px solid rgba(255,255,255,.08); background:#10131a; border-radius:14px; overflow:hidden; }
+.quiz-live-side { display:flex; flex-direction:column; padding:14px; }
+.quiz-live-side-title { font-weight:800; font-size:14px; margin-bottom:10px; flex:0 0 auto; }
+.quiz-live-ranking-list { overflow-y:auto; display:flex; flex-direction:column; gap:7px; min-height:0; }
+.quiz-live-rank-row { display:grid; grid-template-columns:30px 1fr auto; gap:7px; align-items:center; padding:9px; border-radius:10px; background:#171a22; border:1px solid rgba(255,255,255,.06); }
+.quiz-live-rank-number { font-weight:800; color:#aab0bb; }
+.quiz-live-rank-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; font-weight:700; }
+.quiz-live-rank-score { font-size:12px; font-weight:800; }
+.quiz-live-center { position:relative; overflow-y:auto; padding:18px; }
+.quiz-live-center #playContent { min-height:100%; }
+.quiz-live-chat-messages { flex:1; min-height:0; overflow-y:auto; display:flex; flex-direction:column; gap:7px; }
+.quiz-live-chat-message { background:#171a22; border-radius:10px; padding:8px 9px; }
+.quiz-live-chat-message strong { font-size:11px; }
+.quiz-live-chat-message p { margin:3px 0 0; color:#c4c8d1; font-size:12px; line-height:1.35; word-break:break-word; }
+.quiz-live-chat-form { display:flex; gap:6px; margin-top:8px; flex:0 0 auto; }
+.quiz-live-chat-form input { min-width:0; flex:1; }
+.quiz-live-chat-form button { background:#fff; color:#111; }
+.quiz-question-transition { display:none; position:absolute; inset:0; z-index:20; background:rgba(8,10,14,.94); align-items:center; justify-content:center; text-align:center; border-radius:14px; }
+.quiz-question-transition.show { display:flex; }
+.quiz-question-transition-card { padding:30px 40px; }
+.quiz-question-transition-label { color:#aab0bb; font-size:16px; margin-bottom:8px; }
+#quizQuestionTransitionNumber { font-size:82px; line-height:1; font-weight:900; }
+@media (max-width:760px) {
+  .quiz-live-modal-content { width:100vw; max-width:none !important; height:100dvh; max-height:none; border-radius:0 !important; }
+  .quiz-live-header { padding:11px 14px !important; }
+  .quiz-live-layout { grid-template-columns:1fr 1fr; grid-template-rows:minmax(0,1fr) minmax(0,1fr); height:calc(100% - 58px); gap:8px; padding:0 8px 8px; }
+  .quiz-live-center { grid-column:1 / -1; grid-row:1; padding:12px; }
+  .quiz-live-ranking-panel { grid-column:1; grid-row:2; padding:10px; }
+  .quiz-live-chat-panel { grid-column:2; grid-row:2; padding:10px; }
+  .quiz-live-side-title { font-size:12px; margin-bottom:7px; }
+  .quiz-live-rank-row { grid-template-columns:23px 1fr auto; padding:7px; }
+  .quiz-live-rank-name, .quiz-live-rank-score { font-size:11px; }
+  .quiz-live-chat-form { gap:4px; }
+  .quiz-live-chat-form input { font-size:12px; padding:8px; }
+  .quiz-live-chat-form button { font-size:11px; padding:8px 9px; }
+}
+</style>
+
+<style id="v52-live-chat-and-submitted-state-fix">
+/* Live quiz chat is always a real panel, not an empty/placeholder state. */
+.quiz-live-chat-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+}
+.quiz-live-chat-messages {
+    flex: 1 1 auto !important;
+    min-height: 90px !important;
+    overflow-y: auto !important;
+}
+.quiz-live-chat-form {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+.quiz-live-chat-form input,
+.quiz-live-chat-form button {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* After submitting, the whole question card becomes a clear waiting state. */
+.play-question.answer-submitted-state {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 34px 24px !important;
+    position: relative;
+    overflow: hidden;
+}
+.play-question.answer-submitted-state > h3,
+.play-question.answer-submitted-state > .answer-option {
+    display: none !important;
+}
+.play-question.answer-submitted-state .quiz-answer-submitted-card {
+    width: min(100%, 520px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+.quiz-answer-submitted-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.06);
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 8px;
+}
+.quiz-answer-submitted-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: #8f95a2;
+    font-weight: 800;
+}
+.quiz-answer-submitted-main {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.15;
+}
+.quiz-answer-submitted-sub {
+    font-size: 16px;
+    font-weight: 700;
+    color: #c7cbd4;
+}
+.quiz-answer-submitted-hint {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #8f95a2;
+}
+
+@media (max-width:760px) {
+    .play-question.answer-submitted-state {
+        min-height: 230px;
+        padding: 24px 16px !important;
+    }
+    .quiz-answer-submitted-main {
+        font-size: 20px;
+    }
+    .quiz-answer-submitted-sub {
+        font-size: 14px;
+    }
+}
+</style>
+
+
+<style id="v54-live-chat-always-on-final">
+#playModal .quiz-live-chat-panel {
+    display:flex !important;
+    flex-direction:column !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    min-height:0 !important;
+    height:100% !important;
+    overflow:hidden !important;
+}
+#playModal .quiz-live-chat-messages {
+    display:flex !important;
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    height:auto !important;
+    overflow-y:auto !important;
+}
+#playModal .quiz-live-chat-form {
+    display:flex !important;
+    flex:0 0 auto !important;
+    width:100% !important;
+    min-height:44px !important;
+    margin-top:8px !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    z-index:30 !important;
+}
+#playModal .quiz-live-chat-form input {
+    display:block !important;
+    flex:1 1 auto !important;
+    min-width:0 !important;
+    width:0 !important;
+    visibility:visible !important;
+    opacity:1 !important;
+}
+#playModal .quiz-live-chat-form button {
+    display:inline-flex !important;
+    flex:0 0 auto !important;
+    align-items:center !important;
+    justify-content:center !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    cursor:pointer !important;
+}
+</style>
+
+
+<style id="v55-live-chat-hard-fix">
+#playModal .quiz-live-chat-panel {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    padding-bottom: 10px !important;
+}
+#playModal .quiz-live-chat-panel .quiz-live-chat-messages {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 0 !important;
+    overflow-y: auto !important;
+    padding: 2px 2px 4px !important;
+}
+#playModal .quiz-live-chat-panel .quiz-live-chat-form {
+    position: relative !important;
+    display: flex !important;
+    flex: 0 0 44px !important;
+    width: 100% !important;
+    min-height: 44px !important;
+    margin: 8px 0 0 !important;
+    gap: 6px !important;
+    z-index: 999 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+#playModal .quiz-live-chat-panel .quiz-live-chat-form input {
+    display: block !important;
+    flex: 1 1 auto !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    box-sizing: border-box !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+#playModal .quiz-live-chat-panel .quiz-live-chat-form button {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    min-width: 62px !important;
+    height: 44px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+@media (max-width:760px) {
+    #playModal .quiz-live-chat-panel .quiz-live-chat-form {
+        flex-basis: 38px !important;
+        min-height: 38px !important;
+    }
+    #playModal .quiz-live-chat-panel .quiz-live-chat-form input,
+    #playModal .quiz-live-chat-panel .quiz-live-chat-form button {
+        height: 38px !important;
+    }
+    #playModal .quiz-live-chat-panel .quiz-live-chat-form button {
+        min-width: 52px !important;
+    }
+}
+</style>
+
+
+<style id="v56-live-chat-layout-final-fix">
+/* Root cause fix: the live modal was using a fixed grid height while the
+   chat panel also had height:100% + padding/border. The composer was pushed
+   below the panel and clipped by overflow:hidden. Make the modal a real
+   vertical flex layout and make the chat panel border-box. */
+#playModal .quiz-live-modal-content {
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+}
+#playModal .quiz-live-header,
+#playModal .quiz-live-control-strip {
+    flex: 0 0 auto !important;
+}
+#playModal .quiz-live-layout {
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+}
+#playModal .quiz-live-side.quiz-live-chat-panel {
+    box-sizing: border-box !important;
+    height: auto !important;
+    min-height: 0 !important;
+}
+#playModal .quiz-live-chat-panel .quiz-live-chat-messages {
+    min-height: 0 !important;
+    height: auto !important;
+    flex: 1 1 auto !important;
+}
+#playModal .quiz-live-chat-panel .quiz-live-chat-form {
+    box-sizing: border-box !important;
+    flex: 0 0 44px !important;
+    min-height: 44px !important;
+    margin-bottom: 0 !important;
+}
+@media (max-width:760px) {
+    #playModal .quiz-live-layout {
+        height: auto !important;
+        flex: 1 1 auto !important;
+    }
+    #playModal .quiz-live-chat-panel .quiz-live-chat-form {
+        flex-basis: 38px !important;
+        min-height: 38px !important;
+    }
+}
+</style>
+
+
+<script>
+if (typeof window.openAdminHistoryForQuiz !== "function") {
+    window.openAdminHistoryForQuiz = window.openPublicQuizHistory;
+}
+</script>
+
 </body>
 </html>
