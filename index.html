@@ -6154,8 +6154,7 @@ async function saveQuiz() {
                     questions: questionData,
                     updated_at: new Date().toISOString()
                 })
-                .eq("id", editingQuizId)
-                .eq("creator_id", currentProfile.id);
+                .eq("id", editingQuizId);
 
         error = result.error;
 
@@ -6464,13 +6463,12 @@ async function editQuiz(id) {
                 .select("*")
 
                 .eq(
-                    "id",
-                    id
-                )
-
-                .eq(
-                    "creator_id",
-                    currentProfile.id
+                    /^\d+$/.test(String(id))
+                        ? "quiz_number"
+                        : "id",
+                    /^\d+$/.test(String(id))
+                        ? Number(id)
+                        : id
                 )
 
                 .maybeSingle();
@@ -6683,7 +6681,7 @@ async function openQuizFromUrl() {
         document.title,
         window.location.pathname
     );
-}    
+}
 
 
 /* =========================
@@ -10609,26 +10607,37 @@ function getAuthRedirectUrl() {
         getPendingSharedQuizId();
 
     const params = new URLSearchParams(window.location.search);
-    const editMode = params.get("edit") === "1";
+    const editId = params.get("edit");
 
-    if (!quizId) {
+    if (quizId) {
+
+        sessionStorage.setItem(
+            "pendingSharedQuizId",
+            quizId
+        );
+
         return (
             window.location.origin +
-            window.location.pathname
+            window.location.pathname +
+            "?quiz=" +
+            encodeURIComponent(quizId) +
+            (editId ? "&edit=" + encodeURIComponent(editId) : "")
+        );
+
+    }
+
+    if (editId) {
+        return (
+            window.location.origin +
+            window.location.pathname +
+            "?edit=" +
+            encodeURIComponent(editId)
         );
     }
 
-    sessionStorage.setItem(
-        "pendingSharedQuizId",
-        quizId
-    );
-
     return (
         window.location.origin +
-        window.location.pathname +
-        "?quiz=" +
-        encodeURIComponent(quizId) +
-        (editMode ? "&edit=1" : "")
+        window.location.pathname
     );
 
 }
