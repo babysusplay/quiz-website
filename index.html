@@ -1380,6 +1380,129 @@ textarea {
 .social-list-main small { color:#8f95a2; margin-top:3px; }
 .social-system-message { margin:10px auto; max-width:90%; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); color:#b7bbc5; text-align:center; font-size:12px; }
 
+
+/* =========================
+   MOBILE HEADER / NAV
+========================= */
+.mobile-menu-btn {
+    display: none;
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 9px 11px;
+    font-size: 18px;
+    line-height: 1;
+}
+.mobile-nav-panel {
+    display: none;
+}
+@media (max-width: 760px) {
+    header {
+        padding: 12px 16px;
+        gap: 10px;
+        position: relative;
+    }
+    .logo { font-size: 20px; }
+    header nav { display: none; }
+    .account-area {
+        margin-left: auto;
+        gap: 7px;
+        flex-wrap: nowrap;
+    }
+    .account-area > .header-action-btn { display: none !important; }
+    .account-area > .login-btn { display: none !important; }
+    .account-area > .profile-btn {
+        display: flex !important;
+        padding: 5px;
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+    }
+    .account-area > .profile-btn #profileName,
+    .account-area > .profile-btn .profile-arrow { display: none; }
+    .mobile-menu-btn { display: block; }
+    .mobile-nav-panel {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 12px;
+        right: 12px;
+        z-index: 1200;
+        background: #171a22;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 14px;
+        padding: 8px;
+        box-shadow: 0 18px 40px rgba(0,0,0,.4);
+    }
+    .mobile-nav-panel.open { display: block; }
+    .mobile-nav-panel a,
+    .mobile-nav-panel button {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 12px 13px;
+        margin: 2px 0;
+        border-radius: 9px;
+        background: transparent;
+        color: #fff;
+        text-decoration: none;
+        font-size: 14px;
+        border: 0;
+        text-align: left;
+    }
+    .mobile-nav-panel a:hover,
+    .mobile-nav-panel button:hover { background: rgba(255,255,255,.07); }
+    .mobile-nav-divider {
+        height: 1px;
+        background: rgba(255,255,255,.08);
+        margin: 6px 4px;
+    }
+    .mobile-social-row { position: relative; }
+    .mobile-social-badge {
+        margin-left: auto;
+        min-width: 19px;
+        height: 19px;
+        padding: 0 5px;
+        border-radius: 999px;
+        background: #ef4444;
+        color: #fff;
+        font-size: 10px;
+        line-height: 19px;
+        text-align: center;
+        font-weight: 800;
+        display: none;
+    }
+    .mobile-social-badge.show { display: inline-block; }
+    .hero {
+        width: calc(100% - 24px);
+        margin: 24px auto;
+        min-height: 360px;
+        padding: 30px 22px;
+        border-radius: 18px;
+    }
+    .hero-buttons { flex-wrap: wrap; }
+    .hero-buttons button { flex: 1 1 140px; }
+}
+
+
+/* MOBILE HEADER V2 - compact primary actions */
+@media (max-width:650px){
+  header{padding:10px 12px !important; gap:8px !important;}
+  header .logo{font-size:18px !important; margin-right:auto !important;}
+  header nav{display:none !important;}
+  .account-area{display:flex !important; align-items:center !important; flex-wrap:nowrap !important; gap:7px !important; margin-left:auto !important;}
+  .account-area .header-action-btn{display:inline-flex !important; align-items:center !important; justify-content:center !important; min-width:38px !important; height:36px !important; padding:0 9px !important; border-radius:10px !important; font-size:0 !important; white-space:nowrap !important;}
+  .account-area .header-action-btn[onclick*="openJoinRoomModal"]{font-size:11px !important; padding:0 11px !important; min-width:auto !important; font-weight:700 !important;}
+  .account-area .header-action-btn[onclick*="openPlayerSearch"]::before{content:"🔎"; font-size:17px !important;}
+  .account-area .header-action-btn[onclick*="openGlobalLeaderboard"]::before{content:"🏆"; font-size:17px !important;}
+  .account-area .social-header-btn{font-size:0 !important; position:relative !important;}
+  .account-area .social-header-btn::before{content:"👥"; font-size:17px !important;}
+  .account-area .profile-header-btn{font-size:0 !important;}
+  .account-area .profile-header-btn::before{content:"👤"; font-size:17px !important;}
+  .account-area .mobile-menu-btn{display:inline-flex !important;}
+}
+@media (min-width:651px){.mobile-menu-btn{display:none !important;}}
 </style>
 </head>
 
@@ -1390,6 +1513,15 @@ textarea {
     <div class="logo">
         Quiz
     </div>
+
+    <button
+        class="mobile-menu-btn"
+        id="mobileMenuButton"
+        type="button"
+        aria-label="Open menu"
+        onclick="toggleMobileMenu()">
+        ☰
+    </button>
 
     <nav>
 
@@ -1405,11 +1537,26 @@ textarea {
             Create
         </a>
 
-        <a href="#about" onclick="goAbout(); return false;">
+        <a href="#about" onclick="goAbout(); closeMobileMenu(); return false;">
             About
         </a>
 
     </nav>
+
+    <div class="mobile-nav-panel" id="mobileNavPanel">
+        <a href="#" onclick="goHome(); closeMobileMenu(); return false;">🏠 Home</a>
+        <a href="#" onclick="openQuizLibrary(); closeMobileMenu(); return false;">📚 My Quizzes</a>
+        <a href="#" onclick="openCreateQuiz(); closeMobileMenu(); return false;">➕ Create</a>
+        <a href="#about" onclick="goAbout(); closeMobileMenu(); return false;">ℹ️ About</a>
+        <div class="mobile-nav-divider"></div>
+        <button type="button" onclick="openGlobalLeaderboard(); closeMobileMenu();">🏆 Leaderboard</button>
+        <button type="button" onclick="openJoinRoomModal(); closeMobileMenu();">🚪 Join Room</button>
+        <button type="button" onclick="openPlayerSearch(); closeMobileMenu();">🔎 Search Players</button>
+        <button type="button" class="mobile-social-row" onclick="openSocialCenter(); closeMobileMenu();">
+            👥 Social
+            <span id="mobileSocialNotificationBadge" class="mobile-social-badge">0</span>
+        </button>
+    </div>
 
     <div class="account-area">
 
@@ -7433,6 +7580,17 @@ function closeProfileMenu() {
 
 }
 
+
+function toggleMobileMenu() {
+    const panel = document.getElementById("mobileNavPanel");
+    if (!panel) return;
+    panel.classList.toggle("open");
+}
+
+function closeMobileMenu() {
+    const panel = document.getElementById("mobileNavPanel");
+    if (panel) panel.classList.remove("open");
+}
 
 function toggleProfileMenu() {
 
