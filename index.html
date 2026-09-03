@@ -2008,6 +2008,61 @@ header .home-logo {
 }
 </style>
 
+
+<style id="v22-chat-composer-fixed">
+/* Keep the attachment control away from the Send button. */
+.chat-composer {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto auto !important;
+    align-items: end !important;
+    gap: 8px !important;
+}
+
+.chat-composer #directChatInput {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.chat-composer .chat-image-btn {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: end !important;
+    margin: 0 !important;
+}
+
+.chat-composer .chat-send-btn {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    align-self: end !important;
+    margin: 0 !important;
+}
+
+/* On narrow phones, keep all three controls usable without overlap. */
+@media (max-width: 650px) {
+    .chat-composer {
+        grid-template-columns: minmax(0, 1fr) 40px auto !important;
+        gap: 6px !important;
+        width: 100% !important;
+    }
+
+    .chat-composer #directChatInput {
+        min-height: 64px !important;
+    }
+
+    .chat-composer .chat-image-btn {
+        width: 40px !important;
+        min-width: 40px !important;
+    }
+
+    .chat-composer .chat-send-btn {
+        min-width: 62px !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+}
+</style>
+
 </head>
 
 <body>
