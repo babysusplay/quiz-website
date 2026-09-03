@@ -918,6 +918,99 @@ textarea {
 }
 
 /* =========================
+   QUIZ SETTINGS & TIMERS
+========================= */
+
+.quiz-settings {
+    background: #10131a;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 15px;
+    padding: 18px;
+    margin-top: 20px;
+}
+
+.quiz-settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.question-settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.timer-bar-wrap {
+    margin: 10px 0 15px;
+}
+
+.timer-label {
+    display: flex;
+    justify-content: space-between;
+    color: #9da3b0;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.timer-bar {
+    width: 100%;
+    height: 7px;
+    background: #242833;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.timer-bar-fill {
+    height: 100%;
+    width: 100%;
+    background: white;
+    transition: width .1s linear;
+}
+
+.share-btn {
+    background: rgba(255,255,255,.08);
+    color: white;
+}
+
+.result-summary {
+    background: #10131a;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+.result-summary h3 {
+    font-size: 25px;
+    margin-bottom: 14px;
+}
+
+.result-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.result-summary-box {
+    background: #171a22;
+    border-radius: 10px;
+    padding: 13px;
+}
+
+.result-summary-box strong {
+    display: block;
+    font-size: 22px;
+}
+
+.result-summary-box span {
+    color: #8f95a2;
+    font-size: 11px;
+}
+
+/* =========================
    MOBILE
 ========================= */
 
@@ -973,6 +1066,12 @@ textarea {
     }
 
     .options-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quiz-settings-grid,
+    .question-settings-grid,
+    .result-summary-grid {
         grid-template-columns: 1fr;
     }
 
@@ -1602,7 +1701,38 @@ textarea {
         <div class="form-group">
 
             <label>
-                Avatar URL
+                Profile Picture
+            </label>
+
+            <input
+                type="file"
+                id="editAvatarFile"
+                accept="image/jpeg,image/png,image/webp,image/gif">
+
+            <div style="margin-top:10px;">
+
+                <img
+                    id="editAvatarPreview"
+                    src=""
+                    alt="Avatar preview"
+                    style="
+                        display:none;
+                        width:90px;
+                        height:90px;
+                        object-fit:cover;
+                        border-radius:50%;
+                        border:1px solid #ccc;
+                    ">
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Or Avatar URL
             </label>
 
             <input
@@ -1769,6 +1899,54 @@ textarea {
         </div>
 
 
+        <div class="quiz-settings">
+
+            <h3 style="margin-bottom:12px;">
+                Quiz Settings
+            </h3>
+
+            <p style="color:#8f95a2; font-size:12px; margin-bottom:14px;">
+                These are the default settings. You can override them for individual questions below.
+            </p>
+
+            <div class="quiz-settings-grid">
+
+                <div class="form-group" style="margin-bottom:0;">
+
+                    <label>
+                        Default Question Time (seconds)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="quizDefaultTime"
+                        min="1"
+                        max="600"
+                        value="10">
+
+                </div>
+
+
+                <div class="form-group" style="margin-bottom:0;">
+
+                    <label>
+                        Default Points
+                    </label>
+
+                    <input
+                        type="number"
+                        id="quizDefaultPoints"
+                        min="1"
+                        max="1000000"
+                        value="1000">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
         <div id="questionsContainer"></div>
 
 
@@ -1853,6 +2031,38 @@ textarea {
 
 
         <div id="playContent"></div>
+
+    </div>
+
+</div>
+
+
+<!-- QUIZ RESULT -->
+
+<div
+    class="modal"
+    id="resultModal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>
+                Quiz Result
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeModal('resultModal')">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <div id="resultContent"></div>
 
     </div>
 
@@ -1984,6 +2194,14 @@ let currentQuestionIndex = 0;
 
 let currentScore = 0;
 
+let questionTimer = null;
+
+let questionStartedAt = 0;
+
+let questionTimeRemaining = 0;
+
+let answerSubmitted = false;
+
 let participants = JSON.parse(
     localStorage.getItem("quizParticipants") || "[]"
 );
@@ -2025,6 +2243,48 @@ function closeModal(id) {
 
 function quizFromDatabase(row) {
 
+    const rawQuestions =
+        row.questions;
+
+
+    let settings = {
+
+        defaultTime: 10,
+
+        defaultPoints: 1000
+
+    };
+
+
+    let questions = [];
+
+
+    if (
+        rawQuestions &&
+        !Array.isArray(rawQuestions) &&
+        Array.isArray(rawQuestions.items)
+    ) {
+
+        questions =
+            rawQuestions.items;
+
+        settings = {
+
+            ...settings,
+
+            ...(rawQuestions.settings || {})
+
+        };
+
+    } else if (
+        Array.isArray(rawQuestions)
+    ) {
+
+        questions = rawQuestions;
+
+    }
+
+
     return {
 
         id: row.id,
@@ -2036,9 +2296,10 @@ function quizFromDatabase(row) {
         description: row.description || "",
 
         questions:
-            Array.isArray(row.questions)
-                ? row.questions
-                : [],
+            questions,
+
+        settings:
+            settings,
 
         creator_id: row.creator_id,
 
@@ -2165,8 +2426,20 @@ async function migrateLocalQuizzesToSupabase() {
                         quiz.description ||
                         "",
 
-                    questions:
-                        quiz.questions
+                    questions: {
+
+                        settings: {
+
+                            defaultTime: 10,
+
+                            defaultPoints: 1000
+
+                        },
+
+                        items:
+                            quiz.questions
+
+                    }
 
                 })
             );
@@ -2245,21 +2518,41 @@ function openCreateQuiz() {
     ).textContent =
         "Create Quiz";
 
-
     document.getElementById(
         "quizName"
     ).value = "";
-
 
     document.getElementById(
         "quizDescription"
     ).value = "";
 
+    const defaultTime =
+        document.getElementById(
+            "quizDefaultTime"
+        );
+
+    const defaultPoints =
+        document.getElementById(
+            "quizDefaultPoints"
+        );
+
+    if (defaultTime) {
+
+        defaultTime.value =
+            "10";
+
+    }
+
+    if (defaultPoints) {
+
+        defaultPoints.value =
+            "1000";
+
+    }
 
     document.getElementById(
         "questionsContainer"
     ).innerHTML = "";
-
 
     questionCounter = 0;
 
@@ -2274,31 +2567,28 @@ function openCreateQuiz() {
 
 /* =========================
    ADD QUESTION
+========================= *//* =========================
+   ADD QUESTION
 ========================= */
 
 function addQuestion(data = null) {
 
     questionCounter++;
 
-
     const id =
         Date.now() +
         Math.random();
-
 
     const box =
         document.createElement(
             "div"
         );
 
-
     box.className =
         "question-box";
 
-
     box.dataset.id =
         id;
-
 
     box.innerHTML = `
 
@@ -2426,6 +2716,42 @@ function addQuestion(data = null) {
 
         </div>
 
+
+        <div class="question-settings-grid">
+
+            <div class="form-group" style="margin-bottom:0;">
+
+                <label>
+                    Question Time Override (seconds)
+                </label>
+
+                <input
+                    type="number"
+                    class="question-time"
+                    min="1"
+                    max="600"
+                    placeholder="Use quiz default">
+
+            </div>
+
+
+            <div class="form-group" style="margin-bottom:0;">
+
+                <label>
+                    Question Points Override
+                </label>
+
+                <input
+                    type="number"
+                    class="question-points"
+                    min="1"
+                    max="1000000"
+                    placeholder="Use quiz default">
+
+            </div>
+
+        </div>
+
     `;
 
 
@@ -2443,12 +2769,10 @@ function addQuestion(data = null) {
         ).value =
             data.question || "";
 
-
         const optionInputs =
             box.querySelectorAll(
                 ".option"
             );
-
 
         if (
             Array.isArray(
@@ -2477,7 +2801,6 @@ function addQuestion(data = null) {
 
         }
 
-
         box.querySelector(
             ".correct-answer"
         ).value =
@@ -2485,8 +2808,31 @@ function addQuestion(data = null) {
                 data.correct
             );
 
-    }
+        if (
+            data.timeLimit !== undefined &&
+            data.timeLimit !== null
+        ) {
 
+            box.querySelector(
+                ".question-time"
+            ).value =
+                data.timeLimit;
+
+        }
+
+        if (
+            data.points !== undefined &&
+            data.points !== null
+        ) {
+
+            box.querySelector(
+                ".question-points"
+            ).value =
+                data.points;
+
+        }
+
+    }
 
     updateQuestionNumbers();
 
@@ -2494,6 +2840,8 @@ function addQuestion(data = null) {
 
 
 /* =========================
+   DELETE QUESTION
+========================= *//* =========================
    DELETE QUESTION
 ========================= */
 
@@ -2642,6 +2990,28 @@ async function saveQuiz() {
         .trim();
 
 
+    const defaultTime =
+        Math.max(
+            1,
+            Number(
+                document.getElementById(
+                    "quizDefaultTime"
+                ).value
+            ) || 10
+        );
+
+
+    const defaultPoints =
+        Math.max(
+            1,
+            Number(
+                document.getElementById(
+                    "quizDefaultPoints"
+                ).value
+            ) || 1000
+        );
+
+
     const questionBoxes =
         document.querySelectorAll(
             ".question-box"
@@ -2722,17 +3092,32 @@ async function saveQuiz() {
             ).value;
 
 
+        const timeInput =
+            box.querySelector(
+                ".question-time"
+            );
+
+
+        const pointsInput =
+            box.querySelector(
+                ".question-points"
+            );
+
+
+        const timeValue =
+            timeInput?.value.trim();
+
+
+        const pointsValue =
+            pointsInput?.value.trim();
+
+
         if (
-
             !question ||
-
             options.some(
-                option =>
-                    !option
+                option => !option
             ) ||
-
             correct === ""
-
         ) {
 
             alert(
@@ -2744,7 +3129,7 @@ async function saveQuiz() {
         }
 
 
-        questions.push({
+        const questionData = {
 
             question:
                 question,
@@ -2755,7 +3140,36 @@ async function saveQuiz() {
             correct:
                 Number(correct)
 
-        });
+        };
+
+
+        if (timeValue) {
+
+            questionData.timeLimit =
+                Math.max(
+                    1,
+                    Number(timeValue) ||
+                    defaultTime
+                );
+
+        }
+
+
+        if (pointsValue) {
+
+            questionData.points =
+                Math.max(
+                    1,
+                    Number(pointsValue) ||
+                    defaultPoints
+                );
+
+        }
+
+
+        questions.push(
+            questionData
+        );
 
     }
 
@@ -2771,6 +3185,24 @@ async function saveQuiz() {
         return;
 
     }
+
+
+    const questionData = {
+
+        settings: {
+
+            defaultTime:
+                defaultTime,
+
+            defaultPoints:
+                defaultPoints
+
+        },
+
+        items:
+            questions
+
+    };
 
 
     let error = null;
@@ -2794,7 +3226,7 @@ async function saveQuiz() {
                         description,
 
                     questions:
-                        questions,
+                        questionData,
 
                     updated_at:
                         new Date()
@@ -2835,7 +3267,7 @@ async function saveQuiz() {
                         description,
 
                     questions:
-                        questions
+                        questionData
 
                 })
 
@@ -2875,14 +3307,14 @@ async function saveQuiz() {
     );
 
 
-    alert(
-
+    const savedQuizMessage =
         editingQuizId
-
             ? "Quiz updated successfully!"
+            : "Quiz created successfully!";
 
-            : "Quiz created successfully!"
 
+    alert(
+        savedQuizMessage
     );
 
 
@@ -2892,6 +3324,8 @@ async function saveQuiz() {
 
 
 /* =========================
+   QUIZ LIBRARY
+========================= *//* =========================
    QUIZ LIBRARY
 ========================= */
 
@@ -3049,6 +3483,16 @@ function renderQuizList() {
 
 
                     <button
+                        class="share-btn"
+                        type="button"
+                        onclick='shareQuiz(${JSON.stringify(quiz.id)})'>
+
+                        Share
+
+                    </button>
+
+
+                    <button
                         class="edit-btn"
                         type="button"
                         data-quiz-id="${escapeHTML(
@@ -3197,6 +3641,36 @@ async function editQuiz(id) {
         "quizDescription"
     ).value =
         quiz.description || "";
+
+
+    const defaultTime =
+        document.getElementById(
+            "quizDefaultTime"
+        );
+
+
+    const defaultPoints =
+        document.getElementById(
+            "quizDefaultPoints"
+        );
+
+
+    if (defaultTime) {
+
+        defaultTime.value =
+            quiz.settings?.defaultTime ||
+            10;
+
+    }
+
+
+    if (defaultPoints) {
+
+        defaultPoints.value =
+            quiz.settings?.defaultPoints ||
+            1000;
+
+    }
 
 
     const container =
@@ -3352,34 +3826,272 @@ async function deleteQuiz(id) {
 
 
 /* =========================
-   PLAY QUIZ
+   SHARE QUIZ
 ========================= */
 
-function playQuiz(id) {
+async function shareQuiz(id) {
 
     if (!requireLogin()) return;
 
+    if (!id) {
 
-    const quiz =
-        quizzes.find(
-            q =>
-                q.id === id
+        alert(
+            "Unable to share this quiz."
         );
-
-
-    if (!quiz) {
 
         return;
 
     }
 
+    const shareUrl =
+        window.location.origin +
+        window.location.pathname +
+        "?quiz=" +
+        encodeURIComponent(
+            String(id)
+        );
+
+    const shareData = {
+
+        title:
+            "Play my quiz",
+
+        text:
+            "Play this quiz on BabySusPlay!",
+
+        url:
+            shareUrl
+
+    };
+
+    try {
+
+        if (
+            navigator.share
+        ) {
+
+            await navigator.share(
+                shareData
+            );
+
+            return;
+
+        }
+
+        if (
+            navigator.clipboard &&
+            window.isSecureContext
+        ) {
+
+            await navigator.clipboard.writeText(
+                shareUrl
+            );
+
+            alert(
+                "Quiz share link copied!"
+            );
+
+            return;
+
+        }
+
+    } catch (error) {
+
+        if (
+            error &&
+            error.name ===
+                "AbortError"
+        ) {
+
+            return;
+
+        }
+
+        console.error(
+            "Quiz share error:",
+            error
+        );
+
+    }
+
+    window.prompt(
+        "Copy this quiz link:",
+        shareUrl
+    );
+
+}
+
+
+/* =========================
+   OPEN SHARED QUIZ
+========================= */
+
+async function openSharedQuizFromUrl() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const sharedQuizId =
+        params.get(
+            "quiz"
+        );
+
+    if (!sharedQuizId) {
+
+        return;
+
+    }
+
+    if (!currentProfile) {
+
+        return;
+
+    }
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("quizzes")
+                .select("*")
+                .eq(
+                    "id",
+                    sharedQuizId
+                )
+                .maybeSingle();
+
+        if (
+            error
+        ) {
+
+            console.error(
+                "Shared quiz load error:",
+                error
+            );
+
+            alert(
+                "Unable to load this shared quiz: " +
+                error.message
+            );
+
+            return;
+
+        }
+
+        if (!data) {
+
+            alert(
+                "This quiz could not be found or you do not have access to it."
+            );
+
+            return;
+
+        }
+
+        const sharedQuiz =
+            quizFromDatabase(
+                data
+            );
+
+        if (
+            !sharedQuiz.questions ||
+            sharedQuiz.questions.length === 0
+        ) {
+
+            alert(
+                "This quiz has no questions."
+            );
+
+            return;
+
+        }
+
+        window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+        );
+
+        await playQuizObject(
+            sharedQuiz
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Shared quiz error:",
+            error
+        );
+
+        alert(
+            "Unable to open the shared quiz."
+        );
+
+    }
+
+}
+
+
+/* =========================
+   PLAY QUIZ
+========================= */
+
+async function playQuiz(id) {
+
+    if (!requireLogin()) return;
+
+
+    let quiz =
+        quizzes.find(
+            q =>
+                String(q.id) ===
+                String(id)
+        );
+
+
+    if (!quiz) {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("quizzes")
+                .select("*")
+                .eq(
+                    "id",
+                    id
+                )
+                .maybeSingle();
+
+
+        if (error || !data) {
+
+            alert(
+                "Unable to load this quiz."
+            );
+
+            return;
+
+        }
+
+
+        quiz =
+            quizFromDatabase(
+                data
+            );
+
+    }
+
 
     if (
-
         !quiz.questions ||
-
         quiz.questions.length === 0
-
     ) {
 
         alert(
@@ -3396,16 +4108,24 @@ function playQuiz(id) {
     );
 
 
+    closeModal(
+        "resultModal"
+    );
+
+
     currentQuiz =
         quiz;
-
 
     currentQuestionIndex =
         0;
 
-
     currentScore =
         0;
+
+    questionTimer = null;
+    questionStartedAt = 0;
+    questionTimeRemaining = 0;
+    answerSubmitted = false;
 
 
     document.getElementById(
@@ -3424,7 +4144,227 @@ function playQuiz(id) {
 }
 
 
+async function playQuizObject(quiz) {
+
+    if (!quiz) return;
+
+
+    if (
+        !quiz.questions ||
+        quiz.questions.length === 0
+    ) {
+
+        alert(
+            "This quiz has no questions."
+        );
+
+        return;
+
+    }
+
+
+    closeModal(
+        "resultModal"
+    );
+
+
+    currentQuiz =
+        quiz;
+
+    currentQuestionIndex =
+        0;
+
+    currentScore =
+        0;
+
+    questionTimer = null;
+    questionStartedAt = 0;
+    questionTimeRemaining = 0;
+    answerSubmitted = false;
+
+
+    document.getElementById(
+        "playTitle"
+    ).textContent =
+        quiz.name;
+
+
+    showCurrentQuestion();
+
+
+    openModal(
+        "playModal"
+    );
+
+}
+
+
+function getQuestionTime(question) {
+
+    const value =
+        Number(
+            question?.timeLimit
+        );
+
+    if (
+        Number.isFinite(value) &&
+        value > 0
+    ) {
+
+        return value;
+
+    }
+
+    return Math.max(
+        1,
+        Number(
+            currentQuiz?.settings?.defaultTime
+        ) || 10
+    );
+
+}
+
+
+function getQuestionPoints(question) {
+
+    const value =
+        Number(
+            question?.points
+        );
+
+    if (
+        Number.isFinite(value) &&
+        value > 0
+    ) {
+
+        return value;
+
+    }
+
+    return Math.max(
+        1,
+        Number(
+            currentQuiz?.settings?.defaultPoints
+        ) || 1000
+    );
+
+}
+
+
+function stopQuestionTimer() {
+
+    if (questionTimer) {
+
+        clearInterval(
+            questionTimer
+        );
+
+        questionTimer =
+            null;
+
+    }
+
+}
+
+
+function startQuestionTimer() {
+
+    stopQuestionTimer();
+
+
+    const question =
+        currentQuiz?.questions[
+            currentQuestionIndex
+        ];
+
+    const timeLimit =
+        getQuestionTime(
+            question
+        );
+
+
+    questionStartedAt =
+        Date.now();
+
+    questionTimeRemaining =
+        timeLimit;
+
+
+    const timerText =
+        document.getElementById(
+            "questionTimerText"
+        );
+
+    const timerFill =
+        document.getElementById(
+            "questionTimerFill"
+        );
+
+
+    const updateTimer = () => {
+
+        const elapsed =
+            (Date.now() -
+                questionStartedAt) /
+            1000;
+
+        questionTimeRemaining =
+            Math.max(
+                0,
+                timeLimit - elapsed
+            );
+
+        if (timerText) {
+
+            timerText.textContent =
+                `${questionTimeRemaining.toFixed(1)}s`;
+
+        }
+
+        if (timerFill) {
+
+            timerFill.style.width =
+                `${Math.max(
+                    0,
+                    Math.min(
+                        100,
+                        (questionTimeRemaining /
+                            timeLimit) *
+                            100
+                    )
+                )}%`;
+
+        }
+
+        if (
+            questionTimeRemaining <= 0
+        ) {
+
+            stopQuestionTimer();
+
+            submitCurrentAnswer(
+                true
+            );
+
+        }
+
+    };
+
+
+    updateTimer();
+
+    questionTimer =
+        setInterval(
+            updateTimer,
+            100
+        );
+
+}
+
+
 /* =========================
+   SHOW ONE QUESTION
+========================= *//* =========================
    SHOW ONE QUESTION
 ========================= */
 
@@ -3435,6 +4375,12 @@ function showCurrentQuestion() {
         return;
 
     }
+
+
+    stopQuestionTimer();
+
+    answerSubmitted =
+        false;
 
 
     const content =
@@ -3453,15 +4399,25 @@ function showCurrentQuestion() {
         ];
 
 
+    const timeLimit =
+        getQuestionTime(
+            question
+        );
+
+
+    const points =
+        getQuestionPoints(
+            question
+        );
+
+
     const progress =
         document.createElement(
             "div"
         );
 
-
     progress.className =
         "play-progress";
-
 
     progress.textContent =
         `Question ${
@@ -3470,9 +4426,57 @@ function showCurrentQuestion() {
             currentQuiz.questions.length
         }`;
 
-
     content.appendChild(
         progress
+    );
+
+
+    const timerWrap =
+        document.createElement(
+            "div"
+        );
+
+    timerWrap.className =
+        "timer-bar-wrap";
+
+    timerWrap.innerHTML = `
+
+        <div class="timer-label">
+
+            <span>
+                Time • ${timeLimit}s
+            </span>
+
+            <span id="questionTimerText">
+                ${timeLimit.toFixed(1)}s
+            </span>
+
+        </div>
+
+        <div class="timer-bar">
+
+            <div
+                id="questionTimerFill"
+                class="timer-bar-fill">
+            </div>
+
+        </div>
+
+        <div
+            style="
+                color:#777d8a;
+                font-size:11px;
+                margin-top:6px;
+            ">
+
+            Correct answer • Up to ${points} points
+
+        </div>
+
+    `;
+
+    content.appendChild(
+        timerWrap
     );
 
 
@@ -3481,10 +4485,8 @@ function showCurrentQuestion() {
             "div"
         );
 
-
     box.className =
         "question-box play-question";
-
 
     box.innerHTML = `
 
@@ -3542,16 +4544,13 @@ function showCurrentQuestion() {
             "button"
         );
 
-
     submit.className =
         "next-btn";
 
 
     if (
-
         currentQuestionIndex ===
         currentQuiz.questions.length - 1
-
     ) {
 
         submit.textContent =
@@ -3566,21 +4565,46 @@ function showCurrentQuestion() {
 
 
     submit.onclick =
-        submitCurrentAnswer;
-
+        () =>
+            submitCurrentAnswer(
+                false
+            );
 
     content.appendChild(
         submit
     );
+
+
+    startQuestionTimer();
 
 }
 
 
 /* =========================
    SUBMIT ANSWER
+========================= *//* =========================
+   SUBMIT ANSWER
 ========================= */
 
-function submitCurrentAnswer() {
+async function submitCurrentAnswer(
+    timedOut = false
+) {
+
+    if (
+        answerSubmitted ||
+        !currentQuiz
+    ) {
+
+        return;
+
+    }
+
+
+    answerSubmitted =
+        true;
+
+    stopQuestionTimer();
+
 
     const selected =
         document.querySelector(
@@ -3588,7 +4612,15 @@ function submitCurrentAnswer() {
         );
 
 
-    if (!selected) {
+    if (
+        !selected &&
+        !timedOut
+    ) {
+
+        answerSubmitted =
+            false;
+
+        startQuestionTimer();
 
         alert(
             "Please select an answer."
@@ -3605,44 +4637,80 @@ function submitCurrentAnswer() {
         ];
 
 
+    const timeLimit =
+        getQuestionTime(
+            question
+        );
+
+
+    const elapsed =
+        questionStartedAt
+            ? Math.max(
+                0,
+                (Date.now() -
+                    questionStartedAt) /
+                    1000
+            )
+            : timeLimit;
+
+
+    const remaining =
+        Math.max(
+            0,
+            timeLimit - elapsed
+        );
+
+
+    let earnedPoints = 0;
+
+
     if (
-
+        selected &&
         Number(selected.value) ===
-        question.correct
-
+            Number(question.correct) &&
+        remaining > 0
     ) {
 
-        currentScore++;
+        const basePoints =
+            getQuestionPoints(
+                question
+            );
+
+        earnedPoints =
+            Math.round(
+                basePoints *
+                (remaining /
+                    timeLimit)
+            );
 
     }
+
+
+    currentScore +=
+        earnedPoints;
 
 
     currentQuestionIndex++;
 
 
     if (
-
         currentQuestionIndex >=
         currentQuiz.questions.length
-
     ) {
 
         const finalScore =
             currentScore;
 
+        const finishedQuiz =
+            currentQuiz;
 
         const totalQuestions =
-            currentQuiz.questions.length;
+            finishedQuiz.questions.length;
 
 
-        saveParticipantResult(
-            currentQuiz,
+        await saveParticipantResult(
+            finishedQuiz,
             finalScore
-        );
-
-
-        alert(
-            `Quiz completed!\n\nScore: ${finalScore}/${totalQuestions}`
         );
 
 
@@ -3654,14 +4722,21 @@ function submitCurrentAnswer() {
         currentQuiz =
             null;
 
-
         currentQuestionIndex =
             0;
-
 
         currentScore =
             0;
 
+        answerSubmitted =
+            false;
+
+
+        await showQuizResult(
+            finishedQuiz,
+            finalScore,
+            totalQuestions
+        );
 
         return;
 
@@ -3745,7 +4820,269 @@ async function saveParticipantResult(
 }
 
 
+async function showQuizResult(
+    quiz,
+    score,
+    totalQuestions
+) {
+
+    const resultContent =
+        document.getElementById(
+            "resultContent"
+        );
+
+    if (!resultContent) return;
+
+
+    resultContent.innerHTML = `
+
+        <div class="result-summary">
+
+            <h3>
+                🎉 Quiz Completed!
+            </h3>
+
+            <div class="result-summary-grid">
+
+                <div class="result-summary-box">
+
+                    <strong>
+                        ${score}
+                    </strong>
+
+                    <span>
+                        Your Score
+                    </span>
+
+                </div>
+
+                <div class="result-summary-box">
+
+                    <strong id="yourRankValue">
+                        —
+                    </strong>
+
+                    <span>
+                        Your Rank
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <h3 style="margin-bottom:10px;">
+            Leaderboard
+        </h3>
+
+        <div
+            id="resultLeaderboardList"
+            class="results-list">
+
+            <div class="empty">
+                Loading leaderboard...
+            </div>
+
+        </div>
+
+    `;
+
+
+    openModal(
+        "resultModal"
+    );
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("quiz_attempts")
+            .select("*")
+            .eq(
+                "quiz_id",
+                quiz.id
+            );
+
+
+    const list =
+        document.getElementById(
+            "resultLeaderboardList"
+        );
+
+    if (
+        error ||
+        !list
+    ) {
+
+        if (list) {
+
+            list.innerHTML =
+                '<div class="empty">Unable to load leaderboard.</div>';
+
+        }
+
+        return;
+
+    }
+
+
+    const bestByUser =
+        new Map();
+
+
+    (data || []).forEach(
+        entry => {
+
+            const key =
+                entry.user_id ||
+                entry.participant_user_id ||
+                entry.participant_name ||
+                String(
+                    Math.random()
+                );
+
+            const existing =
+                bestByUser.get(key);
+
+            if (
+                !existing ||
+                Number(entry.score || 0) >
+                    Number(existing.score || 0) ||
+                (
+                    Number(entry.score || 0) ===
+                        Number(existing.score || 0) &&
+                    new Date(
+                        entry.completed_at || 0
+                    ) >
+                        new Date(
+                            existing.completed_at || 0
+                        )
+                )
+            ) {
+
+                bestByUser.set(
+                    key,
+                    entry
+                );
+
+            }
+
+        }
+    );
+
+
+    const entries =
+        [...bestByUser.values()]
+            .sort(
+                (a, b) =>
+                    Number(b.score || 0) -
+                    Number(a.score || 0)
+            );
+
+
+    const currentUserId =
+        currentProfile?.id ||
+        "";
+
+    const rankIndex =
+        entries.findIndex(
+            entry =>
+                entry.user_id ===
+                currentUserId
+        );
+
+
+    const rankElement =
+        document.getElementById(
+            "yourRankValue"
+        );
+
+    if (rankElement) {
+
+        rankElement.textContent =
+            rankIndex >= 0
+                ? `#${rankIndex + 1}`
+                : "—";
+
+    }
+
+
+    if (
+        entries.length === 0
+    ) {
+
+        list.innerHTML =
+            '<div class="empty">No leaderboard entries yet.</div>';
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        entries.map(
+            (
+                entry,
+                index
+            ) => `
+
+            <div class="result-item">
+
+                <div class="result-row">
+
+                    <div class="rank-badge">
+                        ${index + 1}
+                    </div>
+
+                    <div class="result-main">
+
+                        <div class="result-name">
+
+                            ${escapeHTML(
+                                entry.participant_name ||
+                                "User"
+                            )}
+
+                        </div>
+
+                        <div class="result-meta">
+
+                            ${escapeHTML(
+                                entry.participant_user_id ||
+                                "USER"
+                            )}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="result-score">
+
+                    ${
+                        Number(
+                            entry.score ||
+                            0
+                        )
+                    }
+
+                </div>
+
+            </div>
+
+        `
+        ).join("");
+
+}
+
+
 /* =========================
+   RESULT QUIZ SELECT
+========================= *//* =========================
    RESULT QUIZ SELECT
 ========================= */
 
@@ -4029,7 +5366,6 @@ async function renderLeaderboard() {
             "leaderboardQuizSelect"
         );
 
-
     const list =
         document.getElementById(
             "leaderboardList"
@@ -4062,22 +5398,11 @@ async function renderLeaderboard() {
         error
     } =
         await supabaseClient
-
             .from("quiz_attempts")
-
             .select("*")
-
             .eq(
                 "quiz_id",
                 quizId
-            )
-
-            .order(
-                "score",
-                {
-                    ascending:
-                        false
-                }
             );
 
 
@@ -4088,60 +5413,67 @@ async function renderLeaderboard() {
             error
         );
 
-
         list.innerHTML =
             '<div class="empty">Unable to load leaderboard.</div>';
-
 
         return;
 
     }
 
 
-    const entries =
-        data || [];
+    const bestByUser =
+        new Map();
 
 
-    entries.sort(
-        (
-            a,
-            b
-        ) => {
+    (data || []).forEach(
+        entry => {
 
-            const percentageA =
-                a.total_questions
-                    ? a.score /
-                      a.total_questions
-                    : 0;
+            const key =
+                entry.user_id ||
+                entry.participant_user_id ||
+                entry.participant_name;
+
+            if (!key) return;
 
 
-            const percentageB =
-                b.total_questions
-                    ? b.score /
-                      b.total_questions
-                    : 0;
+            const existing =
+                bestByUser.get(key);
 
 
             if (
-                percentageB !==
-                percentageA
+                !existing ||
+                Number(entry.score || 0) >
+                    Number(existing.score || 0) ||
+                (
+                    Number(entry.score || 0) ===
+                        Number(existing.score || 0) &&
+                    new Date(
+                        entry.completed_at || 0
+                    ) >
+                        new Date(
+                            existing.completed_at || 0
+                        )
+                )
             ) {
 
-                return (
-                    percentageB -
-                    percentageA
+                bestByUser.set(
+                    key,
+                    entry
                 );
 
             }
 
-
-            return (
-                b.score -
-                a.score
-            );
-
         }
     );
+
+
+    const entries =
+        [...bestByUser.values()]
+            .sort(
+                (a, b) =>
+                    Number(b.score || 0) -
+                    Number(a.score || 0)
+            );
 
 
     if (
@@ -4168,11 +5500,7 @@ async function renderLeaderboard() {
                 <div class="result-row">
 
                     <div class="rank-badge">
-
-                        ${
-                            index + 1
-                        }
-
+                        ${index + 1}
                     </div>
 
                     <div class="result-main">
@@ -4201,11 +5529,11 @@ async function renderLeaderboard() {
 
                 <div class="result-score">
 
-                    ${
-                        entry.score
-                    }/${
-                        entry.total_questions
-                    }
+                    ${Number(
+                        entry.score ||
+                        0
+                    )}
+                    pts
 
                 </div>
 
@@ -4233,6 +5561,10 @@ function goHome() {
 
     closeModal(
         "playModal"
+    );
+
+    closeModal(
+        "resultModal"
     );
 
 
@@ -4263,6 +5595,10 @@ function goAbout() {
 
     closeModal(
         "playModal"
+    );
+
+    closeModal(
+        "resultModal"
     );
 
 
@@ -4922,6 +6258,9 @@ async function handleUserProfile() {
     renderProfileQuizList();
 
 
+    await openSharedQuizFromUrl();
+
+
     console.log(
         "Logged in User ID:",
         profile.user_id
@@ -5042,18 +6381,77 @@ function openEditProfile() {
     if (!currentProfile) return;
 
 
-    document.getElementById(
-        "editDisplayName"
-    ).value =
-        currentProfile.display_name ||
-        "";
+    const displayNameInput =
+        document.getElementById(
+            "editDisplayName"
+        );
 
 
-    document.getElementById(
-        "editAvatarUrl"
-    ).value =
-        currentProfile.avatar_url ||
-        "";
+    const avatarUrlInput =
+        document.getElementById(
+            "editAvatarUrl"
+        );
+
+
+    const avatarFileInput =
+        document.getElementById(
+            "editAvatarFile"
+        );
+
+
+    const avatarPreview =
+        document.getElementById(
+            "editAvatarPreview"
+        );
+
+
+    if (displayNameInput) {
+
+        displayNameInput.value =
+            currentProfile.display_name ||
+            "";
+
+    }
+
+
+    if (avatarUrlInput) {
+
+        avatarUrlInput.value =
+            currentProfile.avatar_url ||
+            "";
+
+    }
+
+
+    if (avatarFileInput) {
+
+        avatarFileInput.value =
+            "";
+
+    }
+
+
+    if (avatarPreview) {
+
+        if (currentProfile.avatar_url) {
+
+            avatarPreview.src =
+                currentProfile.avatar_url;
+
+            avatarPreview.style.display =
+                "block";
+
+        } else {
+
+            avatarPreview.src =
+                "";
+
+            avatarPreview.style.display =
+                "none";
+
+        }
+
+    }
 
 
     openModal(
@@ -5064,6 +6462,8 @@ function openEditProfile() {
 
 
 /* =========================
+   SAVE PROFILE
+========================= *//* =========================
    SAVE PROFILE
 ========================= */
 
@@ -5080,12 +6480,27 @@ async function saveProfile() {
         .trim();
 
 
-    const avatarUrl =
+    const avatarUrlInput =
         document.getElementById(
             "editAvatarUrl"
-        )
-        .value
-        .trim();
+        );
+
+
+    const avatarFileInput =
+        document.getElementById(
+            "editAvatarFile"
+        );
+
+
+    const avatarFile =
+        avatarFileInput?.files?.[0] ||
+        null;
+
+
+    const typedAvatarUrl =
+        avatarUrlInput
+            ? avatarUrlInput.value.trim()
+            : "";
 
 
     if (!displayName) {
@@ -5095,6 +6510,159 @@ async function saveProfile() {
         );
 
         return;
+
+    }
+
+
+    if (avatarFile) {
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "image/gif"
+        ];
+
+
+        if (
+            !allowedTypes.includes(
+                avatarFile.type
+            )
+        ) {
+
+            alert(
+                "Please select a JPG, PNG, WebP, or GIF image."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            avatarFile.size >
+            10 * 1024 * 1024
+        ) {
+
+            alert(
+                "Image size must be 10 MB or less."
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    let newAvatarUrl =
+        typedAvatarUrl;
+
+
+    if (avatarFile) {
+
+        const fileExtension =
+            avatarFile.name
+                .split(".")
+                .pop()
+                .toLowerCase();
+
+
+        const filePath =
+            currentProfile.id +
+            "/" +
+            Date.now() +
+            "." +
+            fileExtension;
+
+
+        const {
+            error: uploadError
+        } =
+            await supabaseClient
+                .storage
+                .from("avatars")
+                .upload(
+                    filePath,
+                    avatarFile,
+                    {
+                        upsert: false,
+                        contentType:
+                            avatarFile.type
+                    }
+                );
+
+
+        if (uploadError) {
+
+            alert(
+                "Avatar upload failed: " +
+                uploadError.message
+            );
+
+            return;
+
+        }
+
+
+        const {
+            data: publicUrlData
+        } =
+            supabaseClient
+                .storage
+                .from("avatars")
+                .getPublicUrl(
+                    filePath
+                );
+
+
+        newAvatarUrl =
+            publicUrlData.publicUrl;
+
+    }
+
+
+    const oldAvatarUrl =
+        currentProfile.avatar_url ||
+        "";
+
+
+    if (
+        oldAvatarUrl &&
+        newAvatarUrl !== oldAvatarUrl
+    ) {
+
+        const {
+            error: historyError
+        } =
+            await supabaseClient
+                .from("avatar_history")
+                .insert({
+
+                    user_id:
+                        currentProfile.id,
+
+                    avatar_url:
+                        oldAvatarUrl
+
+                });
+
+
+        if (historyError) {
+
+            console.error(
+                "Avatar history save error:",
+                historyError
+            );
+
+            alert(
+                "Avatar history could not be saved: " +
+                historyError.message
+            );
+
+            return;
+
+        }
 
     }
 
@@ -5113,7 +6681,7 @@ async function saveProfile() {
                     displayName,
 
                 avatar_url:
-                    avatarUrl ||
+                    newAvatarUrl ||
                     null
 
             })
@@ -5158,7 +6726,63 @@ async function saveProfile() {
 }
 
 
+const editAvatarFile =
+    document.getElementById(
+        "editAvatarFile"
+    );
+
+const editAvatarPreview =
+    document.getElementById(
+        "editAvatarPreview"
+    );
+
+
+if (
+    editAvatarFile &&
+    editAvatarPreview
+) {
+
+    editAvatarFile.addEventListener(
+        "change",
+        function() {
+
+            const file =
+                this.files?.[0];
+
+            if (!file) return;
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function(event) {
+
+                    editAvatarPreview.src =
+                        event.target.result;
+
+                    editAvatarPreview.style.display =
+                        "block";
+
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+}
+
+
 /* =========================
+   LOGOUT
+========================= *//* =========================
+   LOGOUT
+========================= *//* =========================
    LOGOUT
 ========================= */
 
@@ -5220,18 +6844,9 @@ async function checkAdminStatus() {
         data,
         error
     } =
-        await supabaseClient
-
-            .from("admin_users")
-
-            .select("user_id")
-
-            .eq(
-                "user_id",
-                currentProfile.id
-            )
-            
-            .maybeSingle();
+        await supabaseClient.rpc(
+            "is_admin"
+        );
 
 
     if (error) {
@@ -5257,7 +6872,7 @@ async function checkAdminStatus() {
 
 
     isCurrentUserAdmin =
-        !!data;
+        data === true;
 
 
     updateLoginUI(
@@ -5745,7 +7360,7 @@ async function openAdminUser(
                 )
                 
                 .order(
-                    "created_at",
+                    "changed_at",
                     {
                         ascending:
                             false
@@ -6067,7 +7682,12 @@ async function openAdminUser(
                                                     quiz.questions
                                                 )
                                                     ? quiz.questions.length
-                                                    : 0
+                                                    : (
+                                                        quiz.questions &&
+                                                        Array.isArray(quiz.questions.items)
+                                                            ? quiz.questions.items.length
+                                                            : 0
+                                                    )
                                             }
                                             question(s)
 
@@ -6197,7 +7817,29 @@ async function openAdminUser(
             <div
                 class="admin-mini-item">
 
-                <small>
+                <img
+                    src="${escapeHTML(
+                        user.avatar_url ||
+                        getDefaultAvatar()
+                    )}"
+                    alt="Current Avatar"
+                    onclick="window.open('${escapeHTML(
+                        user.avatar_url ||
+                        getDefaultAvatar()
+                    )}', '_blank')"
+                    style="
+                        width:90px;
+                        height:90px;
+                        object-fit:cover;
+                        border-radius:50%;
+                        display:block;
+                        border:1px solid #ccc;
+                        cursor:pointer;
+                    "
+                    title="Click to view full image">
+
+                <small
+                    style="display:block; margin-top:8px;">
                     ${
                         user.avatar_url
                             ? escapeHTML(
@@ -6264,10 +7906,10 @@ async function openAdminUser(
                                         }
 
                                         ${
-                                            record.created_at
+                                            record.changed_at
                                                 ? " • " +
                                                   new Date(
-                                                      record.created_at
+                                                      record.changed_at
                                                   ).toLocaleString()
                                                 : ""
                                         }
@@ -6328,41 +7970,6 @@ async function isUserAdmin(
 
 
     return !!data;
-
-}
-
-
-function showAdminUsers() {
-
-    const mainView =
-        document.getElementById(
-            "adminMainView"
-        );
-
-
-    const detailView =
-        document.getElementById(
-            "adminDetailView"
-        );
-
-
-    if (mainView) {
-
-        mainView.style.display =
-            "block";
-
-    }
-
-
-    if (detailView) {
-
-        detailView.style.display =
-            "none";
-
-    }
-
-
-    loadAdminUsers();
 
 }
 
