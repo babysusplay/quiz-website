@@ -6449,29 +6449,34 @@ async function editQuiz(id) {
                 String(id)
         );
 
+    // Discord bot uses the short quiz number in ?edit=10, ?edit=11, etc.
+    if (!quiz && /^\d+$/.test(String(id))) {
+        quiz = quizzes.find(
+            q =>
+                String(q.quiz_number) ===
+                String(id)
+        );
+    }
+
 
     if (!quiz) {
+
+        let quizQuery =
+            supabaseClient
+                .from("quizzes")
+                .select("*");
+
+        if (/^\d+$/.test(String(id))) {
+            quizQuery = quizQuery.eq("quiz_number", Number(id));
+        } else {
+            quizQuery = quizQuery.eq("id", id);
+        }
 
         const {
             data,
             error
         } =
-            await supabaseClient
-
-                .from("quizzes")
-
-                .select("*")
-
-                .eq(
-                    /^\d+$/.test(String(id))
-                        ? "quiz_number"
-                        : "id",
-                    /^\d+$/.test(String(id))
-                        ? Number(id)
-                        : id
-                )
-
-                .maybeSingle();
+            await quizQuery.maybeSingle();
 
 
         if (
@@ -6664,7 +6669,10 @@ async function editQuiz(id) {
 
 async function openQuizFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    const quizId = params.get("edit");
+    const quizId =
+        params.get("edit") ||
+        sessionStorage.getItem("pendingEditQuizId") ||
+        "";
 
     if (!quizId) return;
 
@@ -6672,6 +6680,8 @@ async function openQuizFromUrl() {
         showLogin();
         return;
     }
+
+    sessionStorage.removeItem("pendingEditQuizId");
 
     await editQuiz(quizId);
 
@@ -6681,7 +6691,7 @@ async function openQuizFromUrl() {
         document.title,
         window.location.pathname
     );
-}
+}    
 
 
 /* =========================
@@ -10606,42 +10616,57 @@ function getAuthRedirectUrl() {
     const quizId =
         getPendingSharedQuizId();
 
-    const params = new URLSearchParams(window.location.search);
-    const editId = params.get("edit");
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const editQuizId =
+        params.get("edit") ||
+        sessionStorage.getItem("pendingEditQuizId") ||
+        "";
+
+    if (!quizId && !editQuizId) {
+        return (
+            window.location.origin +
+            window.location.pathname
+        );
+    }
 
     if (quizId) {
-
         sessionStorage.setItem(
             "pendingSharedQuizId",
             quizId
         );
-
-        return (
-            window.location.origin +
-            window.location.pathname +
-            "?quiz=" +
-            encodeURIComponent(quizId) +
-            (editId ? "&edit=" + encodeURIComponent(editId) : "")
-        );
-
     }
 
-    if (editId) {
-        return (
-            window.location.origin +
-            window.location.pathname +
-            "?edit=" +
-            encodeURIComponent(editId)
+    if (editQuizId) {
+        sessionStorage.setItem(
+            "pendingEditQuizId",
+            editQuizId
         );
     }
 
-    return (
+    let redirectUrl =
         window.location.origin +
-        window.location.pathname
-    );
+        window.location.pathname;
+
+    if (quizId) {
+        redirectUrl +=
+            "?quiz=" +
+            encodeURIComponent(quizId);
+    }
+
+    if (editQuizId) {
+        redirectUrl +=
+            (redirectUrl.includes("?") ? "&" : "?") +
+            "edit=" +
+            encodeURIComponent(editQuizId);
+    }
+
+    return redirectUrl;
 
 }
-
 
 async function loginWithGoogle() {
 
