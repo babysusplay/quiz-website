@@ -6664,6 +6664,27 @@ async function editQuiz(id) {
 
 }
 
+async function openQuizFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const quizId = params.get("edit");
+
+    if (!quizId) return;
+
+    if (!currentProfile) {
+        showLogin();
+        return;
+    }
+
+    await editQuiz(quizId);
+
+    // Remove the edit parameter from the URL
+    window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+    );
+}    
+
 
 /* =========================
    DELETE QUIZ
