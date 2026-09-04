@@ -6704,14 +6704,17 @@ async function openQuizFromUrl() {
 
     if (!quizId) return;
 
+    // Logged-out users go directly to login. The spinner is only for quiz loading.
+    if (!currentProfile) {
+        sessionStorage.setItem("pendingEditQuizId", quizId);
+        hideEditQuizLoading();
+        showLogin();
+        return;
+    }
+
     showEditQuizLoading();
 
     try {
-        if (!currentProfile) {
-            showLogin();
-            return;
-        }
-
         sessionStorage.removeItem("pendingEditQuizId");
 
         await editQuiz(quizId);
@@ -16206,9 +16209,23 @@ if (typeof window.openAdminHistoryForQuiz !== "function") {
 <script id="edit-quiz-loading-spinner-script">
 (function(){
     const params = new URLSearchParams(window.location.search);
-    if (params.get("edit") || sessionStorage.getItem("pendingEditQuizId")) {
-        showEditQuizLoading();
-    }
+    const editId =
+        params.get("edit") ||
+        sessionStorage.getItem("pendingEditQuizId") ||
+        "";
+
+    if (!editId) return;
+
+    // Logged-in users get the spinner; logged-out users go straight to login.
+    supabaseClient.auth.getSession().then(({ data }) => {
+        if (data?.session?.user) {
+            showEditQuizLoading();
+        } else {
+            hideEditQuizLoading();
+            sessionStorage.setItem("pendingEditQuizId", editId);
+            showLogin();
+        }
+    });
 })();
 </script>
 
