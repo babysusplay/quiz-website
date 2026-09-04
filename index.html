@@ -5912,6 +5912,19 @@ function isQuestionCompletelyBlank(box) {
     return !question && options.every(option => !option) && correct === "" && !image;
 }
 
+function getCurrentDiscordUserId() {
+
+    const profileDiscordId = currentProfile?.discord_user_id;
+
+    if (profileDiscordId) {
+        return String(profileDiscordId);
+    }
+
+    return "";
+
+}
+
+
 async function saveQuiz() {
 
     if (!currentProfile) {
@@ -6150,6 +6163,13 @@ async function saveQuiz() {
 
             roomOpen: Boolean(
                 quizzes.find(q => String(q.id) === String(editingQuizId))?.settings?.roomOpen
+            ),
+
+            // Discord quizzes keep their original Discord creator ID.
+            // Normal website quizzes do not need this field.
+            creatorDiscordUserId: String(
+                quizzes.find(q => String(q.id) === String(editingQuizId))?.settings?.creatorDiscordUserId ||
+                ""
             )
 
         },
@@ -6535,6 +6555,38 @@ async function editQuiz(id) {
         );
 
         return;
+
+    }
+
+
+    // Discord quizzes created by the bot are owned by the Discord user
+    // whose ID is stored inside the quiz settings. This prevents another
+    // Discord account from editing the quiz even if it has the edit link.
+    const quizCreatorDiscordId =
+        quiz.settings?.creatorDiscordUserId
+            ? String(quiz.settings.creatorDiscordUserId)
+            : "";
+
+    if (
+        quiz.settings?.quizType === "discord" &&
+        quizCreatorDiscordId
+    ) {
+
+        const currentDiscordUserId =
+            getCurrentDiscordUserId();
+
+        if (
+            !currentDiscordUserId ||
+            currentDiscordUserId !== quizCreatorDiscordId
+        ) {
+
+            alert(
+                "Only the Discord account that created this quiz can edit it."
+            );
+
+            return;
+
+        }
 
     }
 
@@ -11183,6 +11235,7 @@ async function syncDiscordIdentity(user) {
             discordIdentity?.identity_data?.sub ||
             discordIdentity?.identity_data?.user_id ||
             discordIdentity?.identity_data?.id ||
+            discordIdentity?.identity_data?.provider_id ||
             "";
 
         if (!discordUserId) return;
