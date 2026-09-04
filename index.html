@@ -3302,6 +3302,48 @@ function renderCurrentIdentityName(name) {
     box-shadow: 0 24px 70px rgba(0,0,0,.42);
     text-align: center;
 }
+/* Discord quiz saved confirmation */
+#discordQuizSavedModal{
+    position:fixed;
+    inset:0;
+    z-index:100001;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:rgba(7,9,14,.64);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+}
+#discordQuizSavedModal.is-visible{display:flex;}
+.discord-quiz-saved-card{
+    width:min(430px,100%);
+    padding:30px 28px 26px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:24px;
+    background:rgba(18,21,29,.96);
+    box-shadow:0 22px 70px rgba(0,0,0,.38);
+}
+.discord-quiz-saved-icon{
+    width:64px;
+    height:64px;
+    margin:0 auto 16px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(88,101,242,.16);
+    border:1px solid rgba(88,101,242,.30);
+    color:#8f9bff;
+    font-size:32px;
+    font-weight:900;
+}
+.discord-quiz-saved-title{margin:0 0 8px;font-size:22px;font-weight:800;}
+.discord-quiz-saved-text{margin:0 auto 20px;max-width:340px;color:rgba(255,255,255,.68);line-height:1.55;font-size:14px;}
+.discord-quiz-saved-actions{display:flex;gap:10px;justify-content:center;}
+.discord-quiz-saved-actions button{min-width:130px;}
+
 #discordLinkModal .discord-link-icon {
     width: 58px; height: 58px; margin: 0 auto 16px; border-radius: 18px;
     display: flex; align-items: center; justify-content: center;
@@ -6234,7 +6276,6 @@ async function saveQuiz() {
             ),
 
             // Discord quizzes keep their original Discord creator ID.
-            // Never replace it with the Google/Supabase profile ID.
             creatorDiscordUserId: String(
                 existingDiscordCreatorId
             )
@@ -6257,12 +6298,13 @@ async function saveQuiz() {
             updated_at: new Date().toISOString()
         };
 
-        // Once the Discord creator has linked Discord to this website account,
-        // associate the quiz with the same Supabase profile so it appears in
-        // My Quizzes. The original Discord creator ID stays in settings.
+        // A linked Discord creator's website account owns the saved quiz
+        // for My Quizzes, while creatorDiscordUserId remains the Discord
+        // ownership key.
         if (
             quizType === "discord" &&
-            existingDiscordCreatorId
+            existingDiscordCreatorId &&
+            currentProfile?.id
         ) {
             updateData.creator_id = currentProfile.id;
         }
@@ -6325,7 +6367,11 @@ async function saveQuiz() {
     renderQuizList();
 
     if (savedQuizNumber !== null) {
-        alert(`Quiz saved successfully!\n\nQuiz ID: #${savedQuizNumber}`);
+        if (quizType === "discord") {
+            openDiscordQuizSavedModal();
+        } else {
+            alert(`Quiz saved successfully!\n\nQuiz ID: #${savedQuizNumber}`);
+        }
     }
 
 }
@@ -6620,23 +6666,17 @@ async function editQuiz(id) {
                 data
             );
 
-        // Keep directly loaded Discord quizzes in the in-memory list.
-        // saveQuiz() uses this object to preserve the Discord creator ID
-        // and other existing settings when the quiz is saved again.
-        const existingLoadedQuizIndex = quizzes.findIndex(
+        // Keep a directly loaded Discord quiz in the main quiz list so
+        // later saves preserve its ownership and existing settings.
+        const loadedQuizIndex = quizzes.findIndex(
             q => String(q.id) === String(quiz.id)
         );
 
-        if (existingLoadedQuizIndex >= 0) {
-            quizzes[existingLoadedQuizIndex] = quiz;
+        if (loadedQuizIndex >= 0) {
+            quizzes[loadedQuizIndex] = quiz;
         } else {
             quizzes.push(quiz);
         }
-
-        localStorage.setItem(
-            "quizzes",
-            JSON.stringify(quizzes)
-        );
 
     }
 
@@ -6655,27 +6695,22 @@ async function editQuiz(id) {
 
     if (isDiscordQuiz) {
 
-        // Admins can edit any quiz from the Admin Panel.
-        // Everyone else must be the Discord account that created it.
-        if (!isCurrentUserAdmin) {
-            const currentDiscordUserId =
-                getCurrentDiscordUserId();
+        const currentDiscordUserId =
+            getCurrentDiscordUserId();
 
-            if (!currentDiscordUserId) {
-                openDiscordLinkModal();
-                return;
-            }
+        if (!currentDiscordUserId) {
+            openDiscordLinkModal();
+            return;
+        }
 
-            if (currentDiscordUserId !== quizCreatorDiscordId) {
-                showDiscordLinkError(
-                    "Only the Discord account that created this quiz can edit it. Please connect the correct Discord account to this website account."
-                );
-                return;
-            }
+        if (currentDiscordUserId !== quizCreatorDiscordId) {
+            showDiscordLinkError(
+                "Only the Discord account that created this quiz can edit it. Please connect the correct Discord account to this website account."
+            );
+            return;
         }
 
     } else if (
-        !isCurrentUserAdmin &&
         quiz.creator_id &&
         quiz.creator_id !== currentProfile.id
     ) {
@@ -6852,6 +6887,20 @@ function hideEditQuizLoading() {
 }
 
 let isOpeningEditQuizFromUrl = false;
+
+function openDiscordQuizSavedModal() {
+    const modal = document.getElementById("discordQuizSavedModal");
+    if (!modal) return;
+    modal.classList.add("is-visible");
+    modal.setAttribute("aria-hidden", "false");
+}
+
+function closeDiscordQuizSavedModal() {
+    const modal = document.getElementById("discordQuizSavedModal");
+    if (!modal) return;
+    modal.classList.remove("is-visible");
+    modal.setAttribute("aria-hidden", "true");
+}
 
 async function openQuizFromUrl() {
     if (isOpeningEditQuizFromUrl) return;
@@ -16508,5 +16557,18 @@ if (typeof window.openAdminHistoryForQuiz !== "function") {
 })();
 </script>
 
+<div id="discordQuizSavedModal" aria-hidden="true">
+    <div class="discord-quiz-saved-card">
+        <div class="discord-quiz-saved-icon">✓</div>
+        <h3 class="discord-quiz-saved-title">Your quiz is saved!</h3>
+        <p class="discord-quiz-saved-text">
+            Your Discord quiz has been saved successfully.
+            You can check it anytime from <strong>My Quizzes</strong>.
+        </p>
+        <div class="discord-quiz-saved-actions">
+            <button type="button" class="btn btn-primary" onclick="closeDiscordQuizSavedModal()">Continue</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
