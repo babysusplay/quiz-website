@@ -741,6 +741,78 @@ textarea {
     overflow-y: auto;
 }
 
+.admin-user-search {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 10px;
+}
+.admin-user-search input {
+    flex: 1 1 auto;
+    min-width: 0;
+    background: #10131a;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 12px;
+    color: #fff;
+    padding: 11px 13px;
+    outline: none;
+}
+.admin-user-search input:focus {
+    border-color: rgba(100,110,255,.55);
+    box-shadow: 0 0 0 3px rgba(100,110,255,.10);
+}
+.admin-user-search-count {
+    color: #777d8a;
+    font-size: 11px;
+    white-space: nowrap;
+}
+.admin-quiz-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.admin-quiz-card-main { min-width: 0; }
+.admin-quiz-card-meta {
+    color: #8f95a2;
+    font-size: 11px;
+    margin-top: 4px;
+    line-height: 1.5;
+}
+.admin-quiz-card-actions {
+    display: flex;
+    gap: 7px;
+    flex: 0 0 auto;
+}
+.admin-avatar-history-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+    gap: 10px;
+}
+.admin-avatar-history-card {
+    background: #10131a;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 12px;
+    padding: 8px;
+    text-align: center;
+}
+.admin-avatar-history-card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 9px;
+    display: block;
+    cursor: pointer;
+    background: #242833;
+}
+.admin-avatar-history-card small {
+    display: block;
+    color: #8f95a2;
+    font-size: 10px;
+    line-height: 1.35;
+    margin-top: 7px;
+}
+
 .admin-user-item {
     background: #10131a;
     border: 1px solid rgba(255,255,255,.08);
@@ -5192,25 +5264,6 @@ function renderCurrentIdentityName(name) {
             </div>
 
 
-            <div id="adminQuizLibrarySection" style="margin-top:20px;margin-bottom:20px;">
-                <div class="admin-section-title-row">
-                    <div>
-                        <h3 class="admin-section-title">📝 All Quizzes</h3>
-                        <p class="admin-chat-monitor-subtitle">
-                            View quizzes created by every player.
-                        </p>
-                    </div>
-                    <button
-                        class="admin-chat-refresh-btn"
-                        type="button"
-                        onclick="loadAdminQuizzes()">↻</button>
-                </div>
-
-                <div id="adminQuizList" class="admin-user-list">
-                    <div class="empty">Loading quizzes...</div>
-                </div>
-            </div>
-
             <div style="margin-top:20px;margin-bottom:20px;">
                 <h3 class="admin-section-title">Quiz History</h3>
                 <p style="color:#777d8a;font-size:12px;margin-bottom:10px;">
@@ -5255,6 +5308,20 @@ function renderCurrentIdentityName(name) {
 
             </div>
 
+
+            <div class="admin-user-search">
+                <input
+                    id="adminUserSearch"
+                    type="search"
+                    placeholder="Search users by name, email, user ID or Discord ID"
+                    autocomplete="off"
+                    oninput="filterAdminUsers(this.value)">
+                <span
+                    id="adminUserSearchCount"
+                    class="admin-user-search-count">
+                    0 users
+                </span>
+            </div>
 
             <div
                 id="adminUserList"
@@ -5327,6 +5394,8 @@ let participants = JSON.parse(
 let currentProfile = null;
 
 let isCurrentUserAdmin = false;
+
+let adminUsersCache = [];
 
 let activeLobbyQuiz = null;
 
@@ -14631,7 +14700,7 @@ async function openAdminPanel() {
 
     showAdminUsers();
     await loadAdminLiveRooms();
-    await loadAdminQuizzes();
+
 
 
     openModal(
@@ -14828,8 +14897,50 @@ async function loadAdminUsers() {
     }
 
 
+    adminUsersCache = users;
+
+    renderAdminUsers(
+        users
+    );
+
+
+}
+
+
+function renderAdminUsers(
+    users
+) {
+
+    const list =
+        document.getElementById(
+            "adminUserList"
+        );
+
+    const count =
+        document.getElementById(
+            "adminUserSearchCount"
+        );
+
+    if (!list) return;
+
+    const rows =
+        Array.isArray(users)
+            ? users
+            : [];
+
+    if (count) {
+        count.textContent =
+            `${rows.length} ${rows.length === 1 ? "user" : "users"}`;
+    }
+
+    if (rows.length === 0) {
+        list.innerHTML =
+            '<div class="empty">No users found.</div>';
+        return;
+    }
+
     list.innerHTML =
-        users.map(
+        rows.map(
             user => {
 
                 const avatar =
@@ -14923,6 +15034,43 @@ async function loadAdminUsers() {
 
 }
 
+function filterAdminUsers(
+    searchValue
+) {
+
+    const query =
+        String(searchValue || "")
+            .trim()
+            .toLowerCase();
+
+    if (!query) {
+        renderAdminUsers(adminUsersCache);
+        return;
+    }
+
+    const filtered =
+        adminUsersCache.filter(
+            user => {
+
+                const haystack =
+                    [
+                        user.display_name,
+                        user.user_id,
+                        user.email,
+                        user.discord_user_id,
+                        user.id
+                    ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+                return haystack.includes(query);
+            }
+        );
+
+    renderAdminUsers(filtered);
+}
+
 
 async function openAdminUser(
     userId
@@ -15002,8 +15150,8 @@ async function openAdminUser(
 
 
     const {
-        data: userQuizzes,
-        error: quizError
+        data: ownedQuizzes,
+        error: ownedQuizError
     } =
         await supabaseClient
 
@@ -15024,6 +15172,104 @@ async function openAdminUser(
                 }
             );
 
+
+    let discordQuizzes =
+        [];
+
+    let discordQuizError =
+        null;
+
+
+    if (
+        user.discord_user_id
+    ) {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+
+                .from("quizzes")
+
+                .select("*")
+
+                .eq(
+                    "questions->settings->>creatorDiscordUserId",
+                    String(
+                        user.discord_user_id
+                    )
+                )
+
+                .order(
+                    "created_at",
+                    {
+                        ascending:
+                            false
+                    }
+                );
+
+        discordQuizzes =
+            data || [];
+
+        discordQuizError =
+            error || null;
+
+    }
+
+
+    const quizMap =
+        new Map();
+
+
+    [
+        ...(ownedQuizzes || []),
+        ...(discordQuizzes || [])
+    ].forEach(
+        quiz => {
+
+            const key =
+                String(
+                    quiz.id ||
+                    quiz.quiz_id
+                );
+
+            if (
+                key &&
+                key !== "undefined"
+            ) {
+                quizMap.set(
+                    key,
+                    quiz
+                );
+            }
+
+        }
+    );
+
+
+    const userQuizzes =
+        Array.from(
+            quizMap.values()
+        ).sort(
+            (
+                a,
+                b
+            ) =>
+                new Date(
+                    b.created_at ||
+                    0
+                ) -
+                new Date(
+                    a.created_at ||
+                    0
+                )
+        );
+
+
+    const quizError =
+        ownedQuizError ||
+        discordQuizError;
 
     const {
         data: attempts,
@@ -15373,51 +15619,72 @@ async function openAdminUser(
                                     quiz => `
 
                                     <div
-                                        class="admin-mini-item">
+                                        class="admin-mini-item admin-quiz-card">
 
-                                        <strong>
-                                            ${escapeHTML(
-                                                quiz.title ||
-                                                "Untitled Quiz"
-                                            )}
-                                        </strong>
+                                        <div
+                                            class="admin-quiz-card-main">
 
-                                        <small>
+                                            <strong>
+                                                ${escapeHTML(
+                                                    quiz.title ||
+                                                    "Untitled Quiz"
+                                                )}
+                                            </strong>
 
-                                            ${
-                                                escapeHTML(
+                                            <div
+                                                class="admin-quiz-card-meta">
+
+                                                ${escapeHTML(
                                                     quiz.quiz_id ||
                                                     "No Quiz ID"
-                                                )
-                                            }
+                                                )}
 
-                                            •
+                                                •
+                                                ${
+                                                    Array.isArray(quiz.questions)
+                                                        ? quiz.questions.length
+                                                        : (
+                                                            quiz.questions &&
+                                                            Array.isArray(quiz.questions.items)
+                                                                ? quiz.questions.items.length
+                                                                : 0
+                                                        )
+                                                }
+                                                question(s)
+                                                •
+                                                ${
+                                                    quiz.questions?.settings?.quizType === "discord"
+                                                        ? "Discord quiz"
+                                                        : "Website quiz"
+                                                }
+                                                •
+                                                ${
+                                                    quiz.created_at
+                                                        ? new Date(
+                                                            quiz.created_at
+                                                        ).toLocaleString()
+                                                        : "Date unavailable"
+                                                }
 
-                                            ${
-                                                Array.isArray(
-                                                    quiz.questions
-                                                )
-                                                    ? quiz.questions.length
-                                                    : (
-                                                        quiz.questions &&
-                                                        Array.isArray(quiz.questions.items)
-                                                            ? quiz.questions.items.length
-                                                            : 0
-                                                    )
-                                            }
-                                            question(s)
+                                            </div>
 
-                                            •
+                                        </div>
 
-                                            ${
-                                                quiz.created_at
-                                                    ? new Date(
-                                                        quiz.created_at
-                                                    ).toLocaleString()
-                                                    : "Date unavailable"
-                                            }
+                                        <div
+                                            class="admin-quiz-card-actions">
 
-                                        </small>
+                                            <button
+                                                class="admin-view-btn"
+                                                type="button"
+                                                onclick='viewAdminQuiz(${JSON.stringify(
+                                                    quiz.id
+                                                )})'>
+
+                                                View
+
+                                            </button>
+
+                                        </div>
 
                                     </div>
 
@@ -15596,45 +15863,65 @@ async function openAdminUser(
                     : `
 
                     <div
-                        class="admin-mini-list">
+                        class="admin-avatar-history-grid">
 
                         ${
                             avatarHistory.map(
-                                record => `
+                                record => {
 
-                                <div
-                                    class="admin-mini-item">
+                                    const historyAvatar =
+                                        record.avatar_url ||
+                                        record.url ||
+                                        "";
 
-                                    <strong>
-
-                                        Avatar record
-
-                                    </strong>
-
-                                    <small>
+                                    return `
+                                    <div
+                                        class="admin-avatar-history-card">
 
                                         ${
-                                            escapeHTML(
-                                                record.avatar_url ||
-                                                record.url ||
-                                                "Avatar URL unavailable"
-                                            )
+                                            historyAvatar
+                                                ? `
+                                                <img
+                                                    src="${escapeHTML(historyAvatar)}"
+                                                    alt="Previous avatar"
+                                                    loading="lazy"
+                                                    onclick="window.open('${escapeHTML(historyAvatar)}', '_blank')"
+                                                    title="Click to view full image"
+                                                    onerror="
+                                                        this.onerror=null;
+                                                        this.style.opacity='0.35';
+                                                    ">
+                                                `
+                                                : `
+                                                <div
+                                                    style="
+                                                        width:100%;
+                                                        aspect-ratio:1/1;
+                                                        display:flex;
+                                                        align-items:center;
+                                                        justify-content:center;
+                                                        border-radius:9px;
+                                                        background:#242833;
+                                                        color:#777d8a;
+                                                        font-size:10px;">
+                                                    No image
+                                                </div>
+                                                `
                                         }
 
-                                        ${
-                                            record.changed_at
-                                                ? " • " +
-                                                  new Date(
-                                                      record.changed_at
-                                                  ).toLocaleString()
-                                                : ""
-                                        }
+                                        <small>
+                                            ${
+                                                record.changed_at
+                                                    ? new Date(
+                                                        record.changed_at
+                                                    ).toLocaleString()
+                                                    : "Date unavailable"
+                                            }
+                                        </small>
 
-                                    </small>
-
-                                </div>
-
-                            `
+                                    </div>
+                                    `;
+                                }
                             ).join("")
                         }
 
