@@ -3282,12 +3282,14 @@ function renderCurrentIdentityName(name) {
 
 
 <style id="edit-quiz-loading-spinner-style">
-#editQuizLoadingOverlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(7,9,14,.58);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
+#editQuizLoadingOverlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(7,9,14,.64);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);}
 #editQuizLoadingOverlay.is-visible{display:flex;}
-.edit-quiz-spinner-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 20px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:rgba(18,21,29,.92);box-shadow:0 12px 40px rgba(0,0,0,.28);}
-.edit-quiz-spinner{width:28px;height:28px;border:3px solid rgba(255,255,255,.16);border-top-color:rgba(255,255,255,.92);border-radius:50%;animation:editQuizSpin .75s linear infinite;}
-.edit-quiz-spinner-text{font-size:13px;color:rgba(255,255,255,.78);letter-spacing:.2px;}
+.edit-quiz-spinner-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;min-width:170px;padding:24px 26px;border:1px solid rgba(255,255,255,.10);border-radius:20px;background:rgba(18,21,29,.94);box-shadow:0 18px 55px rgba(0,0,0,.34);}
+.edit-quiz-spinner{position:relative;width:52px;height:52px;border:4px solid rgba(255,255,255,.10);border-top-color:#5865f2;border-right-color:#7c83ff;border-radius:50%;animation:editQuizSpin .82s cubic-bezier(.55,.1,.35,.95) infinite;}
+.edit-quiz-spinner::after{content:"";position:absolute;inset:7px;border:3px solid transparent;border-left-color:rgba(255,255,255,.72);border-bottom-color:rgba(255,255,255,.22);border-radius:50%;animation:editQuizSpinReverse .58s linear infinite;}
+.edit-quiz-spinner-text{font-size:14px;color:rgba(255,255,255,.82);letter-spacing:.15px;text-align:center;}
 @keyframes editQuizSpin{to{transform:rotate(360deg);}}
+@keyframes editQuizSpinReverse{to{transform:rotate(-360deg);}}
 </style>
 
 <style id="discord-link-modal-ui">
@@ -3305,6 +3307,11 @@ function renderCurrentIdentityName(name) {
     display: flex; align-items: center; justify-content: center;
     background: rgba(88,101,242,.14); border: 1px solid rgba(88,101,242,.28);
     color: #8f9bff; font-size: 27px; font-weight: 800;
+}
+#discordLinkModal .discord-link-discord-logo {
+    width: 31px;
+    height: 24px;
+    display: block;
 }
 #discordLinkModal .discord-link-title { margin: 0 0 9px; color: #fff; font-size: 22px; font-weight: 800; }
 #discordLinkModal .discord-link-text { margin: 0 auto 22px; max-width: 390px; color: #aeb4c2; font-size: 14px; line-height: 1.65; }
@@ -3759,7 +3766,11 @@ function renderCurrentIdentityName(name) {
 <!-- DISCORD ACCOUNT LINK MODAL -->
 <div class="modal" id="discordLinkModal" aria-hidden="true">
     <div class="modal-content discord-link-modal-content">
-        <div class="discord-link-icon" id="discordLinkModalIcon" aria-hidden="true">D</div>
+        <div class="discord-link-icon" id="discordLinkModalIcon" aria-hidden="true">
+    <svg class="discord-link-discord-logo" viewBox="0 0 71 55" role="img" aria-label="Discord">
+        <path fill="currentColor" d="M60.1 4.5A58.5 58.5 0 0 0 45.8 0l-1.8 3.7a54.4 54.4 0 0 0-16 0L26.2 0a58.6 58.6 0 0 0-14.3 4.5C2.8 17.8.3 30.8 1.5 43.6a58.8 58.8 0 0 0 17.6 8.9l4.3-5.8a36.9 36.9 0 0 1-6.8-3.2l1.7-1.3c13.1 6.1 27.3 6.1 40.2 0l1.7 1.3a37.3 37.3 0 0 1-6.8 3.2l4.3 5.8a58.7 58.7 0 0 0 17.6-8.9C76.5 28.9 71.8 16 60.1 4.5ZM24.5 35.1c-4 0-7.3-3.6-7.3-8s3.2-8 7.3-8 7.3 3.6 7.3 8-3.2 8-7.3 8Zm22 0c-4 0-7.3-3.6-7.3-8s3.2-8 7.3-8 7.3 3.6 7.3 8-3.2 8-7.3 8Z"/>
+    </svg>
+</div>
         <h2 class="discord-link-title" id="discordLinkModalTitle">Connect Discord to Edit</h2>
         <p class="discord-link-text" id="discordLinkModalText">
             This Discord quiz can only be edited by the Discord account that created it.
@@ -6781,7 +6792,13 @@ async function editQuiz(id) {
 
 }
 
-function showEditQuizLoading() {
+function setEditQuizLoadingMessage(message) {
+    const text = document.querySelector("#editQuizLoadingOverlay .edit-quiz-spinner-text");
+    if (text) text.textContent = message || "Opening quiz…";
+}
+
+function showEditQuizLoading(message) {
+    setEditQuizLoadingMessage(message || "Opening quiz…");
     const overlay = document.getElementById("editQuizLoadingOverlay");
     if (overlay) overlay.classList.add("is-visible");
 }
@@ -6791,7 +6808,11 @@ function hideEditQuizLoading() {
     if (overlay) overlay.classList.remove("is-visible");
 }
 
+let isOpeningEditQuizFromUrl = false;
+
 async function openQuizFromUrl() {
+    if (isOpeningEditQuizFromUrl) return;
+
     const params = new URLSearchParams(window.location.search);
     const quizId =
         params.get("edit") ||
@@ -6800,15 +6821,18 @@ async function openQuizFromUrl() {
 
     if (!quizId) return;
 
+    isOpeningEditQuizFromUrl = true;
+
     // Logged-out users go directly to login. The spinner is only for quiz loading.
     if (!currentProfile) {
         sessionStorage.setItem("pendingEditQuizId", quizId);
         hideEditQuizLoading();
+        isOpeningEditQuizFromUrl = false;
         showLogin();
         return;
     }
 
-    showEditQuizLoading();
+    showEditQuizLoading("Opening quiz…");
 
     try {
         sessionStorage.removeItem("pendingEditQuizId");
@@ -6823,6 +6847,7 @@ async function openQuizFromUrl() {
         );
     } finally {
         hideEditQuizLoading();
+        isOpeningEditQuizFromUrl = false;
     }
 }    
 
@@ -10842,7 +10867,7 @@ function openDiscordLinkModal() {
 
     if (!modal || !icon || !title || !text || !actions) return;
 
-    icon.textContent = "D";
+    icon.innerHTML = `<svg class="discord-link-discord-logo" viewBox="0 0 71 55" aria-hidden="true"><path fill="currentColor" d="M60.1 4.5A58.5 58.5 0 0 0 45.8 0l-1.8 3.7a54.4 54.4 0 0 0-16 0L26.2 0a58.6 58.6 0 0 0-14.3 4.5C2.8 17.8.3 30.8 1.5 43.6a58.8 58.8 0 0 0 17.6 8.9l4.3-5.8a36.9 36.9 0 0 1-6.8-3.2l1.7-1.3c13.1 6.1 27.3 6.1 40.2 0l1.7 1.3a37.3 37.3 0 0 1-6.8 3.2l4.3 5.8a58.7 58.7 0 0 0 17.6-8.9C76.5 28.9 71.8 16 60.1 4.5ZM24.5 35.1c-4 0-7.3-3.6-7.3-8s3.2-8 7.3-8 7.3 3.6 7.3 8-3.2 8-7.3 8Zm22 0c-4 0-7.3-3.6-7.3-8s3.2-8 7.3-8 7.3 3.6 7.3 8-3.2 8-7.3 8Z"/></svg>`;
     title.textContent = "Connect Discord to Edit";
     text.innerHTML =
         "This Discord quiz can only be edited by the Discord account that created it." +
@@ -10874,7 +10899,7 @@ function showDiscordLinkError(message) {
 
     if (!modal || !icon || !title || !text || !actions) return;
 
-    icon.textContent = "!";
+    icon.innerHTML = `<span style="font-size:30px;font-weight:900;line-height:1;">!</span>`;
     title.textContent = "Discord Connection Unavailable";
     text.textContent = message;
     actions.innerHTML = `
@@ -10887,6 +10912,7 @@ function showDiscordLinkError(message) {
 
 async function confirmDiscordAccountLink() {
     closeDiscordLinkModal();
+    showEditQuizLoading("Connecting to Discord…");
     await linkDiscordAccountForEdit();
 }
 
@@ -10921,6 +10947,7 @@ async function linkDiscordAccountForEdit() {
 
         if (error) {
             console.error("Discord account linking error:", error);
+            hideEditQuizLoading();
             showDiscordLinkError(
                 error.message ||
                 "We could not connect your Discord account right now."
@@ -10936,6 +10963,7 @@ async function linkDiscordAccountForEdit() {
         }
     } catch (error) {
         console.error("Discord account linking error:", error);
+        hideEditQuizLoading();
         showDiscordLinkError(
             error?.message ||
             "We could not connect your Discord account right now."
