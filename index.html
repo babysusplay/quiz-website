@@ -6206,6 +6206,15 @@ async function saveQuiz() {
         return;
     }
 
+    const existingQuizBeingEdited =
+        editingQuizId
+            ? quizzes.find(q => String(q.id) === String(editingQuizId))
+            : null;
+
+    const existingDiscordCreatorId =
+        existingQuizBeingEdited?.settings?.creatorDiscordUserId ||
+        "";
+
     const questionData = {
 
         settings: {
@@ -6221,14 +6230,13 @@ async function saveQuiz() {
             roomPassword: roomPassword,
 
             roomOpen: Boolean(
-                quizzes.find(q => String(q.id) === String(editingQuizId))?.settings?.roomOpen
+                existingQuizBeingEdited?.settings?.roomOpen
             ),
 
             // Discord quizzes keep their original Discord creator ID.
-            // Normal website quizzes do not need this field.
+            // Never replace it with the Google/Supabase profile ID.
             creatorDiscordUserId: String(
-                quizzes.find(q => String(q.id) === String(editingQuizId))?.settings?.creatorDiscordUserId ||
-                ""
+                existingDiscordCreatorId
             )
 
         },
@@ -6241,16 +6249,28 @@ async function saveQuiz() {
 
     if (editingQuizId) {
 
+        const updateData = {
+            title: name,
+            description: description,
+            quiz_id: roomId,
+            questions: questionData,
+            updated_at: new Date().toISOString()
+        };
+
+        // Once the Discord creator has linked Discord to this website account,
+        // associate the quiz with the same Supabase profile so it appears in
+        // My Quizzes. The original Discord creator ID stays in settings.
+        if (
+            quizType === "discord" &&
+            existingDiscordCreatorId
+        ) {
+            updateData.creator_id = currentProfile.id;
+        }
+
         const result =
             await supabaseClient
                 .from("quizzes")
-                .update({
-                    title: name,
-                    description: description,
-                    quiz_id: roomId,
-                    questions: questionData,
-                    updated_at: new Date().toISOString()
-                })
+                .update(updateData)
                 .eq("id", editingQuizId);
 
         error = result.error;
@@ -6600,6 +6620,24 @@ async function editQuiz(id) {
                 data
             );
 
+        // Keep directly loaded Discord quizzes in the in-memory list.
+        // saveQuiz() uses this object to preserve the Discord creator ID
+        // and other existing settings when the quiz is saved again.
+        const existingLoadedQuizIndex = quizzes.findIndex(
+            q => String(q.id) === String(quiz.id)
+        );
+
+        if (existingLoadedQuizIndex >= 0) {
+            quizzes[existingLoadedQuizIndex] = quiz;
+        } else {
+            quizzes.push(quiz);
+        }
+
+        localStorage.setItem(
+            "quizzes",
+            JSON.stringify(quizzes)
+        );
+
     }
 
 
@@ -6617,22 +6655,27 @@ async function editQuiz(id) {
 
     if (isDiscordQuiz) {
 
-        const currentDiscordUserId =
-            getCurrentDiscordUserId();
+        // Admins can edit any quiz from the Admin Panel.
+        // Everyone else must be the Discord account that created it.
+        if (!isCurrentUserAdmin) {
+            const currentDiscordUserId =
+                getCurrentDiscordUserId();
 
-        if (!currentDiscordUserId) {
-            openDiscordLinkModal();
-            return;
-        }
+            if (!currentDiscordUserId) {
+                openDiscordLinkModal();
+                return;
+            }
 
-        if (currentDiscordUserId !== quizCreatorDiscordId) {
-            showDiscordLinkError(
-                "Only the Discord account that created this quiz can edit it. Please connect the correct Discord account to this website account."
-            );
-            return;
+            if (currentDiscordUserId !== quizCreatorDiscordId) {
+                showDiscordLinkError(
+                    "Only the Discord account that created this quiz can edit it. Please connect the correct Discord account to this website account."
+                );
+                return;
+            }
         }
 
     } else if (
+        !isCurrentUserAdmin &&
         quiz.creator_id &&
         quiz.creator_id !== currentProfile.id
     ) {
