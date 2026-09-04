@@ -16112,7 +16112,8 @@ window.onclick =
         if (
             event.target.classList.contains(
                 "modal"
-            )
+            ) &&
+            event.target.id !== "createModal"
         ) {
 
             event.target.style.display =
