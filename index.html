@@ -3289,6 +3289,35 @@ function renderCurrentIdentityName(name) {
 .edit-quiz-spinner-text{font-size:13px;color:rgba(255,255,255,.78);letter-spacing:.2px;}
 @keyframes editQuizSpin{to{transform:rotate(360deg);}}
 </style>
+
+<style id="discord-link-modal-ui">
+#discordLinkModal .discord-link-modal-content {
+    max-width: 480px;
+    padding: 28px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, #1d2030 0%, #171a22 100%);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow: 0 24px 70px rgba(0,0,0,.42);
+    text-align: center;
+}
+#discordLinkModal .discord-link-icon {
+    width: 58px; height: 58px; margin: 0 auto 16px; border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(88,101,242,.14); border: 1px solid rgba(88,101,242,.28);
+    color: #8f9bff; font-size: 27px; font-weight: 800;
+}
+#discordLinkModal .discord-link-title { margin: 0 0 9px; color: #fff; font-size: 22px; font-weight: 800; }
+#discordLinkModal .discord-link-text { margin: 0 auto 22px; max-width: 390px; color: #aeb4c2; font-size: 14px; line-height: 1.65; }
+#discordLinkModal .discord-link-actions { display: flex; gap: 10px; justify-content: center; }
+#discordLinkModal .discord-link-actions button { flex: 1; min-height: 44px; }
+#discordLinkModal .discord-link-actions .discord-link-connect { background: #5865f2; border-color: #5865f2; }
+#discordLinkModal .discord-link-actions .discord-link-connect:hover { filter: brightness(1.08); }
+@media (max-width: 520px) {
+    #discordLinkModal .discord-link-modal-content { padding: 24px 18px; }
+    #discordLinkModal .discord-link-actions { flex-direction: column-reverse; }
+}
+</style>
+
 </head>
 
 <body>
@@ -3724,6 +3753,25 @@ function renderCurrentIdentityName(name) {
 
 </footer>
 
+
+
+
+<!-- DISCORD ACCOUNT LINK MODAL -->
+<div class="modal" id="discordLinkModal" aria-hidden="true">
+    <div class="modal-content discord-link-modal-content">
+        <div class="discord-link-icon" id="discordLinkModalIcon" aria-hidden="true">D</div>
+        <h2 class="discord-link-title" id="discordLinkModalTitle">Connect Discord to Edit</h2>
+        <p class="discord-link-text" id="discordLinkModalText">
+            This Discord quiz can only be edited by the Discord account that created it.
+            Your website account is currently signed in with Google.
+            Connect your Discord account to this website account to continue editing.
+        </p>
+        <div class="discord-link-actions" id="discordLinkModalActions">
+            <button type="button" class="secondary-btn" onclick="closeDiscordLinkModal()">Cancel</button>
+            <button type="button" class="primary-btn discord-link-connect" onclick="confirmDiscordAccountLink()">Connect Discord</button>
+        </div>
+    </div>
+</div>
 
 <!-- LOGIN MODAL -->
 
@@ -6545,9 +6593,8 @@ async function editQuiz(id) {
 
 
     // Discord quizzes are owned by the Discord account that created them.
-    // Do this check before the normal website creator_id check because the
-    // Google/Supabase user who is currently signed in is not necessarily the
-    // same identity as the Discord account that created the quiz.
+    // Check Discord ownership first because a Google/Supabase user ID is not
+    // the same thing as the Discord creator ID.
     const quizCreatorDiscordId =
         quiz.settings?.creatorDiscordUserId
             ? String(quiz.settings.creatorDiscordUserId)
@@ -6562,38 +6609,16 @@ async function editQuiz(id) {
         const currentDiscordUserId =
             getCurrentDiscordUserId();
 
-        // A user can be logged into the website with Google and still edit
-        // their Discord-created quiz, but only after linking that Discord
-        // identity to the same Supabase account.
         if (!currentDiscordUserId) {
-
-            sessionStorage.setItem(
-                "pendingEditQuizId",
-                String(id)
-            );
-
-            const shouldLinkDiscord = window.confirm(
-                "This Discord quiz can only be edited by the Discord account that created it.\n\n" +
-                "Your website account is currently signed in with Google.\n\n" +
-                "Click OK to link your Discord account to this website account, then you can edit the quiz."
-            );
-
-            if (shouldLinkDiscord) {
-                await linkDiscordAccountForEdit();
-            }
-
+            openDiscordLinkModal();
             return;
-
         }
 
         if (currentDiscordUserId !== quizCreatorDiscordId) {
-
-            alert(
-                "Only the Discord account that created this quiz can edit it."
+            showDiscordLinkError(
+                "Only the Discord account that created this quiz can edit it. Please connect the correct Discord account to this website account."
             );
-
             return;
-
         }
 
     } else if (
@@ -7425,8 +7450,10 @@ async function openSharedQuizFromUrl() {
 
         const sharedParams = new URLSearchParams(window.location.search);
         if (sharedParams.get("edit") === "1") {
-            // editQuiz() performs the complete ownership check, including
-            // Discord creator ownership and the Discord-account linking flow.
+            if (String(sharedQuiz.creator_id) !== String(currentProfile.id)) {
+                alert("You can only edit your own quiz.");
+                return;
+            }
             await editQuiz(sharedQuiz.id);
         } else {
             openQuizLobby(sharedQuiz);
@@ -10806,6 +10833,63 @@ async function loginWithGoogle() {
 }
 
 
+function openDiscordLinkModal() {
+    const modal = document.getElementById("discordLinkModal");
+    const icon = document.getElementById("discordLinkModalIcon");
+    const title = document.getElementById("discordLinkModalTitle");
+    const text = document.getElementById("discordLinkModalText");
+    const actions = document.getElementById("discordLinkModalActions");
+
+    if (!modal || !icon || !title || !text || !actions) return;
+
+    icon.textContent = "D";
+    title.textContent = "Connect Discord to Edit";
+    text.innerHTML =
+        "This Discord quiz can only be edited by the Discord account that created it." +
+        "<br><br>Your website account is currently signed in with Google." +
+        "<br><br>Connect your Discord account to this website account to continue editing.";
+    actions.innerHTML = `
+        <button type="button" class="secondary-btn" onclick="closeDiscordLinkModal()">Cancel</button>
+        <button type="button" class="primary-btn discord-link-connect" onclick="confirmDiscordAccountLink()">Connect Discord</button>
+    `;
+
+    modal.style.display = "block";
+    modal.setAttribute("aria-hidden", "false");
+}
+
+function closeDiscordLinkModal() {
+    const modal = document.getElementById("discordLinkModal");
+    if (modal) {
+        modal.style.display = "none";
+        modal.setAttribute("aria-hidden", "true");
+    }
+}
+
+function showDiscordLinkError(message) {
+    const modal = document.getElementById("discordLinkModal");
+    const icon = document.getElementById("discordLinkModalIcon");
+    const title = document.getElementById("discordLinkModalTitle");
+    const text = document.getElementById("discordLinkModalText");
+    const actions = document.getElementById("discordLinkModalActions");
+
+    if (!modal || !icon || !title || !text || !actions) return;
+
+    icon.textContent = "!";
+    title.textContent = "Discord Connection Unavailable";
+    text.textContent = message;
+    actions.innerHTML = `
+        <button type="button" class="primary-btn discord-link-connect" onclick="closeDiscordLinkModal()">Got it</button>
+    `;
+
+    modal.style.display = "block";
+    modal.setAttribute("aria-hidden", "false");
+}
+
+async function confirmDiscordAccountLink() {
+    closeDiscordLinkModal();
+    await linkDiscordAccountForEdit();
+}
+
 async function linkDiscordAccountForEdit() {
 
     if (!currentProfile) {
@@ -10837,9 +10921,9 @@ async function linkDiscordAccountForEdit() {
 
         if (error) {
             console.error("Discord account linking error:", error);
-            alert(
-                "Unable to link your Discord account: " +
-                error.message
+            showDiscordLinkError(
+                error.message ||
+                "We could not connect your Discord account right now."
             );
             return;
         }
@@ -10852,14 +10936,13 @@ async function linkDiscordAccountForEdit() {
         }
     } catch (error) {
         console.error("Discord account linking error:", error);
-        alert(
-            "Unable to link your Discord account: " +
-            (error?.message || "Unknown error")
+        showDiscordLinkError(
+            error?.message ||
+            "We could not connect your Discord account right now."
         );
     }
 
 }
-
 
 async function loginWithDiscord() {
 
