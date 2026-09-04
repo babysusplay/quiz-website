@@ -6704,8 +6704,6 @@ async function openQuizFromUrl() {
 
     if (!quizId) return;
 
-    if (window.__editQuizUrlHandled) return;
-
     showEditQuizLoading();
 
     try {
@@ -6713,8 +6711,6 @@ async function openQuizFromUrl() {
             showLogin();
             return;
         }
-
-        window.__editQuizUrlHandled = true;
 
         sessionStorage.removeItem("pendingEditQuizId");
 
@@ -15413,15 +15409,11 @@ supabaseClient.auth.onAuthStateChange(
             "loginModal"
         );
 
-        await openQuizFromUrl();
-
     } else {
 
         updateLoginUI(
             null
         );
-
-        await openQuizFromUrl();
 
         if (getPendingSharedQuizId()) {
 
