@@ -5539,40 +5539,61 @@ async function loadQuizzesFromSupabase() {
 
     if (!currentProfile) return;
 
-    const { data, error } =
-        await supabaseClient
-
+    const queries = [
+        supabaseClient
             .from("quizzes")
-
             .select("*")
+            .eq("creator_id", currentProfile.id)
+            .order("created_at", { ascending: false })
+    ];
 
-            .eq(
-                "creator_id",
-                currentProfile.id
-            )
+    // If the user has already linked Discord, also load Discord-created
+    // drafts that belong to that Discord identity. This lets a freshly
+    // created Discord quiz appear in My Quizzes even before its first
+    // question is saved.
+    const linkedDiscordId = currentProfile?.discord_user_id
+        ? String(currentProfile.discord_user_id)
+        : "";
 
-            .order(
-                "created_at",
-                { ascending: false }
-            );
-
-
-    if (error) {
-
-        console.error(
-            "Quiz load error:",
-            error
+    if (linkedDiscordId) {
+        queries.push(
+            supabaseClient
+                .from("quizzes")
+                .select("*")
+                .eq(
+                    "questions->settings->>creatorDiscordUserId",
+                    linkedDiscordId
+                )
+                .order("created_at", { ascending: false })
         );
-
-        return;
-
     }
 
+    const results = await Promise.all(queries);
+    const firstError = results.find(result => result.error)?.error;
 
-    quizzes =
-        (data || [])
-            .map(quizFromDatabase);
+    if (firstError) {
+        console.error(
+            "Quiz load error:",
+            firstError
+        );
+        return;
+    }
 
+    const rowsById = new Map();
+
+    results.forEach(result => {
+        (result.data || []).forEach(row => {
+            rowsById.set(String(row.id), row);
+        });
+    });
+
+    quizzes = Array.from(rowsById.values())
+        .map(quizFromDatabase)
+        .sort((a, b) =>
+            String(b.created_at || "").localeCompare(
+                String(a.created_at || "")
+            )
+        );
 
     localStorage.setItem(
         "quizzes",
@@ -6506,6 +6527,9 @@ function renderQuizList() {
 
                     ${quiz.questions.length}
                     question(s)
+                    ${quiz.settings?.quizType === "discord" && quiz.questions.length === 0
+                        ? '<span style="margin-left:7px;opacity:.7;">• Draft</span>'
+                        : ""}
 
                 </p>
 
