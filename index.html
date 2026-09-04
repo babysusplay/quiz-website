@@ -6544,41 +6544,49 @@ async function editQuiz(id) {
     }
 
 
-    if (
-        quiz.creator_id &&
-        quiz.creator_id !==
-        currentProfile.id
-    ) {
-
-        alert(
-            "You can only edit your own quizzes."
-        );
-
-        return;
-
-    }
-
-
-    // Discord quizzes created by the bot are owned by the Discord user
-    // whose ID is stored inside the quiz settings. This prevents another
-    // Discord account from editing the quiz even if it has the edit link.
+    // Discord quizzes are owned by the Discord account that created them.
+    // Do this check before the normal website creator_id check because the
+    // Google/Supabase user who is currently signed in is not necessarily the
+    // same identity as the Discord account that created the quiz.
     const quizCreatorDiscordId =
         quiz.settings?.creatorDiscordUserId
             ? String(quiz.settings.creatorDiscordUserId)
             : "";
 
-    if (
+    const isDiscordQuiz =
         quiz.settings?.quizType === "discord" &&
-        quizCreatorDiscordId
-    ) {
+        !!quizCreatorDiscordId;
+
+    if (isDiscordQuiz) {
 
         const currentDiscordUserId =
             getCurrentDiscordUserId();
 
-        if (
-            !currentDiscordUserId ||
-            currentDiscordUserId !== quizCreatorDiscordId
-        ) {
+        // A user can be logged into the website with Google and still edit
+        // their Discord-created quiz, but only after linking that Discord
+        // identity to the same Supabase account.
+        if (!currentDiscordUserId) {
+
+            sessionStorage.setItem(
+                "pendingEditQuizId",
+                String(id)
+            );
+
+            const shouldLinkDiscord = window.confirm(
+                "This Discord quiz can only be edited by the Discord account that created it.\n\n" +
+                "Your website account is currently signed in with Google.\n\n" +
+                "Click OK to link your Discord account to this website account, then you can edit the quiz."
+            );
+
+            if (shouldLinkDiscord) {
+                await linkDiscordAccountForEdit();
+            }
+
+            return;
+
+        }
+
+        if (currentDiscordUserId !== quizCreatorDiscordId) {
 
             alert(
                 "Only the Discord account that created this quiz can edit it."
@@ -6587,6 +6595,17 @@ async function editQuiz(id) {
             return;
 
         }
+
+    } else if (
+        quiz.creator_id &&
+        quiz.creator_id !== currentProfile.id
+    ) {
+
+        alert(
+            "You can only edit your own quizzes."
+        );
+
+        return;
 
     }
 
@@ -7406,10 +7425,8 @@ async function openSharedQuizFromUrl() {
 
         const sharedParams = new URLSearchParams(window.location.search);
         if (sharedParams.get("edit") === "1") {
-            if (String(sharedQuiz.creator_id) !== String(currentProfile.id)) {
-                alert("You can only edit your own quiz.");
-                return;
-            }
+            // editQuiz() performs the complete ownership check, including
+            // Discord creator ownership and the Discord-account linking flow.
             await editQuiz(sharedQuiz.id);
         } else {
             openQuizLobby(sharedQuiz);
@@ -10784,6 +10801,61 @@ async function loginWithGoogle() {
             error.message
         );
 
+    }
+
+}
+
+
+async function linkDiscordAccountForEdit() {
+
+    if (!currentProfile) {
+        showLogin();
+        return;
+    }
+
+    // Keep the edit link alive through the Discord OAuth callback.
+    const editId =
+        new URLSearchParams(window.location.search).get("edit") ||
+        sessionStorage.getItem("pendingEditQuizId") ||
+        "";
+
+    if (editId) {
+        sessionStorage.setItem(
+            "pendingEditQuizId",
+            String(editId)
+        );
+    }
+
+    try {
+        const { data, error } =
+            await supabaseClient.auth.linkIdentity({
+                provider: "discord",
+                options: {
+                    redirectTo: getAuthRedirectUrl()
+                }
+            });
+
+        if (error) {
+            console.error("Discord account linking error:", error);
+            alert(
+                "Unable to link your Discord account: " +
+                error.message
+            );
+            return;
+        }
+
+        // Most OAuth flows redirect before this point. If Supabase returns
+        // without redirecting, refresh the profile identity immediately.
+        if (data?.user) {
+            await syncDiscordIdentity(data.user);
+            await handleUserProfile();
+        }
+    } catch (error) {
+        console.error("Discord account linking error:", error);
+        alert(
+            "Unable to link your Discord account: " +
+            (error?.message || "Unknown error")
+        );
     }
 
 }
