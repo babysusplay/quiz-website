@@ -5606,55 +5606,53 @@ function quizFromDatabase(row) {
 
 async function loadQuizzesFromSupabase() {
 
-    if (!currentProfile) return;
+    if (!currentProfile) return false;
 
-    const queries = [
-        supabaseClient
-            .from("quizzes")
-            .select("*")
-            .eq("creator_id", currentProfile.id)
-            .order("created_at", { ascending: false })
-    ];
+    // The creator_id query is the primary source for My Quizzes.
+    // Discord-linked loading is optional and must never prevent the main
+    // quiz list from appearing if that JSON-path query fails.
+    const ownerResult = await supabaseClient
+        .from("quizzes")
+        .select("*")
+        .eq("creator_id", currentProfile.id)
+        .order("created_at", { ascending: false });
 
-    // If the user has already linked Discord, also load Discord-created
-    // drafts that belong to that Discord identity. This lets a freshly
-    // created Discord quiz appear in My Quizzes even before its first
-    // question is saved.
+    if (ownerResult.error) {
+        console.error("Quiz load error:", ownerResult.error);
+        return false;
+    }
+
+    const rowsById = new Map();
+
+    (ownerResult.data || []).forEach(row => {
+        rowsById.set(String(row.id), row);
+    });
+
     const linkedDiscordId = currentProfile?.discord_user_id
         ? String(currentProfile.discord_user_id)
         : "";
 
     if (linkedDiscordId) {
-        queries.push(
-            supabaseClient
-                .from("quizzes")
-                .select("*")
-                .eq(
-                    "questions->settings->>creatorDiscordUserId",
-                    linkedDiscordId
-                )
-                .order("created_at", { ascending: false })
-        );
+        const discordResult = await supabaseClient
+            .from("quizzes")
+            .select("*")
+            .eq(
+                "questions->settings->>creatorDiscordUserId",
+                linkedDiscordId
+            )
+            .order("created_at", { ascending: false });
+
+        if (discordResult.error) {
+            console.warn(
+                "Discord-linked quiz load skipped:",
+                discordResult.error
+            );
+        } else {
+            (discordResult.data || []).forEach(row => {
+                rowsById.set(String(row.id), row);
+            });
+        }
     }
-
-    const results = await Promise.all(queries);
-    const firstError = results.find(result => result.error)?.error;
-
-    if (firstError) {
-        console.error(
-            "Quiz load error:",
-            firstError
-        );
-        return;
-    }
-
-    const rowsById = new Map();
-
-    results.forEach(result => {
-        (result.data || []).forEach(row => {
-            rowsById.set(String(row.id), row);
-        });
-    });
 
     quizzes = Array.from(rowsById.values())
         .map(quizFromDatabase)
@@ -5669,6 +5667,7 @@ async function loadQuizzesFromSupabase() {
         JSON.stringify(quizzes)
     );
 
+    return true;
 }
 
 
@@ -6477,13 +6476,19 @@ async function openQuizLibrary() {
 
     if (!requireLogin()) return;
 
-    await loadQuizzesFromSupabase();
-
+    // Open immediately so the button never looks dead while Supabase loads.
+    openModal("libraryModal");
     renderQuizList();
 
-    openModal(
-        "libraryModal"
-    );
+    try {
+        const loaded = await loadQuizzesFromSupabase();
+        if (loaded) {
+            renderQuizList();
+        }
+    } catch (error) {
+        console.error("Quiz library load error:", error);
+        renderQuizList();
+    }
 
 }
 
@@ -12080,28 +12085,32 @@ async function openProfile() {
 
     closeProfileMenu();
 
+    if (!requireLogin()) return;
 
-    if (!currentProfile) return;
+    // Show the profile modal immediately. Network/RPC calls below should not
+    // make the button appear unresponsive.
+    openModal("profileModal");
 
+    try {
+        await loadOwnProfileSocialStats();
+    } catch (error) {
+        console.error("Profile stats load error:", error);
+    }
 
-    await handleUserProfile();
-    await loadOwnProfileSocialStats();
-
-    const ownGallery =
-        await loadProfileGallery(
+    try {
+        const ownGallery = await loadProfileGallery(
             currentProfile.id,
             currentProfile.avatar_url || ""
         );
 
-    renderProfileGallery(
-        "profileGallery",
-        ownGallery,
-        "Profile Pictures"
-    );
-
-    openModal(
-        "profileModal"
-    );
+        renderProfileGallery(
+            "profileGallery",
+            ownGallery,
+            "Profile Pictures"
+        );
+    } catch (error) {
+        console.error("Profile gallery load error:", error);
+    }
 
 }
 
