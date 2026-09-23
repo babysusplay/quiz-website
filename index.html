@@ -5662,10 +5662,24 @@ async function loadQuizzesFromSupabase() {
             )
         );
 
-    localStorage.setItem(
-        "quizzes",
-        JSON.stringify(quizzes)
-    );
+    // LocalStorage is only a cache. Do not let a full browser storage
+    // quota break the Supabase quiz loading flow (or block Discord edit links).
+    try {
+        localStorage.setItem(
+            "quizzes",
+            JSON.stringify(quizzes)
+        );
+    } catch (storageError) {
+        console.warn(
+            "Quiz cache could not be saved to localStorage; continuing without cache.",
+            storageError
+        );
+        try {
+            localStorage.removeItem("quizzes");
+        } catch (removeError) {
+            console.warn("Unable to clear the old quiz cache:", removeError);
+        }
+    }
 
     return true;
 }
@@ -7129,12 +7143,26 @@ async function deleteQuiz(id) {
         );
 
 
-    localStorage.setItem(
-        "quizzes",
-        JSON.stringify(
-            quizzes
-        )
-    );
+    // The Supabase data is the source of truth. If the browser cache is
+    // full, deleting the cache must not prevent the quiz from being deleted.
+    try {
+        localStorage.setItem(
+            "quizzes",
+            JSON.stringify(
+                quizzes
+            )
+        );
+    } catch (storageError) {
+        console.warn(
+            "Quiz cache could not be updated after deletion; continuing without cache.",
+            storageError
+        );
+        try {
+            localStorage.removeItem("quizzes");
+        } catch (removeError) {
+            console.warn("Unable to clear the old quiz cache:", removeError);
+        }
+    }
 
 
     renderQuizList();
