@@ -6320,10 +6320,12 @@ async function saveQuiz() {
 
     }
 
-    const { data: matchingRooms, error: roomLookupError } = await supabaseClient
+    const { data: existingRoom, error: roomLookupError } = await supabaseClient
         .from("quizzes")
-        .select("id, quiz_id")
-        .eq("quiz_id", roomId);
+        .select("id")
+        .eq("quiz_id", roomId)
+        .neq("id", editingQuizId || "00000000-0000-0000-0000-000000000000")
+        .maybeSingle();
 
     if (roomLookupError) {
         console.error("Room ID lookup error:", roomLookupError);
@@ -6331,11 +6333,7 @@ async function saveQuiz() {
         return;
     }
 
-    const hasAnotherRoomWithSameId = (matchingRooms || []).some(
-        room => String(room.id) !== String(editingQuizId || "")
-    );
-
-    if (hasAnotherRoomWithSameId) {
+    if (existingRoom) {
         alert("That Room ID is already in use. Please choose another one.");
         return;
     }
