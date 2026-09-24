@@ -16928,5 +16928,14 @@ if (typeof window.openAdminHistoryForQuiz !== "function") {
 </div>
 
 <script src="./quiz-hub-return.js"></script>
+<script>
+(function () {
+    document.querySelectorAll("button, a").forEach(function (element) {
+        if (element.textContent.trim() === "Sus Games") {
+            element.remove();
+        }
+    });
+})();
+</script>
 </body>
 </html>
