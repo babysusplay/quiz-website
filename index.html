@@ -6333,6 +6333,10 @@ async function saveQuiz() {
 
     }
 
+    const saveButton = document.querySelector(".quiz-question-actions .save-btn");
+    if (saveButton?.disabled) return;
+    if (saveButton) saveButton.disabled = true;
+
     const { data: existingRoom, error: roomLookupError } = await supabaseClient
         .from("quizzes")
         .select("id")
@@ -6343,11 +6347,13 @@ async function saveQuiz() {
     if (roomLookupError) {
         console.error("Room ID lookup error:", roomLookupError);
         alert("Unable to validate the Room ID: " + roomLookupError.message);
+        if (saveButton) saveButton.disabled = false;
         return;
     }
 
     if (existingRoom) {
         alert("That Room ID is already in use. Please choose another one.");
+        if (saveButton) saveButton.disabled = false;
         return;
     }
 
@@ -6451,9 +6457,12 @@ async function saveQuiz() {
             error.message
         );
 
+        if (saveButton) saveButton.disabled = false;
         return;
 
     }
+
+    if (saveButton) saveButton.disabled = false;
 
     const savedQuizId = editingQuizId;
     editingQuizId = null;
