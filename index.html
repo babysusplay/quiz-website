@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="./logo.svg">
+<link rel="apple-touch-icon" href="./logo.svg">
 
 <title>Sus Games Quiz | Create, Play &amp; Compete</title>
 <meta name="google-site-verification" content="9J86-WA0bhStpU9-FfgQFofxVyOFNk1_4AYUKfAzZPA" />
@@ -3505,6 +3507,7 @@ function renderCurrentIdentityName(name) {
 }
 </style>
 
+<style id="shared-sus-games-logo-style">.site-logo-mark{width:42px;height:42px;display:block;object-fit:contain}.home-logo .site-logo-mark{width:42px;height:42px}@media(max-width:650px){.site-logo-mark,.home-logo .site-logo-mark{width:36px;height:36px}}</style>
 </head>
 
 <body>
@@ -3522,9 +3525,7 @@ function renderCurrentIdentityName(name) {
 
     <button class="mobile-menu-btn" type="button" onclick="toggleMobileMenu(event)" aria-label="Menu">⋮</button>
 
-    <button class="logo home-logo" type="button" onclick="goHome()" aria-label="Home">
-        Quiz
-    </button>
+    <button class="logo home-logo" type="button" onclick="goHome()" aria-label="Sus Games Quiz"><img class="site-logo-mark" src="./logo.svg" alt="Sus Games Quiz"></button>
 
     <div id="mobileMenu" class="mobile-menu">
         <button type="button" onclick="toggleMobileMenu(); openQuizLibrary();">📚 My Quizzes</button>
