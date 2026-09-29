@@ -5987,6 +5987,25 @@ function addQuestion(data = null) {
                 <option value="3">Option 4</option>
             </select>
         </div>
+
+        <div class="form-group question-custom-settings">
+            <label>Optional Question Settings</label>
+            <div class="options-grid">
+                <div class="form-group">
+                    <label>Question Time (seconds)</label>
+                    <input type="number" class="question-time" min="1" max="600" placeholder="Use default">
+                </div>
+                <div class="form-group">
+                    <label>Minimum Points</label>
+                    <input type="number" class="question-points-min" min="0" max="1000000" placeholder="Use default">
+                </div>
+                <div class="form-group">
+                    <label>Maximum Points</label>
+                    <input type="number" class="question-points-max" min="1" max="1000000" placeholder="Use default">
+                </div>
+            </div>
+            <small style="display:block;margin-top:6px;opacity:.7;">Leave any field blank to use the quiz default for this question.</small>
+        </div>
     `;
 
     document.getElementById("questionsContainer").appendChild(box);
@@ -6048,6 +6067,21 @@ function addQuestion(data = null) {
         }
 
         box.querySelector(".correct-answer").value = String(data.correct ?? "");
+
+        const questionTime = box.querySelector(".question-time");
+        const questionPointsMin = box.querySelector(".question-points-min");
+        const questionPointsMax = box.querySelector(".question-points-max");
+
+        if (questionTime && data.timeLimit !== undefined && data.timeLimit !== null && data.timeLimit !== "") {
+            questionTime.value = data.timeLimit;
+        }
+        if (questionPointsMin && data.pointsMin !== undefined && data.pointsMin !== null && data.pointsMin !== "") {
+            questionPointsMin.value = data.pointsMin;
+        }
+        if (questionPointsMax && data.pointsMax !== undefined && data.pointsMax !== null && data.pointsMax !== "") {
+            questionPointsMax.value = data.pointsMax;
+        }
+
         setImage(data.image || data.imageUrl || "");
     }
 
@@ -6330,6 +6364,10 @@ async function saveQuiz() {
 
         }
 
+        const questionTimeInput = box.querySelector(".question-time");
+        const questionPointsMinInput = box.querySelector(".question-points-min");
+        const questionPointsMaxInput = box.querySelector(".question-points-max");
+
         const questionData = {
 
             question: question,
@@ -6341,6 +6379,46 @@ async function saveQuiz() {
             image: box.dataset.image || ""
 
         };
+
+        const questionTimeValue = questionTimeInput?.value.trim() || "";
+        const questionPointsMinValue = questionPointsMinInput?.value.trim() || "";
+        const questionPointsMaxValue = questionPointsMaxInput?.value.trim() || "";
+
+        if (questionTimeValue !== "") {
+            const value = Number(questionTimeValue);
+            if (!Number.isFinite(value) || value < 1) {
+                alert(`Please enter a valid time for Question ${i + 1}.`);
+                return;
+            }
+            questionData.timeLimit = Math.max(1, Math.floor(value));
+        }
+
+        if (questionPointsMinValue !== "") {
+            const value = Number(questionPointsMinValue);
+            if (!Number.isFinite(value) || value < 0) {
+                alert(`Please enter a valid minimum point value for Question ${i + 1}.`);
+                return;
+            }
+            questionData.pointsMin = Math.max(0, Math.floor(value));
+        }
+
+        if (questionPointsMaxValue !== "") {
+            const value = Number(questionPointsMaxValue);
+            if (!Number.isFinite(value) || value < 1) {
+                alert(`Please enter a valid maximum point value for Question ${i + 1}.`);
+                return;
+            }
+            questionData.pointsMax = Math.max(1, Math.floor(value));
+        }
+
+        if (
+            questionData.pointsMin !== undefined &&
+            questionData.pointsMax !== undefined &&
+            questionData.pointsMax < questionData.pointsMin
+        ) {
+            [questionData.pointsMin, questionData.pointsMax] =
+                [questionData.pointsMax, questionData.pointsMin];
+        }
 
         questions.push(questionData);
 
