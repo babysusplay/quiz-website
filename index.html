@@ -3352,14 +3352,26 @@ function renderCurrentIdentityName(name) {
 .quiz-editor-position{flex:1;text-align:center;font-size:12px;font-weight:800;color:#c9cdd6}
 .question-box.editor-question{display:none;margin-bottom:12px}
 .question-box.editor-question.is-active{display:block}
-.question-box.editor-question .question-header{margin-bottom:14px}
-.question-image-inline{display:inline-flex;align-items:center;gap:7px;margin-left:auto}
-.question-image-upload{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:34px;padding:7px 11px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:#191c24;color:#fff;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
-.question-image-upload:hover{border-color:rgba(255,255,255,.25);background:#20242d}
+.question-box.editor-question .question-header{margin-bottom:10px}
+.question-image-inline{display:inline-flex;align-items:center;gap:6px;margin-left:auto}
+.question-image-upload,.question-settings-btn,.delete-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:34px;min-height:34px;padding:0;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:#191c24;color:#fff;font-size:16px;font-weight:800;cursor:pointer;line-height:1}
+.question-image-upload:hover,.question-settings-btn:hover{border-color:rgba(255,255,255,.25);background:#20242d}
 .question-image-upload.has-image{border-color:rgba(100,220,150,.35);color:#d9ffe7}
+.question-settings-btn.has-custom-settings{border-color:rgba(120,180,255,.45);color:#dbeaff}
+.delete-btn{background:rgba(255,70,70,.12);color:#ff7777}
+.delete-btn:hover{background:rgba(255,70,70,.20)}
 .question-image-file{display:none!important}
 .question-image-preview-wrap{display:none!important}
 .question-image-editor{display:none!important}
+.question-custom-settings{display:none;margin:0}
+.question-custom-settings.is-open{display:block;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100vw - 32px));max-height:min(78vh,620px);overflow:auto;z-index:100001;margin:0;padding:18px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:#10131a;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+.question-custom-settings-backdrop{display:none;position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.question-custom-settings.is-open + .question-custom-settings-backdrop{display:block}
+.question-custom-settings-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;font-weight:850}
+.question-custom-settings-close{width:32px;height:32px;border:0;border-radius:8px;background:rgba(255,255,255,.07);color:#fff;font-size:18px;cursor:pointer}
+.question-custom-settings .options-grid{gap:9px}
+.question-custom-settings .form-group{margin-bottom:0}
+.question-custom-settings small{font-size:10px;line-height:1.4;color:#8f95a2}
 .quiz-question-actions{display:flex;gap:10px;margin-top:12px}
 .quiz-question-actions .add-question,.quiz-question-actions .save-btn{margin-top:0;flex:1}
 @media(max-width:650px){
@@ -3367,6 +3379,11 @@ function renderCurrentIdentityName(name) {
  .quiz-editor-nav{position:sticky;top:0;z-index:5}
  .quiz-question-step-head{align-items:flex-start}
  .quiz-question-actions{flex-direction:column}
+ .question-box.editor-question{padding:14px;margin-top:12px}
+ .question-box.editor-question .form-group{margin-bottom:10px}
+ .question-box.editor-question .options-grid{gap:8px}
+ .question-box.editor-question input,.question-box.editor-question select{padding:10px}
+ .question-box.editor-question .question-header{margin-bottom:8px}
 }
 </style>
 
@@ -5957,11 +5974,12 @@ function addQuestion(data = null) {
         <div class="question-header">
             <div class="question-number">Question ${questionCounter}</div>
             <div class="question-image-inline">
-                <label class="question-image-upload" title="Add an optional image to this question">
-                    🖼️ <span class="question-image-label">Add Image</span>
+                <label class="question-image-upload" title="Add an optional image to this question" aria-label="Add image">
+                    🖼️
                     <input type="file" class="question-image-file" accept="image/jpeg,image/png,image/webp,image/gif">
                 </label>
-                <button type="button" class="delete-btn" onclick="deleteQuestion(this)">Delete Question</button>
+                <button type="button" class="question-settings-btn" title="Optional question settings" aria-label="Optional question settings" onclick="toggleQuestionSettings(this)">⚙️</button>
+                <button type="button" class="delete-btn" title="Delete question" aria-label="Delete question" onclick="deleteQuestion(this)">🗑️</button>
             </div>
         </div>
 
@@ -5988,8 +6006,11 @@ function addQuestion(data = null) {
             </select>
         </div>
 
-        <div class="form-group question-custom-settings">
-            <label>Optional Question Settings</label>
+        <div class="question-custom-settings">
+            <div class="question-custom-settings-title">
+                <span>Optional Question Settings</span>
+                <button type="button" class="question-custom-settings-close" title="Done" aria-label="Done" onclick="toggleQuestionSettings(this)">✓</button>
+            </div>
             <div class="options-grid">
                 <div class="form-group">
                     <label>Question Time (seconds)</label>
@@ -6004,25 +6025,19 @@ function addQuestion(data = null) {
                     <input type="number" class="question-points-max" min="1" max="1000000" placeholder="Use default">
                 </div>
             </div>
-            <small style="display:block;margin-top:6px;opacity:.7;">Leave any field blank to use the quiz default for this question.</small>
+            <small style="display:block;margin-top:8px;">Leave any field blank to use the quiz default for this question.</small>
         </div>
+        <div class="question-custom-settings-backdrop" aria-hidden="true"></div>
     `;
 
     document.getElementById("questionsContainer").appendChild(box);
 
     const imageFile = box.querySelector(".question-image-file");
     const imageButton = box.querySelector(".question-image-upload");
-    const imageLabel = box.querySelector(".question-image-label");
 
     const setImage = (src) => {
         box.dataset.image = src || "";
-        if (src) {
-            imageButton.classList.add("has-image");
-            imageLabel.textContent = "Image Added";
-        } else {
-            imageButton.classList.remove("has-image");
-            imageLabel.textContent = "Add Image";
-        }
+        imageButton.classList.toggle("has-image", Boolean(src));
     };
 
     imageFile.addEventListener("change", async function() {
@@ -6083,6 +6098,7 @@ function addQuestion(data = null) {
         }
 
         setImage(data.image || data.imageUrl || "");
+        updateQuestionSettingsIndicator(box);
     }
 
     updateQuestionNumbers();
@@ -6093,6 +6109,31 @@ function addQuestion(data = null) {
     }
 
     setEditorQuestion(currentEditorQuestionIndex);
+}
+
+function toggleQuestionSettings(button) {
+    const box = button.closest(".question-box");
+    if (!box) return;
+
+    const panel = box.querySelector(".question-custom-settings");
+    if (!panel) return;
+
+    const isOpen = panel.classList.toggle("is-open");
+    if (isOpen) {
+        panel.querySelector("input")?.focus();
+    }
+}
+
+function updateQuestionSettingsIndicator(box) {
+    const button = box?.querySelector(".question-settings-btn");
+    if (!button) return;
+
+    const hasCustom =
+        Boolean(box.querySelector(".question-time")?.value.trim()) ||
+        Boolean(box.querySelector(".question-points-min")?.value.trim()) ||
+        Boolean(box.querySelector(".question-points-max")?.value.trim());
+
+    button.classList.toggle("has-custom-settings", hasCustom);
 }
 
 function compressQuizImage(file) {
@@ -6420,6 +6461,7 @@ async function saveQuiz() {
                 [questionData.pointsMax, questionData.pointsMin];
         }
 
+        updateQuestionSettingsIndicator(box);
         questions.push(questionData);
 
     }
