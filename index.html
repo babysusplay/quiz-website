@@ -3,36 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="./logo.svg">
-<link rel="apple-touch-icon" href="./logo.svg">
 
-<title>Sus Games Quiz | Create, Play &amp; Compete</title>
-<meta name="google-site-verification" content="9J86-WA0bhStpU9-FfgQFofxVyOFNk1_4AYUKfAzZPA" />
-<meta name="description" content="Sus Games Quiz is a community quiz platform where you can create quizzes, play community quizzes, compete with others, and climb the leaderboard.">
-<link rel="canonical" href="https://babysusplay.github.io/quiz-website/">
-<meta name="robots" content="index, follow, max-image-preview:large">
-<meta name="theme-color" content="#0f1117">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Sus Games Quiz | Create, Play &amp; Compete">
-<meta property="og:description" content="Create quizzes, play community quizzes, compete with others, and climb the leaderboard on Sus Games Quiz.">
-<meta property="og:url" content="https://babysusplay.github.io/quiz-website/">
-<meta property="og:image" content="https://babysusplay.github.io/quiz-website/banner.png.jpeg">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Sus Games Quiz | Create, Play &amp; Compete">
-<meta name="twitter:description" content="Create quizzes, play community quizzes, compete with others, and climb the leaderboard on Sus Games Quiz.">
-<meta name="twitter:image" content="https://babysusplay.github.io/quiz-website/banner.png.jpeg">
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Sus Games Quiz",
-  "url": "https://babysusplay.github.io/quiz-website/",
-  "description": "A community quiz platform for creating, playing, and competing in quizzes."
-}
-</script>
-
-
+<title>Quiz Platform</title>
 
 
 <script id="global-admin-badge-fix">
@@ -3507,7 +3479,6 @@ function renderCurrentIdentityName(name) {
 }
 </style>
 
-<style id="shared-sus-games-logo-style">.site-logo-mark{width:42px;height:42px;display:block;object-fit:contain}.home-logo .site-logo-mark{width:42px;height:42px}@media(max-width:650px){.site-logo-mark,.home-logo .site-logo-mark{width:36px;height:36px}}</style>
 </head>
 
 <body>
@@ -3525,7 +3496,9 @@ function renderCurrentIdentityName(name) {
 
     <button class="mobile-menu-btn" type="button" onclick="toggleMobileMenu(event)" aria-label="Menu">⋮</button>
 
-    <button class="logo home-logo" type="button" onclick="goHome()" aria-label="Sus Games Quiz"><img class="site-logo-mark" src="./logo.svg" alt="Sus Games Quiz"></button>
+    <button class="logo home-logo" type="button" onclick="goHome()" aria-label="Home">
+        Quiz
+    </button>
 
     <div id="mobileMenu" class="mobile-menu">
         <button type="button" onclick="toggleMobileMenu(); openQuizLibrary();">📚 My Quizzes</button>
@@ -5431,20 +5404,9 @@ function renderCurrentIdentityName(name) {
    GLOBAL STATE
 ========================= */
 
-function getQuizCacheKey(userId = currentProfile?.id) {
-    return userId ? "quizzes_" + String(userId) : null;
-}
-
-// Quiz data is account-scoped. Never load a shared/global browser cache.
-let quizzes = [];
-
-// Remove the old global cache format so one account can never appear
-// in another account's browser session.
-try {
-    localStorage.removeItem("quizzes");
-} catch (storageError) {
-    console.warn("Unable to clear the legacy global quiz cache:", storageError);
-}
+let quizzes = JSON.parse(
+    localStorage.getItem("quizzes") || "[]"
+);
 
 let editingQuizId = null;
 
@@ -5744,7 +5706,7 @@ async function loadQuizzesFromSupabase() {
     // quota break the Supabase quiz loading flow (or block Discord edit links).
     try {
         localStorage.setItem(
-            getQuizCacheKey(),
+            "quizzes",
             JSON.stringify(quizzes)
         );
     } catch (storageError) {
@@ -5753,7 +5715,7 @@ async function loadQuizzesFromSupabase() {
             storageError
         );
         try {
-            localStorage.removeItem(getQuizCacheKey());
+            localStorage.removeItem("quizzes");
         } catch (removeError) {
             console.warn("Unable to clear the old quiz cache:", removeError);
         }
@@ -5785,7 +5747,9 @@ async function migrateLocalQuizzesToSupabase() {
 
     const localQuizzes =
         JSON.parse(
-            localStorage.getItem(getQuizCacheKey()) || "[]"
+            localStorage.getItem(
+                "quizzes"
+            ) || "[]"
         );
 
 
@@ -7347,8 +7311,10 @@ async function deleteQuiz(id) {
     // full, deleting the cache must not prevent the quiz from being deleted.
     try {
         localStorage.setItem(
-            getQuizCacheKey(),
-            JSON.stringify(quizzes)
+            "quizzes",
+            JSON.stringify(
+                quizzes
+            )
         );
     } catch (storageError) {
         console.warn(
@@ -7356,7 +7322,7 @@ async function deleteQuiz(id) {
             storageError
         );
         try {
-            localStorage.removeItem(getQuizCacheKey());
+            localStorage.removeItem("quizzes");
         } catch (removeError) {
             console.warn("Unable to clear the old quiz cache:", removeError);
         }
