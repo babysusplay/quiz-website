@@ -5431,9 +5431,20 @@ function renderCurrentIdentityName(name) {
    GLOBAL STATE
 ========================= */
 
-let quizzes = JSON.parse(
-    localStorage.getItem("quizzes") || "[]"
-);
+function getQuizCacheKey(userId = currentProfile?.id) {
+    return userId ? "quizzes_" + String(userId) : null;
+}
+
+// Quiz data is account-scoped. Never load a shared/global browser cache.
+let quizzes = [];
+
+// Remove the old global cache format so one account can never appear
+// in another account's browser session.
+try {
+    localStorage.removeItem(getQuizCacheKey());
+} catch (storageError) {
+    console.warn("Unable to clear the legacy global quiz cache:", storageError);
+}
 
 let editingQuizId = null;
 
@@ -5733,7 +5744,7 @@ async function loadQuizzesFromSupabase() {
     // quota break the Supabase quiz loading flow (or block Discord edit links).
     try {
         localStorage.setItem(
-            "quizzes",
+            getQuizCacheKey(),
             JSON.stringify(quizzes)
         );
     } catch (storageError) {
@@ -5742,7 +5753,7 @@ async function loadQuizzesFromSupabase() {
             storageError
         );
         try {
-            localStorage.removeItem("quizzes");
+            localStorage.removeItem(getQuizCacheKey());
         } catch (removeError) {
             console.warn("Unable to clear the old quiz cache:", removeError);
         }
@@ -5774,9 +5785,7 @@ async function migrateLocalQuizzesToSupabase() {
 
     const localQuizzes =
         JSON.parse(
-            localStorage.getItem(
-                "quizzes"
-            ) || "[]"
+            localStorage.getItem(getQuizCacheKey()) || "[]"
         );
 
 
@@ -7338,10 +7347,8 @@ async function deleteQuiz(id) {
     // full, deleting the cache must not prevent the quiz from being deleted.
     try {
         localStorage.setItem(
-            "quizzes",
-            JSON.stringify(
-                quizzes
-            )
+            getQuizCacheKey(),
+            JSON.stringify(quizzes)
         );
     } catch (storageError) {
         console.warn(
@@ -7349,7 +7356,7 @@ async function deleteQuiz(id) {
             storageError
         );
         try {
-            localStorage.removeItem("quizzes");
+            localStorage.removeItem(getQuizCacheKey());
         } catch (removeError) {
             console.warn("Unable to clear the old quiz cache:", removeError);
         }
